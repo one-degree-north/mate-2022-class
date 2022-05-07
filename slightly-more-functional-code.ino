@@ -14,6 +14,14 @@
 #define TRIGGER_LEFT        A2
 #define TRIGGER_RIGHT       A3
 
+#define DEBUG_ENABLED
+
+#ifdef DEBUG_ENABLED
+    #define DEBUG if(1)
+#else
+    #define DEBUG if(0)
+#endif
+
 // define containers
 typedef struct Joystick {
     uint8_t pin_x;
@@ -36,6 +44,30 @@ typedef struct Output {
     int16_t min;
     int16_t max;
 } output_t;
+
+void printJoystick (joystick_t* joy) {
+    Serial.print("js pin_x=");
+    Serial.print(joy->pin_x);
+    Serial.print(" pin_y=");
+    Serial.print(joy->pin_y);
+    Serial.print(" x=");
+    Serial.print(joy->x);
+    Serial.print(" y=");
+    Serial.print(joy->y);
+    Serial.print(" def_x=");
+    Serial.print(joy->default_x);
+    Serial.print(" def_y=");
+    Serial.println(joy->default_y);
+}
+
+void printTrigger (trigger_t* trig) {
+    Serial.print("trig pin=");
+    Serial.print(trig->pin);
+    Serial.print(" val=");
+    Serial.print(trig->value);
+    Serial.print(" def_value=");
+    Serial.println(trig->default_value);
+}
 
 // create containers for our setup
 joystick_t leftJoystick = {JOYSTICK_LEFT_X, JOYSTICK_LEFT_Y, 0, 0, 0, 0};
@@ -88,6 +120,11 @@ void writeOutput(output_t* out, int8_t percent) {
     if (percent < -100) percent = -100;
     int16_t micros = map(percent, -100, 100, out->min, out->max);
     out->servo.writeMicroseconds(micros);
+
+    DEBUG Serial.print("output ");
+    DEBUG Serial.print(out->pin);
+    DEBUG Serial.print(" set to ");
+    DEBUG Serial.println(micros);
 }
 
 /*** SECTION: INSTRUCTIONS ***/
@@ -129,10 +166,10 @@ void roll(int8_t percent) {
 }
 
 void zPitchRoll(int8_t percent_up, int8_t percent_pitch, int8_t percent_roll) {
-    writeOutput(&frontLeftThruster, (percent_up + percent_pitch + percent_roll) / 3);
-    writeOutput(&frontRightThruster, (percent_up + percent_pitch - percent_roll) / 3);
-    writeOutput(&backLeftThruster, (percent_up - percent_pitch + percent_roll) / 3);
-    writeOutput(&backRightThruster, (percent_up - percent_pitch - percent_roll) / 3);
+    writeOutput(&frontLeftThruster, (percent_up + percent_pitch + percent_roll));
+    writeOutput(&frontRightThruster, (percent_up + percent_pitch - percent_roll));
+    writeOutput(&backLeftThruster, (percent_up - percent_pitch + percent_roll));
+    writeOutput(&backRightThruster, (percent_up - percent_pitch - percent_roll));
 }
 
 /*** SECTION: ARDUINO ***/
@@ -152,11 +189,11 @@ void setup() {
     configureOutput(&backRightThruster);
     configureOutput(&clawServo);
 
-    Serial.begin(115200);
-    // while (!Serial) delay(1);
-    Serial.println("ready. waiting 7.5s for thruster init:");
+    DEBUG Serial.begin(115200);
+    DEBUG while (!Serial) delay(1);
+    DEBUG Serial.println("ready. waiting 7.5s for thruster init:");
     delay(7500);
-    Serial.println("running");
+    DEBUG Serial.println("running");
 }
 
 void loop() {
@@ -166,8 +203,15 @@ void loop() {
     updateTrigger(&leftTrigger);
     updateTrigger(&rightTrigger);
 
-    moveZ(map(rightJoystick.y, -512, 512, -100, 100));
+    DEBUG printJoystick(&leftJoystick);
+    DEBUG printJoystick(&rightJoystick);
+    DEBUG printTrigger(&leftTrigger);
+    DEBUG printTrigger(&rightTrigger);
+
+    zPitchRoll(map(rightJoystick.y, -512, 512, -100, 100), 0, map(rightJoystick.x, -512, 512, -25, 25));
     xYaw(map(rightJoystick.y, -512, 512, -100, 100), map(rightJoystick.x, -512, 512, -100, 100));
+
+    DEBUG Serial.println();
 
     delay(20);
 }
