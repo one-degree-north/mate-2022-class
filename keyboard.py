@@ -1,5 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import *
 from pynput import keyboard
+
+@dataclass
+class Thruster:
+    pinNum = 0
+    writtenValue = 0
 
 @dataclass
 class Thrusters:
@@ -21,10 +26,20 @@ class Servos:
 
 @dataclass
 class MovementKey:
-    char = 'w'
-    movementModify = []
+    key: chr
+    movementModify: list[int]
+    horizontal: bool #horizontal or vertical, modifies how the average is calculated
+    keydown: bool = False
 
 
 class Keyboard:
     def __init__(self):
-        pass
+        self.keys = [
+            MovementKey(key='w', movementModify=[], horizontal=True)
+        ]
+
+def main():
+    keyboard = Keyboard()
+
+if (__name__ == "__main__"):
+    main()
