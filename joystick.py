@@ -3,6 +3,10 @@ import hashlib, hid, time
 from struct import unpack
 
 
+
+
+
+
 """def update(inputTest) : ...
 joystickInput = open(r"/dev/input/js0", "rb")
 def main():

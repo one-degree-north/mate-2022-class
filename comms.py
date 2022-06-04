@@ -6,15 +6,15 @@ import threading, struct
 
 @dataclass
 class GyroData:
-    xOrientation:float = 0
-    yOrientation:float = 0
-    zOrientation:float = 0
+    xOrientation: float = 0
+    yOrientation: float = 0
+    zOrientation: float = 0
 
 @dataclass
 class AccelData:
-    xAccel:float = 0
-    yAccel:float = 0
-    zAccel:float = 0
+    xAccel: float = 0
+    yAccel: float = 0
+    zAccel: float = 0
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, inputQueue=None, outputQueue=None):
