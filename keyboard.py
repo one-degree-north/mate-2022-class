@@ -85,20 +85,18 @@ class Keyboard:
     def onPress(self, key):
         #working wtih setThrusterMovement right now
         for movementKey in self.keys:
-            if (movementKey.key == key.char and movementKey.keydown == False):
+            if movementKey.key == key.char and movementKey.keydown == False:
                 print("key found")
                 movementKey.keydown = True
                 self.setThrusterMovement()
-                break
 
     def onRelease(self, key):
         #working with setThrusterMovement right now
         for movementKey in self.keys:
-            if (movementKey.key == key.char):
+            if movementKey.key == key.char:
                 print("key found")
                 movementKey.keydown = False
                 self.setThrusterMovement()
-                break
         
 
     def startInputReading(self):
