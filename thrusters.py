@@ -17,8 +17,20 @@ class Thruster:
         self.position = (position[0], position[1], position[0])
         self.createdThrusters.append(self)
 
-    def noramlize(self):
-        pass
+    def normalize(self, thrusterSpeeds: dict, reach):
+        """
+        the reach is the maximum power that any one of the vertical thrusters can reach
+        """
+        greatest = max(list(thrusterSpeeds.values())[0:3])
+        multiplier = reach / greatest
+
+        for pin in thrusterSpeeds.keys():
+            if pin in (4, 5): # a very ugly way of doing things, will correct later
+                continue
+            speed = thrusterSpeeds[pin]
+            thrusterSpeeds[pin] = round(speed * multiplier, 3)
+
+        return thrusterSpeeds
 
     @property
     def axis(self) -> int:
@@ -80,6 +92,8 @@ class Thruster:
                 avg = sum(speeds) / 1
             thrusterSpeeds[thruster.pin] = round(avg, 3)
         
+        thrusterSpeeds = cls.normalize(cls, thrusterSpeeds, intendedMotion[-1])
+
         return thrusterSpeeds
 
 
@@ -89,8 +103,8 @@ frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
 frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
 backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
 backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0)) # still have to decide
-sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0)) # what to do with these positions
+sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
+sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
 for thrusterPin, k, in Thruster.determine((0, 0, 1), (0.5, 0.5, 0.5)).items():
     print(f"{thrusterPin=} ->", k)

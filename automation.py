@@ -45,6 +45,7 @@ class Automation():
 
 
     def __init__(self, interval):
+        self.interval = interval
         self.pitch = self.Axis(interval)
         self.roll = self.Axis(interval)
         self.yaw = self.Axis(interval)
@@ -56,7 +57,7 @@ class Automation():
         self.Axis.updateErrors(errors)
         self.Axis.send()
 
-        sleep(0.010)
+        sleep(self.interval * 0.001)
 
         self.collectErrors()
 
