@@ -44,8 +44,8 @@ class Keyboard:
         self.comms = comms
         self.movementModifier = 1.0
         self.keys = [
-            MovementKey(key='w', movementModify=[50, 50], horizontal=True),      #all forward
-            MovementKey(key='s', movementModify=[-50, -50], horizontal=True),    #all back
+            MovementKey(key='w', movementModify=[50, 50], horizontal=True),      # all forward
+            MovementKey(key='s', movementModify=[-50, -50], horizontal=True),    # all back
         ]
         self.thrusterValues = [0, 0, 0, 0, 0 ,0]
     
