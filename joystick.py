@@ -1,4 +1,5 @@
-import hashlib, hid, time
+from dataclasses import dataclass
+import hashlib, hid, time, copy
 from struct import unpack
 
 
@@ -22,21 +23,64 @@ def update(inputTest):
     print("Size :" + str(len(inputTest)))
     print(unpack('IBBB', inputTest))
 """
+@dataclass
+class JoystickData:
+    xAxis:float = 0
+    yAxis:float = 0
+    hat:int = 0
+    twist:float = 0
+    throtle:float = 0
+    buttons:list = []
 
-def hidTest():
-    deviceNum = 49685
-    for device_dict in hid.enumerate():
-        keys = list(device_dict.keys())
-        keys.sort()
-        #for key in keys:
-        #    print("%s : %s" % (key, device_dict[key]))
-        print(device_dict["product_id"])
-        print(device_dict["vendor_id"])
-    joy = hid.device()
-    joy.open(vendor_id=1133, product_id=49685)
-    pastJoyInput = None
-    while True:
-        readHid2(joy)
+class Joystick:
+    def __init__(self, controls):
+        self.joy = hid.device()
+        self.joy.open(vendor_id=1133, product_id=49685)
+        self.pastInput = 0
+        self.joyData = JoystickData()
+        self.pastJoyData = copy.copy(self.joyData)
+        self.controls = controls
+
+    def sendJoyData(self):
+        if 511.5<self.joyData.yAxis<523:
+            pass
+
+    def readJoyData(self):
+        self.pastJoyData = copy.copy(self.joyData)
+        joyInput = self.joy.read(7)
+        self.joyData.xAxis = joyInput[0] + ((joyInput[1]&0b11)<<8)
+        self.joyData.yAxis = (joyInput[1]>>2) + ((joyInput[2]&0b1111)<<6)
+        if 511.5<self.joyData.yAxis and self.joyData.yAxis<523:
+            self.joyData.yAxis = 0
+        if 511.5<self.joyData.xAxis and self.joyData.xAxis<523:
+            self.joyData.xAxis = 0
+        self.joyData.yAxis/=5
+        self.joyData.xAxis/=5
+
+        #give middle some leeway, resting is not exactly at middle sometimes
+
+    def readJoystickThread(self):
+        while True:
+            self.readJoyData()
+            if self.joyData != self.pastJoyData:
+                print("new values")
+
+
+    def startReadingThread(self):
+        pass
+
+    def stopReadingThread(self):
+        pass
+
+    @staticmethod
+    def printHidDevices():
+        for device_dict in hid.enumerate():
+            keys = list(device_dict.keys())
+            keys.sort()
+            #for key in keys:
+            #    print("%s : %s" % (key, device_dict[key]))
+            print(device_dict["product_id"])
+            print(device_dict["vendor_id"])
 
 def readHid(joy):
     joyInput = joy.read(7)
@@ -66,16 +110,3 @@ def readHid2(joy):
     #print(str(bin(test))[2:].zfill(32))
     #test = joyInput[0]*256+joyInput[1]
     #print(str(bin(test))[2:].zfill(16))
-
-    """
-    byte 1: A=[8]
-    byte 2: A=[6] B=[2]
-    byte 3: A=[4] B=[4]
-    
-    X = 2B~1A
-    Y = 3B~2A
-    hat = 3A
-    """
-
-if(__name__ == "__main__"):
-    hidTest()
