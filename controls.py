@@ -1,9 +1,25 @@
 from dataclasses import dataclass
+import copy
+from comms import Comms
+import queue
 
 class Movement:
     def __init__(self, thrusterModify):
         self.thrusterModify = thrusterModify #[frontL, frontR, midL, midR, backL, backR]
-        self.percentage = 0 #percentage ranges from -100 to 100
+        self.percentage = 0 #percentage ranges from -1 to 1
+
+class Movements:
+    def __init__(self, movementValues=None):
+        self.movements = [
+            Movement([0, 0, 1, 1, 0, 0]), #y axis movement
+            Movement([0, 0, 0, 1, 0, 0]), #rotate movement
+            Movement([0, 0, 0, 0, 1, 1]), #pitch movement
+            Movement([1, 0, 0, 0, 1, 0]), #tilt movement
+            Movement([1, 1, 0, 0, 1, 1]), #vertical movement
+        ]
+        if movementValues != None:
+            for i in range(len(self.movements)):
+                self.movements[i].percentage = movementValues[i]
 
 @dataclass
 class GyroData:
@@ -19,26 +35,77 @@ class AccelData:
 
 class Controls:
     def __init__(self):
-        self.movements = [
-            Movement([0, 0, 1, 1, 0, 0]), #y axis movement
-            Movement([0, 0, 0, 1, 0, 0]), #rotate movement
-            Movement([0, 0, 0, 0, 1, 1]), #pitch movement
-            Movement([1, 0, 0, 0, 1, 0]), #tilt movement
-            Movement([1, 1, 0, 0, 1, 1]), #vertical movement
-        ]
-        self.gyroData = GyroData()
-        self.accelData = AccelData()
+        self.movements = Movements()
+        #self.gyroData = GyroData()
+        #self.accelData = AccelData()
+        self.gyroData = [0, 0, 0] #rad/s
+        self.orientationData = [0, 0, 0] #EULER: yaw (0-360), pitch (values are a bit weird, -90 to 90), roll (-180 to 180), may try using gyro instead of euler later
+        self.accelData = [0, 0, 0] #m/s^2
+        self.outputQueue = queue.Queue()
+        self.comms = Comms(controls=self, outputQueue=self.outputQueue)
+        self.thrusterValues = [0, 0, 0, 0, 0, 0]
 
     def applyMovements(self):
         thrusterValues = [0, 0, 0, 0, 0, 0]
 
-    def handleInput(self, inputType, input):
-        pass
+    def handleInput(self, input):
+        if (input == -1):
+            return -1
+        if (input[0] == b'\x20'):   #GYRO output (degrees)
+            for i in range(3):
+                self.gyroData[i] = input[i+1]
+            print(f"gyro data: {self.gyroData}")
+        elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
+            for i in range(3):
+                self.accelData[i] = input[i+1]
+            print(f"accel data: {self.accelData}")
+        else:
+            for i in range(3):
+                self.orientationData[i] = input[i+1]
+            print(f"orientation data: {self.orientationData}")
+        return 1
 
     def applyJoystickOutput(self, joyData):
-        joyData.xAxis
+        print(joyData)
 
-    def writeThruster(self, thrusterNum, value):
+    def writeThruster(self, thrusterNum, value): #DEPRECIATED, DO NOT USE!!!
         #value is between -50 and 50
         #dc is between 0.25 and 0.5
         dc = (value*0.0025+0.375)
+
+    def writeAllThrusters(self, thrusterValues): #assuming thrusterValues is between -1 and 1
+        modifiedThrusters = []
+        for i in range(6):
+            modifiedThrusterValue = int(thrusterValues[i]*50 + 150) #passed thruster values are between 100 and 200 (translates into 1000 and 2000 microseconds)
+            if (thrusterValues > 200):
+                modifiedThrusterValue = 200
+            if (thrusterValues < 100):
+                modifiedThrusterValue = 100
+            modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
+        self.outputQueue.put((1, (int.to_bytes(0x14), 1, "big", modifiedThrusters)))
+
+    def getAccelValue(self):
+        self.outputQueue.put((0, (int.to_bytes(0x10, 1, "big"), int.to_bytes(0, 1, "big"))))
+
+    def getGyroValue(self):
+        self.outputQueue.put((0, (int.to_bytes(0x20, 1, "big"), int.to_bytes(0, 1, "big"))))
+
+    def getOrientationValue(self):
+        self.outputQueue.put((0, (int.to_bytes(0x30, 1, "big"), int.to_bytes(0, 1, "big"))))
+
+    def setAccelAutoreport(self, delay):
+        self.outputQueue.put((0, (int.to_bytes(0x12, 1, "big"), int.to_bytes(delay, 1, "big"))))
+
+    def setGyroAutoreport(self, delay):
+        self.outputQueue.put((0, (int.to_bytes(0x23, 1, "big"), int.to_bytes(delay, 1, "big")))) #delay is in milliseconds/10
+
+    def setOrientationAutoreport(self, delay):
+        self.outputQueue.put((0, (int.to_bytes(0x35, 1, "big"), int.to_bytes(delay, 1, "big"))))
+
+if __name__ == "__main__":
+    controls = Controls()
+    #controls.setAccelAutoreport(100)
+    controls.setOrientationAutoreport(100)
+    #controls.getGyroValue()
+    #controls.getAccelValue()
+    controls.comms.readThread()

@@ -1,36 +1,16 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib, hid, time, copy
 from struct import unpack
+from controls import Controls, Movements
 
-
-"""def update(inputTest) : ...
-joystickInput = open(r"/dev/input/js0", "rb")
-def main():
-    fileHash = ""
-    while True:
-        inputTest = joystickInput.read(7)
-        newFileHash = hashlib.sha256()
-        newFileHash.update(inputTest)
-        newFileHashValue = newFileHash.digest()
-        if newFileHashValue != fileHash:
-            fileHash = newFileHashValue
-            update(inputTest)
-            # Logic here
-    
-
-def update(inputTest):
-    #print(inputTest)
-    print("Size :" + str(len(inputTest)))
-    print(unpack('IBBB', inputTest))
-"""
 @dataclass
 class JoystickData:
     xAxis:float = 0
     yAxis:float = 0
     hat:int = 0
     twist:float = 0
-    throtle:float = 0
-    buttons:list = []
+    throttle:float = 0
+    buttons:list = field(default_factory=list)
 
 class Joystick:
     def __init__(self, controls):
@@ -41,36 +21,83 @@ class Joystick:
         self.pastJoyData = copy.copy(self.joyData)
         self.controls = controls
 
-    def sendJoyData(self):
-        if 511.5<self.joyData.yAxis<523:
-            pass
+    def sendJoyData(self):  #translate data into movement
+        
+        if (self.pastJoyData != self.joyData):
+            self.controls.applyJoystickOutput(self.joyData)
 
     def readJoyData(self):
         self.pastJoyData = copy.copy(self.joyData)
         joyInput = self.joy.read(7)
+
+        #I'm SORRY! JOYSTICK AXIS
         self.joyData.xAxis = joyInput[0] + ((joyInput[1]&0b11)<<8)
         self.joyData.yAxis = (joyInput[1]>>2) + ((joyInput[2]&0b1111)<<6)
-        if 511.5<self.joyData.yAxis and self.joyData.yAxis<523:
+        self.joyData.xAxis -= 511.5
+        self.joyData.yAxis -= 511.5
+        if -11.5<self.joyData.yAxis and self.joyData.yAxis<11.5: #joystick is abit weird on middle position
             self.joyData.yAxis = 0
-        if 511.5<self.joyData.xAxis and self.joyData.xAxis<523:
+        if -11.5<self.joyData.xAxis and self.joyData.xAxis<11.5: #joystick is a bit weird on middle position
             self.joyData.xAxis = 0
-        self.joyData.yAxis/=5
-        self.joyData.xAxis/=5
+        if self.joyData.yAxis > 0:
+            self.joyData.yAxis -= 11.5
+        elif self.joyData.yAxis < 0:
+            self.joyData.yAxis += 11.5
+        if self.joyData.xAxis > 0:
+            self.joyData.xAxis -= 11.5
+        elif self.joyData.xAxis < 0:
+            self.joyData.xAxis += 11.5
+        self.joyData.yAxis/=500
+        self.joyData.xAxis/=500
+        
+        #JOYSTICK HAT
+        self.joyData.hat = joyInput[2]>>4
 
-        #give middle some leeway, resting is not exactly at middle sometimes
+        #JOYSTICK TWIST
+        self.joyData.twist = joyInput[3]
+        #print(f"twist: {self.joyData.twist}")
+        self.joyData.twist -= 127.5
+        #115 - 145 or so, 17.5 offset
+        if -17.5 < self.joyData.twist and self.joyData.twist < 17.5:
+            self.joyData.twist = 0
+        if self.joyData.twist > 0:
+            self.joyData.twist -= 17.5
+        elif self.joyData.twist < 0:
+            self.joyData.twist += 17.5
+        self.joyData.twist/=110
 
-    def readJoystickThread(self):
+        #JOYSTICK THROTTLE
+        self.joyData.throttle = -1*(joyInput[5] - 255)
+
+        #BUTTONS
+        self.joyData.buttons = []
+        for i in range(8):
+            if i in [1, 8]:
+                continue
+            self.joyData.buttons.append((joyInput[4]>>i)&0b1)
+        for i in range(8):
+            if i in [4, 5, 6, 7, 8]:
+                continue
+            self.joyData.buttons.append((joyInput[6]>>i)&0b1)
+
+    def readingThread(self):
         while True:
             self.readJoyData()
-            if self.joyData != self.pastJoyData:
-                print("new values")
-
+            self.sendJoyData()
+            #self.controls.applyJoystickOutput(self.joyData)
 
     def startReadingThread(self):
         pass
 
     def stopReadingThread(self):
         pass
+
+    def readHid2(self):
+        joyInput = self.joy.read(7)
+        print(joyInput)
+        print(joyInput[0] + 0xFF * (joyInput[1] & 0b11))
+        print((joyInput[1] >> 2) + (joyInput[2] & 0b1111) * 0b111111)
+        print(bin(joyInput[2] >> 4)[2:].zfill(4))
 
     @staticmethod
     def printHidDevices():
@@ -82,33 +109,9 @@ class Joystick:
             print(device_dict["product_id"])
             print(device_dict["vendor_id"])
 
-
-def readHid(joy):
-    joyInput = joy.read(7)
-    # xAxis = (joyInput[0]*4) + (joyInput[1] // 64)
-    xAxis = joyInput[0] * 16 + joyInput[1] // 16
-    # xAxis = ((joyInput[1] & 0b11000000) << 2) + joyInput[0]
-    yAxis = ((joyInput[1] << 4) + (joyInput[2] >> 4)) & 1023
-    hat = (joyInput[2]) & 15
-    print(joyInput)
-    print(f"hat: {hat}")
-    # print(joyInput[0] << 2)
-    # print(joyInput[1] >> 6)
-    print(f"xAxis: {xAxis}")
-
-    # print((joyInput[1] << 4)&1023)
-    # print(joyInput[2] >> 4)
-    print(f"yAxis: {yAxis}")
-    time.sleep(0.01)
-
-
-def readHid2(joy):
-    joyInput = joy.read(7)
-    print(joyInput)
-    print(joyInput[0] + 0xFF * (joyInput[1] & 0b11))
-    print((joyInput[1] >> 2) + (joyInput[2] & 0b1111) * 0b111111)
-    print(bin(joyInput[2] >> 4)[2:].zfill(4))
-    #test = (joyInput[0]<<24)+(joyInput[1]<<16)+(joyInput[2]<<8)+joyInput[3]
-    #print(str(bin(test))[2:].zfill(32))
-    #test = joyInput[0]*256+joyInput[1]
-    #print(str(bin(test))[2:].zfill(16))
+if __name__ == "__main__":
+    controls = Controls()
+    joystick = Joystick(controls)
+    joystick.readingThread()
+    #while True:
+    #    joystick.readHid2()
