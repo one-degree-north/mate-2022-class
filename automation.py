@@ -63,6 +63,8 @@ class Automation():
         self.collectErrors()
 
 control = Controls()
+control.setOrientationAutoreport(1)
+control.comms.startThread()
 while True:
     print(control.orientationData)
 
