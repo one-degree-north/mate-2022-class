@@ -20,12 +20,13 @@ class Joystick:
         self.joyData = JoystickData()
         self.pastJoyData = copy.copy(self.joyData)
         self.controls = controls
-        self.readingThread = None
+        self.currReadingThread = None
         self.threadActive = False
 
     def sendJoyData(self):  #translate data into movement
         
         if (self.pastJoyData != self.joyData):
+            #print(self.joyData)
             return self.joyData
             # self.controls.applyJoystickOutput(self.joyData)
 
@@ -87,12 +88,12 @@ class Joystick:
         self.threadActive = True
         while self.threadActive:
             self.readJoyData()
-            #self.sendJoyData()
-            self.controls.applyJoystickOutput(self.joyData)
+            self.sendJoyData()
+            #self.controls.applyJoystickOutput(self.joyData)
 
     def startReadingThread(self):
-        self.readingThread = threading.Thread(target=self.readingThread)
-        self.readingThread.start()
+        self.currReadingThread = threading.Thread(target=self.readingThread)
+        self.currReadingThread.start()
 
     def stopReadingThread(self):
         self.threadActive = False
