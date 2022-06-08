@@ -4,6 +4,7 @@ from math import sin, cos, tanh, degrees, radians
 
 # from thrusters import *
 from time import sleep
+from controls import Controls
 
 class Automation():
     
@@ -61,7 +62,11 @@ class Automation():
 
         self.collectErrors()
 
+control = Controls()
+while True:
+    print(control.orientationData)
 
-test = Automation(10)
+
+# test = Automation(10)
 
 
