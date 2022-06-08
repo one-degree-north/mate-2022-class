@@ -116,20 +116,20 @@ class Thruster:
         for pin, value in self.determine(intendedMotion, intendedRotation, multiplier).items():
             print(f"{pin = }, {value}")
 
-frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
-frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
-backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
-backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
-sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
+# frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
+# frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
+# backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
+# backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
+# sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
+# sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
 
 
-if __name__ == "__main__":
-    joystick = Joystick()
-    while True:
-        joystick.readJoyData()
-        Thruster.showSpeeds((0, -joystick.joyData.yAxis, 0), (0, 0, 0), 1)
+# if __name__ == "__main__":
+#     joystick = Joystick()
+#     while True:
+#         joystick.readJoyData()
+#         Thruster.showSpeeds((0, -joystick.joyData.yAxis, 0), (0, 0, 0), 1)
 
 
 
