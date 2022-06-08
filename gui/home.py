@@ -33,7 +33,6 @@ class MainWindow(QMainWindow):
         self.control_frame = QWidget()
         self.control_frame.layout = QVBoxLayout()
 
-        self.control_frame.layout.addWidget(self.status)
         self.control_frame.layout.addStretch(1)
         self.control_frame.layout.addWidget(self.control)
         
@@ -165,14 +164,12 @@ class StatusBar(QWidget):
         self.setStyleSheet("""
             QWidget {
                 background: rgb(26, 26, 26);
-                border-bottom-right-radius: 10px
+                border-top-left-radius: 10px
             }
         """)
 
         self.front_cam_status = Status('F', 'Front camera')
         self.back_cam_status = Status('B', 'Back camera')
-        # self.claw_cam_status = Status('C', 'Claw camera')
-
         self.serial_status = Status('S', 'Serial connection')
 
 
@@ -181,7 +178,6 @@ class StatusBar(QWidget):
 
         self.layout.addWidget(self.front_cam_status)
         self.layout.addWidget(self.back_cam_status)
-        # self.layout.addWidget(self.claw_cam_status)
         self.layout.addWidget(self.serial_status)
         
         self.setLayout(self.layout)
