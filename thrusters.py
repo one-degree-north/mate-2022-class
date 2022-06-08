@@ -110,20 +110,12 @@ class Thruster:
         # thrusterSpeeds = cls.scale(cls,cls.normalize(cls, thrusterSpeeds=thrusterSpeeds, reach=intendedMotion[-1]), multiplier)
         # thrusterSpeeds = cls.normalize(cls, thrusterSpeeds=thrusterSpeeds, reach=intendedMotion[-1])
         return thrusterSpeeds
+    
+    @classmethod
+    def showSpeeds(self, intendedMotion, intendedRotation, multiplier):
+        for pin, value in self.determine(intendedMotion, intendedRotation, multiplier).items():
+            print(f"{pin = }, {value}")
 
-def getJoyData(joyData):
-    print(joyData)
-
-def begin():
-    #thruster = Thruster()
-    joystick = Joystick(callbackMethod=getJoyData)
-    joystick.startReadingThread()
-    while True:
-        pass
-
-begin()
-
-#                                    (x, y, z)           (_x,_y)
 frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
 frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
 backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
@@ -131,9 +123,18 @@ backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
 sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
 sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
-for thrusterPin, k, in Thruster.determine((0, 0, 0), (0.5, -0.25, -1), 1).items():
-    print(f"{thrusterPin=} ->", k)
-    pass
+
+
+def begin():
+    joystick = Joystick()
+    #joystick.getValues()
+    joystick.startReadingThread()
+    while True:
+        Thruster.showSpeeds((0, -joystick.joyData.yAxis, 0), (0, 0, 0), 1)
+    # joystick.currReadingThread.join()
+
+begin()
+
 
 
 
