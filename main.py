@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget
 
-
 from gui.grid import Grid
 from gui.control import ControlBar
 from gui.status import StatusBar
@@ -62,16 +61,16 @@ class CrimsonUI(QMainWindow):
 
 
         # Lower frame
-        self.lower = QWidget()
+        self.lower_frame = QWidget()
 
-        self.lower.layout = QHBoxLayout()
+        self.lower_frame.layout = QHBoxLayout()
 
-        self.lower.layout.addWidget(self.control_frame)
-        self.lower.layout.addWidget(self.grid, 100)
-        self.lower.layout.addWidget(self.status_frame)
+        self.lower_frame.layout.addWidget(self.control_frame)
+        self.lower_frame.layout.addWidget(self.grid, 100)
+        self.lower_frame.layout.addWidget(self.status_frame)
 
-        self.lower.layout.setContentsMargins(0,0,0,0)
-        self.lower.setLayout(self.lower.layout)
+        self.lower_frame.layout.setContentsMargins(0,0,0,0)
+        self.lower_frame.setLayout(self.lower_frame.layout)
 
 
         # Parent frame
@@ -80,7 +79,7 @@ class CrimsonUI(QMainWindow):
         self.frame.layout = QVBoxLayout()
         
         self.frame.layout.addWidget(self.timer_frame)
-        self.frame.layout.addWidget(self.lower, 100)
+        self.frame.layout.addWidget(self.lower_frame, 100)
 
         self.frame.layout.setContentsMargins(0,0,0,0)
         self.frame.setLayout(self.frame.layout)
