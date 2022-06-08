@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout,
 from gui.grid import Grid
 from gui.control import ControlBar
 from gui.status import StatusBar
-from gui.timer import TimerBar
+from gui.timer import TimerBar, TimerControlBar
 
 import sys
 import yaml
@@ -21,7 +21,8 @@ class CrimsonUI(QMainWindow):
         self.grid = Grid(front_port, down_port)
         self.control = ControlBar()
         self.status = StatusBar()
-        self.timer = TimerBar()
+        self.timer = TimerBar(self)
+        self.timer_control = TimerControlBar(self)
 
 
         # Control frame
@@ -55,6 +56,7 @@ class CrimsonUI(QMainWindow):
         
         self.timer_frame.layout.addWidget(self.timer)
         self.timer_frame.layout.addStretch(1)
+        self.timer_frame.layout.addWidget(self.timer_control)
 
         self.timer_frame.layout.setContentsMargins(0,0,0,0)
         self.timer_frame.setLayout(self.timer_frame.layout)
