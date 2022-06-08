@@ -1,106 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QLabel
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QLabel
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
 
-from .grid import Grid
-
-import sys
-import logging
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setStyleSheet("""
-            QMainWindow {
-                background: rgb(21, 21, 21)
-            }
-        """)
-
-        # self.setWindowFlags(Qt.FramelessWindowHint)
-        # self.setFixedSize(300,200) -- use qtimer/wait for all cameras
-
-
-
-        self.cam = Grid(0, 1)
-
-        self.control = MenuBar()
-        self.status = StatusBar()
-        self.timer = TimerBar()
-
-        # Control Pannel Frame - make better
-
-        self.control_frame = QWidget()
-        self.control_frame.layout = QVBoxLayout()
-
-        self.control_frame.layout.addStretch(1)
-        self.control_frame.layout.addWidget(self.control)
-        
-        self.control_frame.layout.setContentsMargins(0,0,0,0)
-        self.control_frame.setLayout(self.control_frame.layout)
-
-        # Status Frame - make better
-
-        self.status_frame = QWidget()
-        self.status_frame.layout = QVBoxLayout()
-
-        self.status_frame.layout.addStretch(1)
-        self.status_frame.layout.addWidget(self.status)
-        
-        self.status_frame.layout.setContentsMargins(0,0,0,0)
-        self.status_frame.setLayout(self.status_frame.layout)
-
-        # Timer Frame - make better
-
-        self.timer_frame = QWidget()
-        self.timer_frame.layout = QHBoxLayout()
-
-        self.timer_frame.layout.addWidget(self.timer)
-        self.timer_frame.layout.addStretch(1)
-
-        self.timer_frame.layout.setContentsMargins(0,0,0,0)
-        self.timer_frame.setLayout(self.timer_frame.layout)
-
-        # Layout
-
-        self.lower_frame = QWidget()
-        self.lower_frame.layout = QHBoxLayout()
-
-        self.lower_frame.layout.addWidget(self.control_frame)
-        self.lower_frame.layout.addWidget(self.cam, 100)
-        self.lower_frame.layout.addWidget(self.status_frame)
-
-        self.lower_frame.layout.setContentsMargins(0,0,0,0)
-        self.lower_frame.setLayout(self.lower_frame.layout)
-
-        # Main
-
-        self.frame = QWidget()
-        self.frame.layout = QVBoxLayout()
-        
-        self.frame.layout.addWidget(self.timer_frame)
-        self.frame.layout.addWidget(self.lower_frame, 100)
-
-        self.frame.layout.setContentsMargins(0,0,0,0)
-        self.frame.setLayout(self.frame.layout)
-
-        self.setCentralWidget(self.frame)
-
-        # self.frame = QWidget()
-        # self.frame.layout = QGridLayout()
-
-        # self.frame.layout.addWidget(self.timer_frame, 0,0)
-        # self.frame.layout.addWidget(self.control_frame, 1,0)
-        # self.frame.layout.addWidget(self.cam, 1,1,100,100)
-        
-        # self.frame.setContentsMargins(0,0,0,0)
-        # self.frame.setLayout(self.frame.layout)
-
-
-        # self.setCentralWidget(self.frame)
-
-
-class MenuBar(QWidget):
+class ControlWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -155,7 +57,7 @@ class MenuBar(QWidget):
 
         exit()
 
-class StatusBar(QWidget):
+class StatusWidget(QWidget):
     def __init__(self):
         super().__init__()
 
@@ -169,7 +71,7 @@ class StatusBar(QWidget):
         """)
 
         self.front_cam_status = Status('F', 'Front camera')
-        self.back_cam_status = Status('B', 'Back camera')
+        self.back_cam_status = Status('D', 'Down camera')
         self.serial_status = Status('S', 'Serial connection')
 
 
@@ -182,11 +84,11 @@ class StatusBar(QWidget):
         
         self.setLayout(self.layout)
 
-        self.setFixedWidth(60)
+        self.setFixedWidth(40)
 
         self.front_cam_status.connected()
 
-class TimerBar(QWidget):
+class TimerWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -252,6 +154,12 @@ class TimerBar(QWidget):
         self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
         self.startstop_button.setToolTip('Start')
 
+class ConsolePopup(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setStyleSheet
+
 class Status(QLabel):
     def __init__(self, text, tip):
         super().__init__(text)
@@ -283,12 +191,6 @@ class Status(QLabel):
             }
         """)
 
-class ConsolePopup(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.setStyleSheet
-
 class Button(QPushButton):
     def __init__(self, icon, tip):
         super().__init__()
@@ -310,11 +212,3 @@ class Button(QPushButton):
         self.setIconSize(QSize(40,40))
 
         self.setToolTip(tip)
-
-if __name__ == '__main__':
-    app = QApplication([])
-
-    window = FrontCamera()
-    window.show()
-
-    sys.exit(app.exec())
