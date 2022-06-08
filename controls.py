@@ -35,7 +35,7 @@ class AccelData:
 
 class Controls:
     def __init__(self):
-        self.movements = Movements()
+        #self.movements = Movements()
         #self.gyroData = GyroData()
         #self.accelData = AccelData()
         self.gyroData = [0, 0, 0] #rad/s
@@ -43,10 +43,10 @@ class Controls:
         self.accelData = [0, 0, 0] #m/s^2
         self.outputQueue = queue.Queue()
         self.comms = Comms(controls=self, outputQueue=self.outputQueue)
-        self.thrusterValues = [0, 0, 0, 0, 0, 0]
+        #self.thrusterValues = [0, 0, 0, 0, 0, 0]
 
-    def applyMovements(self):
-        thrusterValues = [0, 0, 0, 0, 0, 0]
+    #def applyMovements(self):
+    #    thrusterValues = [0, 0, 0, 0, 0, 0]
 
     def handleInput(self, input):
         if (input == -1):
@@ -62,16 +62,16 @@ class Controls:
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            print(f"orientation data: {self.orientationData}")
+            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
         print(joyData)
 
-    def writeThruster(self, thrusterNum, value): #DEPRECIATED, DO NOT USE!!!
+    """def writeThruster(self, thrusterNum, value): #DEPRECIATED, DO NOT USE!!!
         #value is between -50 and 50
         #dc is between 0.25 and 0.5
-        dc = (value*0.0025+0.375)
+        dc = (value*0.0025+0.375)"""
 
     def writeAllThrusters(self, thrusterValues): #assuming thrusterValues is between -1 and 1
         modifiedThrusters = []
@@ -105,7 +105,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     #controls.setAccelAutoreport(100)
-    controls.setOrientationAutoreport(100)
+    controls.setOrientationAutoreport(1)
     #controls.getGyroValue()
     #controls.getAccelValue()
     controls.comms.readThread()

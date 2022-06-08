@@ -18,7 +18,7 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14201", baudrate=115200)
+        #self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14201", baudrate=115200)
         #self.onshoreArduino = Serial(port=f"/dev/cu.usbmodem14101", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
@@ -29,6 +29,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         self.HEADER = b'\xab'
         #self.FOOTER = 0xB3
         self.FOOTER = b'\xb3'
+        self.threadActive = False
         
         #configure GPIO
         """
@@ -88,7 +89,8 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             self.onshoreArduino.write(self.FOOTER)
 
     def readThread(self):
-        while True:
+        self.threadActive = True
+        while self.threadActive:
             #if (self.offshoreArduino.in_waiting > 0):
             #    print(self.offshoreArduino.read())
             if (self.offshoreArduino.in_waiting >= 15):
@@ -99,4 +101,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def startThread(self):
         currThread = threading.Thread(target=self.commThread)
         currThread.start()
+    
+    def endThread(self):
+        self.threadActive = False
 

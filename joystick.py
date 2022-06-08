@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-import hashlib, hid, time, copy
+import hashlib, hid, time, copy, threading
 from struct import unpack
 from controls import Controls, Movements
 
@@ -20,6 +20,8 @@ class Joystick:
         self.joyData = JoystickData()
         self.pastJoyData = copy.copy(self.joyData)
         self.controls = controls
+        self.readingThread = None
+        self.threadActive = False
 
     def sendJoyData(self):  #translate data into movement
         
@@ -81,16 +83,18 @@ class Joystick:
             self.joyData.buttons.append((joyInput[6]>>i)&0b1)
 
     def readingThread(self):
-        while True:
+        self.threadActive = True
+        while self.threadActive:
             self.readJoyData()
-            self.sendJoyData()
-            #self.controls.applyJoystickOutput(self.joyData)
+            #self.sendJoyData()
+            self.controls.applyJoystickOutput(self.joyData)
 
     def startReadingThread(self):
-        pass
+        self.readingThread = threading.Thread(target=self.commThread)
+        self.readingThread.start()
 
     def stopReadingThread(self):
-        pass
+        self.threadActive = False
 
     def readHid2(self):
         joyInput = self.joy.read(7)
