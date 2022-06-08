@@ -21,7 +21,7 @@ class CrimsonUI(QMainWindow):
         self.grid = Grid(front_port, down_port)
         self.control = ControlBar()
         self.status = StatusBar()
-        self.timer = TimerBar(self)
+        self.timer = TimerBar()
         self.timer_control = TimerControlBar(self)
 
 

@@ -5,12 +5,10 @@ from PyQt5.QtCore import Qt, QSize, QTimer
 from .button import Button
 
 class TimerBar(QWidget): #change to stopwatchbar
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True) #needed?
-
-        self.parent = parent
 
         self.setStyleSheet("""
             QWidget {
@@ -58,33 +56,33 @@ class TimerBar(QWidget): #change to stopwatchbar
         self.setFixedHeight(60)
 
 
-    def startstop(self):
-        if self.stopwatch_on:
-            self.stopwatch_on = False
+    # def startstop(self):
+    #     if self.stopwatch_on:
+    #         self.stopwatch_on = False
 
-            self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
-            self.parent.timer_control.startstop_button.setToolTip('Resume')
-            print(self.stopwatch_on)
+    #         self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
+    #         self.parent.timer_control.startstop_button.setToolTip('Resume')
+    #         print(self.stopwatch_on)
 
-            return
+    #         return
             
 
-        self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
-        self.parent.timer_control.startstop_button.setToolTip('Pause')
+    #     self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
+    #     self.parent.timer_control.startstop_button.setToolTip('Pause')
 
-        self.stopwatch_on = True
+    #     self.stopwatch_on = True
 
-    def reset(self):
-        self.stopwatch_on = False
+    # def reset(self):
+    #     self.stopwatch_on = False
 
-        self.seconds = 0
-        self.minutes = 0
-        self.hours = 0
+    #     self.seconds = 0
+    #     self.minutes = 0
+    #     self.hours = 0
 
-        self.stopwatch.setText('00:00:00')
+    #     self.stopwatch.setText('00:00:00')
 
-        self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
-        self.parent.timer_control.startstop_button.setToolTip('Start')
+    #     self.parent.timer_control.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
+    #     self.parent.timer_control.startstop_button.setToolTip('Start')
 
     def update_stopwatch(self):
         if not self.stopwatch_on:
@@ -110,12 +108,14 @@ class TimerControlBar(QWidget):
             }
         """)
 
+        self.parent = parent
+
         self.startstop_button = Button('gui/icons/play_icon.png', 'Start')
-        self.startstop_button.clicked.connect(parent.timer.startstop)
+        self.startstop_button.clicked.connect(self.startstop)
 
 
         self.reset_button = Button('gui/icons/reload_icon.png', 'Reset')
-        self.reset_button.clicked.connect(parent.timer.reset)
+        self.reset_button.clicked.connect(self.reset)
 
         self.layout = QHBoxLayout()
         self.layout.setSpacing(10)
@@ -125,3 +125,30 @@ class TimerControlBar(QWidget):
 
 
         self.setLayout(self.layout)
+
+    def startstop(self):
+        if self.parent.timer.stopwatch_on:
+            self.parent.timer.stopwatch_on = False
+
+            self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
+            self.startstop_button.setToolTip('Resume')
+
+            return
+            
+
+        self.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
+        self.startstop_button.setToolTip('Pause')
+
+        self.parent.timer.stopwatch_on = True
+
+    def reset(self):
+        self.parent.timer.stopwatch_on = False
+
+        self.parent.timer.seconds = 0
+        self.parent.timer.minutes = 0
+        self.parent.timer.hours = 0
+
+        self.parent.timer.stopwatch.setText('00:00:00')
+
+        self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
+        self.startstop_button.setToolTip('Start')
