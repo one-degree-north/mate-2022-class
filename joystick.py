@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import hashlib, hid, time, copy, threading
 from struct import unpack
 from controls import Controls, Movements
+#from thrusters import Thruster
 
 @dataclass
 class JoystickData:
@@ -13,7 +14,7 @@ class JoystickData:
     buttons:list = field(default_factory=list)
 
 class Joystick:
-    def __init__(self, controls=None):
+    def __init__(self, controls=None, callbackMethod=None):
         self.joy = hid.device()
         self.joy.open(vendor_id=1133, product_id=49685)
         self.pastInput = 0
@@ -22,12 +23,15 @@ class Joystick:
         self.controls = controls
         self.currReadingThread = None
         self.threadActive = False
+        self.callbackMethod = callbackMethod
 
     def sendJoyData(self):  #translate data into movement
         
         if (self.pastJoyData != self.joyData):
             #print(self.joyData)
-            return self.joyData
+            #self.thruster.getJoyData(self.joyData)
+            self.callbackMethod(self.joyData)
+            #return self.joyData
             # self.controls.applyJoystickOutput(self.joyData)
 
     def readJoyData(self):

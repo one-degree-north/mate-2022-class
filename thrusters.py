@@ -111,12 +111,15 @@ class Thruster:
         # thrusterSpeeds = cls.normalize(cls, thrusterSpeeds=thrusterSpeeds, reach=intendedMotion[-1])
         return thrusterSpeeds
 
+def getJoyData(joyData):
+    print(joyData)
+
 def begin():
-    joystick = Joystick()
+    #thruster = Thruster()
+    joystick = Joystick(callbackMethod=getJoyData)
     joystick.startReadingThread()
     while True:
-        print(joystick.sendJoyData())
-        sleep(1)
+        pass
 
 begin()
 
