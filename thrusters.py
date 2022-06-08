@@ -125,15 +125,13 @@ sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
 
 
-def begin():
+if __name__ == "__main__":
     joystick = Joystick()
-    #joystick.getValues()
-    joystick.startReadingThread()
     while True:
+        joystick.readJoyData()
         Thruster.showSpeeds((0, -joystick.joyData.yAxis, 0), (0, 0, 0), 1)
-    # joystick.currReadingThread.join()
 
-begin()
+
 
 
 
