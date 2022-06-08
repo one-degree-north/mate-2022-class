@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import Qt
 
-from gui.windows.home import MainWindow
+from gui.home import MainWindow
 
 import sys
 # from time import sleep

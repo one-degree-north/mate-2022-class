@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QHBoxLayout,
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
 
-from ..camera import Camera
+from .grid import Grid
 
 import sys
+import logging
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,9 +22,10 @@ class MainWindow(QMainWindow):
 
 
 
-        self.cam = Camera(1)
+        self.cam = Grid(0, 1)
 
         self.control = MenuBar()
+        self.status = StatusBar()
         self.timer = TimerBar()
 
         # Control Pannel Frame - make better
@@ -31,13 +33,23 @@ class MainWindow(QMainWindow):
         self.control_frame = QWidget()
         self.control_frame.layout = QVBoxLayout()
 
+        self.control_frame.layout.addWidget(self.status)
         self.control_frame.layout.addStretch(1)
         self.control_frame.layout.addWidget(self.control)
         
-
+        self.control_frame.layout.setContentsMargins(0,0,0,0)
         self.control_frame.setLayout(self.control_frame.layout)
 
-        self.control_frame.layout.setContentsMargins(0,0,0,0)
+        # Status Frame - make better
+
+        self.status_frame = QWidget()
+        self.status_frame.layout = QVBoxLayout()
+
+        self.status_frame.layout.addStretch(1)
+        self.status_frame.layout.addWidget(self.status)
+        
+        self.status_frame.layout.setContentsMargins(0,0,0,0)
+        self.status_frame.setLayout(self.status_frame.layout)
 
         # Timer Frame - make better
 
@@ -47,32 +59,33 @@ class MainWindow(QMainWindow):
         self.timer_frame.layout.addWidget(self.timer)
         self.timer_frame.layout.addStretch(1)
 
-        self.timer_frame.setLayout(self.timer_frame.layout)
         self.timer_frame.layout.setContentsMargins(0,0,0,0)
+        self.timer_frame.setLayout(self.timer_frame.layout)
 
         # Layout
 
-        self.frame = QWidget()
-        self.frame.layout = QHBoxLayout()
+        self.lower_frame = QWidget()
+        self.lower_frame.layout = QHBoxLayout()
 
-        self.frame.layout.addWidget(self.control_frame)
-        self.frame.layout.addWidget(self.cam, 100)
+        self.lower_frame.layout.addWidget(self.control_frame)
+        self.lower_frame.layout.addWidget(self.cam, 100)
+        self.lower_frame.layout.addWidget(self.status_frame)
+
+        self.lower_frame.layout.setContentsMargins(0,0,0,0)
+        self.lower_frame.setLayout(self.lower_frame.layout)
+
+        # Main
+
+        self.frame = QWidget()
+        self.frame.layout = QVBoxLayout()
+        
+        self.frame.layout.addWidget(self.timer_frame)
+        self.frame.layout.addWidget(self.lower_frame, 100)
 
         self.frame.layout.setContentsMargins(0,0,0,0)
         self.frame.setLayout(self.frame.layout)
 
-        # Main
-
-        self.main_frame = QWidget()
-        self.main_frame.layout = QVBoxLayout()
-        
-        self.main_frame.layout.addWidget(self.timer_frame)
-        self.main_frame.layout.addWidget(self.frame, 100)
-
-        self.main_frame.layout.setContentsMargins(0,0,0,0)
-        self.main_frame.setLayout(self.main_frame.layout)
-
-        self.setCentralWidget(self.main_frame)
+        self.setCentralWidget(self.frame)
 
         # self.frame = QWidget()
         # self.frame.layout = QGridLayout()
@@ -126,7 +139,7 @@ class MenuBar(QWidget):
         self.setLayout(self.layout)
 
         self.setFixedWidth(60)
-        self.help_window = HelpWindow()
+        # self.help_window = HelpWindow()
 
     def help(self):
         pass
@@ -142,6 +155,40 @@ class MenuBar(QWidget):
         print('\033[93m\033[1mSuccessfully stopped Crimson UI\033[0m') 
 
         exit()
+
+class StatusBar(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+        self.setStyleSheet("""
+            QWidget {
+                background: rgb(26, 26, 26);
+                border-bottom-right-radius: 10px
+            }
+        """)
+
+        self.front_cam_status = Status('F', 'Front camera')
+        self.back_cam_status = Status('B', 'Back camera')
+        # self.claw_cam_status = Status('C', 'Claw camera')
+
+        self.serial_status = Status('S', 'Serial connection')
+
+
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(10)
+
+        self.layout.addWidget(self.front_cam_status)
+        self.layout.addWidget(self.back_cam_status)
+        # self.layout.addWidget(self.claw_cam_status)
+        self.layout.addWidget(self.serial_status)
+        
+        self.setLayout(self.layout)
+
+        self.setFixedWidth(60)
+
+        self.front_cam_status.connected()
 
 class TimerBar(QWidget):
     def __init__(self):
@@ -183,6 +230,7 @@ class TimerBar(QWidget):
 
         self.setFixedHeight(60)
 
+
     def startstop(self):
         if self.stopwatch_on:
             self.stopwatch_on = False
@@ -208,6 +256,43 @@ class TimerBar(QWidget):
         self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
         self.startstop_button.setToolTip('Start')
 
+class Status(QLabel):
+    def __init__(self, text, tip):
+        super().__init__(text)
+
+        self.setStyleSheet("""
+            QLabel {
+                color: rgb(140, 26, 17);
+                font: bold 25px
+            }
+        """)
+
+
+        self.setAlignment(Qt.AlignCenter)
+        self.setToolTip(tip)
+
+    def connected(self):
+        self.setStyleSheet("""
+            QLabel {
+                color: rgb(29, 177, 0);
+                font: bold 25px
+            }
+        """)
+
+    def disconnected(self):
+        self.setStyleSheet("""
+            QLabel {
+                color: rgb(140, 26, 17);
+                font: bold 25px
+            }
+        """)
+
+class ConsolePopup(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setStyleSheet
+
 class Button(QPushButton):
     def __init__(self, icon, tip):
         super().__init__()
@@ -217,10 +302,6 @@ class Button(QPushButton):
         self.setStyleSheet("""
             QPushButton {
                 background: rgb(35, 35, 35);
-                color: rgb(210, 211, 210);
-
-                font: bold 20px;
-
                 border-radius: 5px
             }
 
