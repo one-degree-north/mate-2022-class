@@ -91,7 +91,7 @@ class Joystick:
             self.controls.applyJoystickOutput(self.joyData)
 
     def startReadingThread(self):
-        self.readingThread = threading.Thread(target=self.commThread)
+        self.readingThread = threading.Thread(target=self.readingThread)
         self.readingThread.start()
 
     def stopReadingThread(self):
