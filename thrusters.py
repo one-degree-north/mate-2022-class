@@ -15,9 +15,9 @@ import time
 class Thruster:
     createdThrusters = []
 
-    def __init__(self, pin, powerMatrix, position):
+    def __init__(self, pin, power, position):
         self.pin = pin
-        self.powerMatrix = powerMatrix
+        self.power = power
         self.position = (position[0], position[1], position[0])
         self.createdThrusters.append(self)
 
@@ -42,6 +42,7 @@ class Thruster:
         return thrusterSpeeds
 
     def averager(self, speeds: list):
+        print(speeds)
         if len(speeds) != 0:
             return round(sum(speeds) / len(speeds), 8)
         return 0
@@ -54,8 +55,8 @@ class Thruster:
 
     @property
     def axis(self) -> int:
-        if sorted(self.powerMatrix)[-1] == 1 and sorted(self.powerMatrix)[-2] == 0:
-            return self.powerMatrix.index(1)
+        if sorted(self.power)[-1] == 1 and sorted(self.power)[-2] == 0:
+            return self.power.index(1)
 
     @property
     def isUp(self):
@@ -85,19 +86,19 @@ class Thruster:
             # print(f"Appending {intendedMotion[thruster.axis]}")
 
             for axis, axisMotion in enumerate(intendedMotion):
-                result = axisMotion * thruster.powerMatrix[axis]
+                result = axisMotion * thruster.power[axis]
                 if result != 0:
                     thrusterSpeeds[thruster.pin].append(result)
 
             if thruster.isUp:
                 for i in (0, 1):
-                    result = -thruster.position[i] * thruster.powerMatrix[thruster.axis] * intendedRotation[i]
+                    result = -thruster.position[i] * thruster.power[thruster.axis] * intendedRotation[i]
                     if result != 0:
                         thrusterSpeeds[thruster.pin].append(result)
 
             elif thruster.isForward:
                 i = 2
-                result = -thruster.position[i] * thruster.powerMatrix[thruster.axis] * intendedRotation[i]
+                result = -thruster.position[i] * thruster.power[thruster.axis] * intendedRotation[i]
                 if result != 0:
                     thrusterSpeeds[thruster.pin].append(result)
 
@@ -122,14 +123,14 @@ start = time.time()
 
 if __name__ == "__main__":
     
-    frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
-    frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
-    backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
-    backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-    sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
-    sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
-    for i in range(10_000):
-        Thruster.determine((0,0,1), (0.5, 0.25, 0), 1)
+    frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+    frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+    backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+    backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+    sideL  = Thruster(pin=4, power=(0, 1, 0), position=(-1, 0))
+    sideR  = Thruster(pin=5, power=(0, 1, 0), position=( 1, 0))
+    for i in range(100):
+        Thruster.showSpeeds((0,0,0), (0.5, 0.25, 0), 1)
 
 end = time.time()
 
