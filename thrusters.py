@@ -128,7 +128,7 @@ if __name__ == "__main__":
     backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
     sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
     sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
-    for i in range(1000):
+    for i in range(10_000):
         Thruster.determine((0,0,1), (0.5, 0.25, 0), 1)
 
 end = time.time()

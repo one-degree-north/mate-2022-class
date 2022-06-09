@@ -1,3 +1,4 @@
+# import numpy as np
 import numpy as np
 import time
 
@@ -47,8 +48,8 @@ class Thruster():
 
     @classmethod
     def getSpeeds(cls, reqMotion, reqRotation):
-        reqMotion = cls.convertInput(reqMotion)
-        reqRotation = cls.convertInput(reqRotation)
+        # reqMotion = cls.convertInput(reqMotion)
+        # reqRotation = cls.convertInput(reqRotation)
 
         output = {}
         for thruster in cls.thrusters:
@@ -70,10 +71,10 @@ if __name__ == "__main__":
     backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
     sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
     sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
-    for i in range(1000):
+    for i in range(10_000):
         # Thruster.showSpeeds(
         #     Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0)))
-        Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0))
+        Thruster.getSpeeds(np.asarray((0, 0, 1)), np.asarray((0.5, 0.25, 0)))
 
 end = time.time()
 
