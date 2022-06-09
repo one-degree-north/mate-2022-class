@@ -13,21 +13,20 @@ struct Input{
   uint8_t values[6];
 };
 
-int thrusterPins[] = {7, 9, 10, 11, 12, 13};
+int thrusterPins[] = {3, 4, 5, 6, 7, 8};
 Servo thrusters[6];
-int servoPins[] = {3, 4, 5}
-Servo clawServos[3];
+int servoPins[] = {2};
+Servo clawServos[1];
 
 Adafruit_BNO055 bnoIMU = Adafruit_BNO055(55, 0x28);
-AutoreportData autoData;
 unsigned long pastMillis;
 
 void setup(){
   for (int i = 0; i < 6; i++){
-    thrusterServos[i].attach(thrusterPins[i]);
+    thrusters[i].attach(thrusterPins[i]);
   }
-  for (int i = 0; i < 3; i++){
-    clawServos[i].attach(clawPins[i], 1200, 1800);
+  for (int i = 0; i < 1; i++){
+    clawServos[i].attach(servoPins[i], 1200, 1800);
   }
   Serial.begin(115200);
 }
@@ -59,7 +58,7 @@ void readInput(){
         packetIndex = -1;
       }
       else{
-        inputValue.value[packetIndex-2] = input;
+        inputValue.values[packetIndex-2] = input;
       }
     }
     packetIndex++;
@@ -94,16 +93,16 @@ void processCommand(Input inputValue){
 
 void moveMultipleThrusters(Input inputValue){
   for (int i = 0; i < 6; i++){
-    thrusterPins[i].writeMicroseconds(inputValue.values[i]*10);
+    thrusters[i].writeMicroseconds(inputValue.values[i]*10);
   }
 }
 
 void moveClawServo(Input inputValue){
-  clawServos[0].write(inputValue*2);
+  clawServos[0].write(inputValue.values[0]*2);
 }
 
 void halt(Input inputValue){
   for (int i = 0; i < 6; i++){
-    thrusterPins[i].writeMicroseconds(1500);
+    thrusters[i].writeMicroseconds(1500);
   }
 }

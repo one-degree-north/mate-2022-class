@@ -76,13 +76,16 @@ class Controls:
     def writeAllThrusters(self, thrusterValues): #assuming thrusterValues is between -1 and 1
         modifiedThrusters = []
         for i in range(6):
+            print(thrusterValues[i])
             modifiedThrusterValue = int(thrusterValues[i]*50 + 150) #passed thruster values are between 100 and 200 (translates into 1000 and 2000 microseconds)
-            if (thrusterValues > 200):
+            print(int(thrusterValues[i]*50 + 150))
+            if (modifiedThrusterValue > 200):
                 modifiedThrusterValue = 200
-            if (thrusterValues < 100):
+            if (modifiedThrusterValue < 100):
                 modifiedThrusterValue = 100
+            print(modifiedThrusterValue)
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
-        self.outputQueue.put((1, (int.to_bytes(0x14), 1, "big", modifiedThrusters)))
+        self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
     def getAccelValue(self):
         self.outputQueue.put((0, (int.to_bytes(0x10, 1, "big"), int.to_bytes(0, 1, "big"))))
@@ -104,8 +107,24 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    #controls.setAccelAutoreport(100)
-    controls.setOrientationAutoreport(1)
-    #controls.getGyroValue()
-    #controls.getAccelValue()
-    controls.comms.readThread()
+    controls.comms.startThread()
+    inputNum = 0;
+    inputs = [0, 0, 0, 0, 0, 0]
+    while True:
+        print("index")
+        index = int(input())
+        print("value")
+        value = float(input())
+        inputs[index] = value
+        print(inputs)
+        controls.writeAllThrusters(inputs)
+        inputs = [0, 0, 0, 0, 0,0]
+
+    """while True:
+        print(f"thrusterNum: {inputNum}")
+        inputs[inputNum] = float(input())
+        if inputNum >= 5:
+            print(inputs)
+            controls.writeAllThrusters(inputs)
+            inputNum = 0
+        inputNum += 1"""

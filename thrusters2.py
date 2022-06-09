@@ -71,6 +71,3 @@ sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
 
 Thruster.showSpeeds(
     Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0)))
-    
-
-

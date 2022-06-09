@@ -16,7 +16,7 @@ thrustMultiplier = 1
 
 
 controls = Controls()
-controls.setOrientationAutoreport(sampInterval * 0.1)
+#controls.setOrientationAutoreport(sampInterval * 0.1)
 controls.comms.startThread()
 
 balancer = Automator(sampInterval, controls)
@@ -54,7 +54,8 @@ def main(interval):
         # currTime = datetime.datetime.now()
         # timeDiff = currTime - startTime
         # timeElapsed = timeDiff.total_seconds() * 1000 # in milliseconds
-        thrusterSpeeds = doMath()
+        thrusterSpeeds = doMath(controls=controls, balancer=balancer, joystick=joystick)
+        print(f"thrusterSpeed: {thrusterSpeeds}")
         controls.writeAllThrusters(thrusterSpeeds)
         sleep(sampInterval * 0.001)
 
