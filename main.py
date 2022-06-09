@@ -55,7 +55,7 @@ def main(interval):
         # timeDiff = currTime - startTime
         # timeElapsed = timeDiff.total_seconds() * 1000 # in milliseconds
         thrusterSpeeds = doMath()
-        WRITE_TO_CONTROLS(THRUSTERSPEEDS)
+        controls.writeAllThrusters(thrusterSpeeds)
         sleep(sampInterval * 0.001)
 
 if __name__ == "__main__":
