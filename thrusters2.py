@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 class Thruster():
     multiplier = 1
@@ -59,14 +60,22 @@ class Thruster():
         for pin, value in speeds.items():
             print(f"{pin = }, {value}")
 
-        
-frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
-frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
-backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
-backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
-sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+start = time.time()
 
+if __name__ == "__main__":     
+       
+    frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+    frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+    backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+    backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+    sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
+    sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+    for i in range(1000):
+        # Thruster.showSpeeds(
+        #     Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0)))
+        Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0))
 
-Thruster.showSpeeds(
-    Thruster.getSpeeds((0, 0, 1), (0.5, 0.25, 0)))
+end = time.time()
+
+totalTime = end - start
+print("\n" + str(totalTime))

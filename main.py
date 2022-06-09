@@ -40,10 +40,9 @@ def doMath(controls, balancer: Automator, joystick: Joystick):
         0
     )
 
-    thrusterSpeeds = Thruster.findSpeeds(
+    thrusterSpeeds = Thruster.getSpeeds(
         intendedMotion=intendedMotion,
-        intendedRotation=intendedRotation,
-        multiplier=1
+        intendedRotation=intendedRotation
     )
 
     return thrusterSpeeds
@@ -57,7 +56,7 @@ def main(interval):
         thrusterSpeeds = doMath(controls=controls, balancer=balancer, joystick=joystick)
         print(f"thrusterSpeed: {thrusterSpeeds}")
         controls.writeAllThrusters(thrusterSpeeds)
-        sleep(sampInterval * 0.001)
+        sleep(interval * 0.001)
 
 if __name__ == "__main__":
     main(sampInterval)

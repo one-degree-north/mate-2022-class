@@ -9,6 +9,7 @@ import numpy as np
 from joystick import Joystick, JoystickData
 from time import sleep
 
+import time
 
 
 class Thruster:
@@ -116,14 +117,24 @@ class Thruster:
         for pin, value in self.determine(intendedMotion, intendedRotation, multiplier).items():
             print(f"{pin = }, {value}")
 
-frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
-frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
-backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
-backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
-sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
-Thruster.showSpeeds((0,0,1), (0.5, 0.25, 0), 1)
+start = time.time()
+
+if __name__ == "__main__":
+    
+    frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
+    frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
+    backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
+    backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
+    sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
+    sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
+    for i in range(1000):
+        Thruster.determine((0,0,1), (0.5, 0.25, 0), 1)
+
+end = time.time()
+
+totalTime = end - start
+print("\n" + str(totalTime))
 
 
 # if __name__ == "__main__":
