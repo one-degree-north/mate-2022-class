@@ -1,5 +1,5 @@
 
-from thrusters import Thruster
+from thrusters2 import Thruster
 from joystick import Joystick
 from automation import Automator
 
@@ -23,12 +23,12 @@ balancer = Automator(sampInterval, controls)
 
 joystick = Joystick()
 
-frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
-frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
-backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
-backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
-sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
+frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+sideL  = Thruster(pin=4, power=(0, 1, 0), position=(-1, 0))
+sideR  = Thruster(pin=5, power=(0, 1, 0), position=( 1, 0))
 
 def doMath(controls, balancer: Automator, joystick: Joystick):
     intendedRotation = balancer.forces()
@@ -40,7 +40,7 @@ def doMath(controls, balancer: Automator, joystick: Joystick):
         0
     )
 
-    thrusterSpeeds = Thruster.determine(
+    thrusterSpeeds = Thruster.findSpeeds(
         intendedMotion=intendedMotion,
         intendedRotation=intendedRotation,
         multiplier=1
