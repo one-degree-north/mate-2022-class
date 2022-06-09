@@ -16,7 +16,7 @@ class StatusBar(QWidget):
         """)
 
         self.front_cam_status = Status('F', 'Front camera')
-        self.back_cam_status = Status('D', 'Down camera')
+        self.down_cam_status = Status('D', 'Down camera')
         self.serial_status = Status('S', 'Serial connection')
 
         self.frame = QWidget()
@@ -25,7 +25,7 @@ class StatusBar(QWidget):
         self.layout.setSpacing(10)
 
         self.layout.addWidget(self.front_cam_status)
-        self.layout.addWidget(self.back_cam_status)
+        self.layout.addWidget(self.down_cam_status)
         self.layout.addWidget(self.serial_status)
         
         self.setLayout(self.layout)
@@ -41,8 +41,6 @@ class StatusBar(QWidget):
 
         self.setFixedWidth(40)
 
-        self.front_cam_status.connected()
-
 class Status(QLabel):
     def __init__(self, text, tip):
         super().__init__(text)
@@ -54,11 +52,16 @@ class Status(QLabel):
             }
         """)
 
+        self.connected = False
+
 
         self.setAlignment(Qt.AlignCenter)
         self.setToolTip(tip)
 
-    def connected(self):
+    def set_connected(self):
+        if self.connected:
+            return
+
         self.setStyleSheet("""
             QLabel {
                 color: rgb(29, 177, 0);
@@ -66,10 +69,17 @@ class Status(QLabel):
             }
         """)
 
-    def disconnected(self):
+        self.connected = True
+
+    def set_disconnected(self):
+        if not self.connected:
+            return
+
         self.setStyleSheet("""
             QLabel {
                 color: rgb(140, 26, 17);
                 font: bold 25px
             }
         """)
+
+        self.connected = False

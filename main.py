@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtCore import QTimer
+
 
 from gui.grid import Grid
 from gui.control import ControlBar
@@ -7,6 +9,9 @@ from gui.timer import TimerBar, TimerControlBar
 
 import sys
 import yaml
+from threading import Thread
+
+from time import sleep
 
 class CrimsonUI(QMainWindow):
     def __init__(self, front_port, down_port):
@@ -87,6 +92,22 @@ class CrimsonUI(QMainWindow):
         self.frame.setLayout(self.frame.layout)
 
         self.setCentralWidget(self.frame)
+
+        # Status updater
+        self.status_updater = QTimer()
+        self.status_updater.timeout.connect(self.update_status)
+        self.status_updater.start(100)
+
+    def update_status(self):
+        if self.grid.front_cam.connected:
+            self.status.front_cam_status.set_connected()
+        else:
+            self.status.front_cam_status.set_disconnected()
+
+        if self.grid.down_cam.connected:
+            self.status.down_cam_status.set_connected()
+        else:
+            self.status.down_cam_status.set_disconnected()
 
 if __name__ == '__main__':
     with open('settings.yml', 'r') as f:
