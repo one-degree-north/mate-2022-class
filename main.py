@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget
 from PyQt5.QtCore import QTimer
 
-
 from gui.grid import Grid
 from gui.control import ControlBar
 from gui.status import StatusBar
@@ -73,7 +72,8 @@ class CrimsonUI(QMainWindow):
         self.lower_frame.layout = QHBoxLayout()
 
         self.lower_frame.layout.addWidget(self.control_frame)
-        self.lower_frame.layout.addWidget(self.grid, 100)
+        # self.lower_frame.layout.addWidget(self.grid, 100)
+        self.lower_frame.layout.addStretch(1)
         self.lower_frame.layout.addWidget(self.status_frame)
 
         self.lower_frame.layout.setContentsMargins(0,0,0,0)
@@ -86,7 +86,8 @@ class CrimsonUI(QMainWindow):
         self.frame.layout = QVBoxLayout()
         
         self.frame.layout.addWidget(self.timer_frame)
-        self.frame.layout.addWidget(self.lower_frame, 100)
+        self.frame.layout.addWidget(self.grid, 100)
+        self.frame.layout.addWidget(self.lower_frame)
 
         self.frame.layout.setContentsMargins(0,0,0,0)
         self.frame.setLayout(self.frame.layout)
@@ -108,6 +109,7 @@ class CrimsonUI(QMainWindow):
             self.status.down_cam_status.set_connected()
         else:
             self.status.down_cam_status.set_disconnected()
+
 
 if __name__ == '__main__':
     with open('settings.yml', 'r') as f:
