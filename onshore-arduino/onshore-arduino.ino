@@ -74,7 +74,7 @@ void processCommand(Input inputValue){
       moveMultipleThrusters(inputValue);
     break;
     case 0x1C: //move claw servo
-      if (inputValue.paramNum != 1){
+      if (inputValue.paramNum != 2){
         break;
       }
       moveClawServo(inputValue);
@@ -97,8 +97,13 @@ void moveMultipleThrusters(Input inputValue){
   }
 }
 
+void moveSingleThruster(Input inputValue){
+  thrusters[inputValue.values[0]].writeMicroseconds(inputValue.values[1]*10);
+}
+
 void moveClawServo(Input inputValue){
-  clawServos[0].write(inputValue.values[0]*2);
+  uint16_t deg = (inputValue.values[0]<<8) + inputValue.values[1];
+  clawServos[0].write(deg); //I'm not sure if the system uses small or big endian, too lazy to check
 }
 
 void halt(Input inputValue){
