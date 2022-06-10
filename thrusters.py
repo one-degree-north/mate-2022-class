@@ -1,4 +1,8 @@
 """
+DEPRECATED
+FOR TESTING PURPOSES ONLY
+
+
 import this if thruster pin number is needed
 don't need to keep making the same
 variables in each file
@@ -42,7 +46,7 @@ class Thruster:
         return thrusterSpeeds
 
     def averager(self, speeds: list):
-        print(speeds)
+        # print(speeds)
         if len(speeds) != 0:
             return round(sum(speeds) / len(speeds), 8)
         return 0
@@ -129,8 +133,11 @@ if __name__ == "__main__":
     backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
     sideL  = Thruster(pin=4, power=(0, 1, 0), position=(-1, 0))
     sideR  = Thruster(pin=5, power=(0, 1, 0), position=( 1, 0))
-    for i in range(100):
-        Thruster.showSpeeds((0,0,0), (0.5, 0.25, 0), 1)
+
+    for i in range(1000):
+        Thruster.determine((0,0,-1), (0.5, 0.25, 0), 1)
+        # count += 
+        # print(cout)
 
 end = time.time()
 

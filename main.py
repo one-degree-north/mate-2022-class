@@ -1,5 +1,5 @@
 
-from thrusters2 import Thruster
+from thrusters3 import Thruster
 from joystick import Joystick
 from automation import Automator
 
