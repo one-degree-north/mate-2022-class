@@ -1,4 +1,4 @@
-from dataclasses import *
+from dataclasses import dataclass
 from pynput import keyboard
 from comms import Comms
 

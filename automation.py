@@ -22,7 +22,8 @@ class Automator():
 
         def force(self):
             p = self.kp * self.errorHistory[-1]
-            d = self.kd * (self.errorHistory[-1] + self.errorHistory[-2]) / self.interval
+            d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
+            # d = self.kd * (self.errorHistory[-2] - self.errorHistory[-1]) / self.interval
             return p + d
 
         def update(self, error):
@@ -65,7 +66,7 @@ class Automator():
         # self.collectErrors()
 
     def forces(self):
-        return (self.roll.force(), self.pitch.force(), self.yaw.force)
+        return (self.roll.force(), self.pitch.force(), self.yaw.force())
 
 # control = Controls()
 # control.setOrientationAutoreport(1)

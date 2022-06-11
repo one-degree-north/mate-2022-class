@@ -41,9 +41,8 @@ def doMath(controls, balancer: Automator, joystick: Joystick):
     )
 
     thrusterSpeeds = Thruster.getSpeeds(
-        intendedMotion=intendedMotion,
-        intendedRotation=intendedRotation
-    )
+        intendedMotion,
+        intendedRotation)
 
     return thrusterSpeeds
 
