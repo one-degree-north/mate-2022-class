@@ -85,6 +85,9 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         else:
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
+            """for value in output[0][1]:
+                print(value)
+                self.onshoreArduino.write(value)"""
             for value in output[1][1]:
                 print(value)
                 self.onshoreArduino.write(value)

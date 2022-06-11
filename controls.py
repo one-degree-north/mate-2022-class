@@ -87,6 +87,9 @@ class Controls:
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
+    def moveClaw(self, deg):
+        self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), int.to_bytes(0x14, 2, "big"))))
+
     def getAccelValue(self):
         self.outputQueue.put((0, (int.to_bytes(0x10, 1, "big"), int.to_bytes(0, 1, "big"))))
 
