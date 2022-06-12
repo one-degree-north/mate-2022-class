@@ -15,7 +15,11 @@ class Thruster():
         )
 
         self.position = (position[0], position[1], position[0])
-        self.thrusters.append(self)
+        self.sendToManager(self)
+
+    @classmethod
+    def sendToManager(cls, thrusterObject):
+        cls.thrusters.append(thrusterObject)
 
     def findForMotion(self, reqMotion):
         forMotion = (reqMotion[0] * self.power[0] +
