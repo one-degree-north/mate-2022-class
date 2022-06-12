@@ -82,7 +82,7 @@ class Thruster():
                     if speed != 0:
                         divisor += 1
                 try:
-                    output[thruster.pin] = sum(speeds) / divisor
+                    output[thruster.pin] = cls.multiplier * sum(speeds) / divisor
                 except ZeroDivisionError:
                     output[thruster.pin] = divisor
 
@@ -101,7 +101,7 @@ class Thruster():
                 bump = 0
             
             for pin, value in axisDict.items():
-                output[pin] = value + bump
+                output[pin] = cls.multiplier * (value + bump)
 
         return output
 
@@ -116,15 +116,24 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
-    frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
-    backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
-    backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
-    sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
-    sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+    # frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+    # frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+    # backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+    # backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+    # sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
+    # sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+
+    Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+    Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+    Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+    Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+    Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
+    Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+
+    Thruster.setMultiplier(100)
 
     for i in range(1000):
-        Thruster.showSpeeds(Thruster.getSpeeds((0, 1, 1), (0.1, 0, -0.1)))
+        Thruster.showSpeeds(Thruster.getSpeeds((0, 1, -1), (0, 0, 0)))
         print("\n" * 3)
 
     end = time.time()

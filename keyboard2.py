@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from pynput import keyboard
 
+from thrusters3 import Thruster
+
 
 @dataclass
 class Move:
@@ -29,6 +31,39 @@ def findAngle(currValue, changeAmount, minMax, changeType):
         currValue = minMax[1]
 
     return currValue
+
+def speakMovement(reqMotion, reqRotation=None):
+    output = "\n---------------\n"
+
+    if reqMotion[1] != 0:
+        if reqMotion[1] > 0:
+            output += "Moving Forward!\n"
+        else:
+            output += "Moving Backward!\n"
+    if reqMotion[2] != 0:
+        if reqMotion[2] > 0:
+            output += "Moving Up!\n"
+        else:
+            output += "Moving Down!\n"
+
+    if reqRotation[0] != 0:
+        if reqRotation[0] > 0:
+            output += "Tilting Rightward!\n"
+        else:
+            output += "Tilting Leftward!\n"
+    if reqRotation[1] != 0:
+        if reqRotation[1] > 0:
+            output += "Tilting Forward!\n"
+        else:
+            output += "Tilting Backward!\n"
+    if reqRotation[2] != 0:
+        if reqRotation[2] > 0:
+            output += "Turning right!\n"
+        else:
+            output += "Turning left!\n"
+
+    print(output)
+    
 
 # print(findAngle(30, None, (0, 90), Move.toggle))
 
@@ -61,7 +96,11 @@ class Key():
     def setState(self, isDown):
         if isDown != self.isDown:
             self.isDown = isDown
-            print(Key.findNets())
+            reqMotion, reqRotation, clawAngle = Key.findNets()
+            speakMovement(reqMotion, reqRotation)
+            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation))
+            
+
         
     @classmethod
     def findNets(cls):
@@ -128,6 +167,13 @@ class Key():
 
 if __name__ == "__main__":
 
+    frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+    frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+    backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+    backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+    sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
+    sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+
 
     w = Key('w', Move.motion, (0, 1, 0), False)
     s = Key('s', Move.motion, (0,-1, 0), False)
@@ -140,6 +186,9 @@ if __name__ == "__main__":
 
     u = Key('u', Move.rotation, (0, 1, 0), False)
     j = Key('j', Move.rotation, (0,-1, 0), False)
+
+    l = Key('l', Move.rotation, (-1, 0, 0), False)
+    semicolon = Key(';', Move.rotation, (1, 0, 0), False)
 
     q = Key('q', Move.killswtich, None, False)
     e = Key('e', Move.toggle, [findAngle, (0, 90), 0], False)

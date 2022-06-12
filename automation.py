@@ -45,9 +45,9 @@ class Automator():
         #     pass
 
 
-    def __init__(self, interval, dataGetter):
+    def __init__(self, interval, dataGetter=None):
         self.interval = interval
-        self.dataGetter = dataGetter
+        # self.dataGetter = dataGetter
         # self.dataGetter = Controls()
         # self.dataGetter.setOrientationAutoreport(self.interval * 0.1)
         # self.dataGetter.comms.startThread()
@@ -56,8 +56,8 @@ class Automator():
         self.roll = self.Axis(interval)
         self.yaw = self.Axis(interval)
 
-    def collectErrors(self):
-        errors = self.dataGetter.orientationData
+    def collectErrors(self, errors):
+        # errors = self.dataGetter.orientationData
         self.yaw.update(errors[0])
         self.pitch.update(errors[1])
         self.roll.update(errors[2])
@@ -65,7 +65,8 @@ class Automator():
 
         # self.collectErrors()
 
-    def forces(self):
+    def forces(self, errors):
+        self.collectErrors(errors)
         return (self.roll.force(), self.pitch.force(), self.yaw.force())
 
 # control = Controls()
