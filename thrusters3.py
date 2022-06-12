@@ -3,11 +3,18 @@ import time
 class Thruster():
     multiplier = 1
     thrusters = []
-    searchType = None
+    # searchTypeZ = None
+    # searchTypeY = None
+    x, y, z = 0, 1, 2
 
     def __init__(self, pin, power, position):
         self.pin = pin
         self.power = power
+        self.axis = 0
+        for axis, value in enumerate(power):
+            if value != 0:
+                self.axis = axis
+
         self.invertedPower = (
             -(self.power[0] - 1),
             -(self.power[1] - 1),
@@ -52,22 +59,21 @@ class Thruster():
         cls.multiplier = m
 
     @classmethod
-    def getSpeeds(cls, reqMotion, reqRotation, normalize=True):
-        if reqMotion[2] > 0:
-            cls.searchType = max
-        elif reqMotion[2] < 0:
-            cls.searchType = min
-        else:
-            cls.searchType = None
-            normalize = False
+    def getSpeeds(cls, reqMotion, reqRotation, normalizeZ=True, normalizeY=True):
+        if reqMotion[2] == 0:
+            normalizeZ = False
+        if reqMotion[1] == 0:
+            normalizeY = False
 
         output = {}
-        toNormalize = {}
+        # each axis' dict is thruster.pin: value_from_findForRotation()
+        #              x   y   z
+        toNormalize = [{}, {}, {}]
 
         for thruster in cls.thrusters:
-            if normalize and thruster.power[2] == 1:
-                forRotation = thruster.findForRotation(reqRotation)
-                toNormalize[thruster.pin] = forRotation
+            if (normalizeY and thruster.axis == cls.y) or (normalizeZ and thruster.axis == cls.z):
+                toNormalize[thruster.axis][thruster.pin] = thruster.findForRotation(reqRotation)
+
             else:
                 speeds = (thruster.findForMotion(reqMotion), thruster.findForRotation(reqRotation))
                 # print(f"{speeds = }")
@@ -79,12 +85,22 @@ class Thruster():
                     output[thruster.pin] = sum(speeds) / divisor
                 except ZeroDivisionError:
                     output[thruster.pin] = divisor
-        
+
         # print(f"{toNormalize = }")
-        if normalize:
-            bump = (1 - abs(cls.searchType(list(toNormalize.values())))) * reqMotion[2]
-            print(f"{bump = }")
-            for pin, value in toNormalize.items():
+        
+        for axis, axisDict in enumerate(toNormalize):
+            searchType = None
+            if reqMotion[axis] > 0:
+                searchType = max
+            elif reqMotion[axis] < 0:
+                searchType = min
+
+            if searchType != None and axisDict: # axisDict part checks if dictionary has content
+                bump = (1 - abs(searchType(list(axisDict.values())))) * reqMotion[axis]
+            else:
+                bump = 0
+            
+            for pin, value in axisDict.items():
                 output[pin] = value + bump
 
         return output
@@ -94,9 +110,11 @@ class Thruster():
             print(f"{pin=} -> {round(speeds[pin], 5)}")
 
 
-start = time.time()
+
 
 if __name__ == "__main__":     
+
+    start = time.time()
 
     frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
     frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
@@ -106,15 +124,13 @@ if __name__ == "__main__":
     sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
 
     for i in range(1000):
-        Thruster.showSpeeds(Thruster.getSpeeds((0, 1, 0.75), (0.1, 0.1, 0.1), normalize=True))
+        Thruster.showSpeeds(Thruster.getSpeeds((0, 1, 1), (0.1, 0, -0.1)))
+        print("\n" * 3)
 
-end = time.time()
+    end = time.time()
 
-totalTime = end - start
-print("\n" + str(totalTime))
+    totalTime = end - start
+    print("\n" + str(totalTime))
 
-# end = time.time()
-# totalTime = end - start
 
-# print("\n" + str(totalTime))
 
