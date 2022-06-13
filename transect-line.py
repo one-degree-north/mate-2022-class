@@ -2,6 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+import thrusters
 
 hsv = None
 img = None
@@ -9,7 +10,10 @@ bounding_rect = None
 empty = None
 cam_dex = 0
 baud_rate = 115200
-
+thrust_manager = thrusters.ThrustManager()
+error_queue = None
+target_orientation = 0
+current_orientation = None  #link controls orientation list here
 # BECAUSE PARAMETERS ARE CRINGE
 
 def detect_rope():
@@ -71,28 +75,44 @@ def turn(direction):
     
     # Get angular acceleration data, then do 0.5at2 and figure out t
     
-    
+def adjust_orientation(orientation):
+    orientation %= 360
+    if (orientation < 0):
+        orientation += 360
+    return orientation
+
+def get_error(current_orientation, target_orientation):
+    error = adjust_orientation(target_orientation - current_orientation[0])
+    if (error > 180):
+        error = 180 - error
+    return error
+
 def run():
     finished = False
-    start_running()    # Move forward
-    
+    thrust_manager.multiplier = 0.1
+    thrust_manager.getTSpeeds((0, 1, 0), (0, 0, 0))    # Move forward
+
     while(not finished):
         read_frame()
         detect_rope()
         defect_pt = find_defect()
         
         if defect_pt == (0, 0):
-            stop_running() # Stop moving forward
+            
             finished = True
         elif defect_pt != (-1, -1):
             x, y, w, h = bounding_rect
-            stop_running() # Stop moving forward
+            thrust_manager.multiplier = 0.1 #stop moving forward
+            thrust_manager.getTSpeeds((0, 0, 0), (0, 0, 0)) # Stop moving forward
             left = False
             right = True
 
             if ((defect_pt[0] - x) > (w / 2.0)):
-                turn(left);
+                target_orientation = current_orientation[0] + 90 #turn left
+                target_orientation = adjust_orientation(target_orientation)
+                #START ERROR READING IN QUEUE, DON'T READ HERE PROBABLY
+                error = adjust_orientation(target_orientation - current_orientation[0])
             else:
-                turn(right);
-        
+                turn(right);    #turn right
+
         
