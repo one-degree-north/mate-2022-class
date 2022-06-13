@@ -1,115 +1,173 @@
 from dataclasses import dataclass
 from pynput import keyboard
-from comms import Comms
+
 
 @dataclass
-class Thruster:
-    pinNum = 0
-    writtenValue = 0
+class Move:
+    motion: int = 0
+    rotation: int = 1
+    killswtich: int = 'q'
+    toggle: int = 3
+    bumpUp: int = 4
+    bumpDown: int = 5
 
-@dataclass
-class Thrusters:
-    frontL = 0
-    frontR = 1
-    midL = 2    #thrusters that move horizontaly
-    midR = 3    #thrusters that move horizontaly
-    backL = 4
-    backR = 5
+def findAngle(currValue, changeAmount, minMax, changeType):
+    if changeType == Move.bumpUp:
+        currValue += changeAmount
+    elif changeType == Move.bumpDown:
+        currValue -= changeAmount
+    elif changeType == Move.toggle:
+        if (currValue - minMax[0]) >= (minMax[1] - currValue):
+            currValue = minMax[0]
+        else:
+            currValue = minMax[1]
 
-@dataclass
-class Servos:
-    claw = 2
-    # Not in use
-    # claw_rotate = 1
-    # camera = 2
+    if currValue < minMax[0]:
+        currValue = minMax[0]
+    elif currValue > minMax[1]:
+        currValue = minMax[1]
 
-@dataclass
-class MovementKey:
-    key: chr
-    movementModify: list[int]   #front_left, front_right, mid_left, mid_right, back_left, back_right
-    horizontal: bool            #horizontal or vertical, modifies how the average is calculated
-    keydown: bool = False
+    return currValue
 
-"""
-@dataclass
-class MovementKey:
-    key = 'w'
-    movementModify = []   #front_left, front_right, mid_left, mid_right, back_left, back_right
-    horizontal = False     #horizontal or vertical, modifies how the average is calculated
-    keydown = False
-"""
+def speakMovement(reqMotion, reqRotation=None):
+    output = "\n---------------\n"
 
-class Keyboard:
-    def __init__(self, comms):
-        self.comms = comms
-        self.movementModifier = 1.0
+    if reqMotion[1] != 0:
+        if reqMotion[1] > 0:
+            output += "Moving Forward!\n"
+        else:
+            output += "Moving Backward!\n"
+    if reqMotion[2] != 0:
+        if reqMotion[2] > 0:
+            output += "Moving Up!\n"
+        else:
+            output += "Moving Down!\n"
+
+    if reqRotation[0] != 0:
+        if reqRotation[0] > 0:
+            output += "Tilting Rightward!\n"
+        else:
+            output += "Tilting Leftward!\n"
+    if reqRotation[1] != 0:
+        if reqRotation[1] > 0:
+            output += "Tilting Forward!\n"
+        else:
+            output += "Tilting Backward!\n"
+    if reqRotation[2] != 0:
+        if reqRotation[2] > 0:
+            output += "Turning right!\n"
+        else:
+            output += "Turning left!\n"
+
+    print(output)
+
+class KeyManager():
+    def __init__(self, controls=None, q=None):
+        self.controls = controls
+        self.q = q
+        self.acceptedChars = {}
         self.keys = [
-            MovementKey(key='w', movementModify=[50, 50], horizontal=True),      # all forward
-            MovementKey(key='s', movementModify=[-50, -50], horizontal=True),    # all back
-        ]
-        self.thrusterValues = [0, 0, 0, 0, 0 ,0]
-    
-    def setThrusterMovement(self):
-        #calculate total movement by iterating through all movement keys
-        horizontalThrusters = [0, 0]
-        verticalThrusters = [0, 0, 0, 0]
-        horizontalNum = 0
-        verticalNum = 0
-        for movementKey in self.keys:
-            if (movementKey.horizontal):
-                horizontalNum += 1
-                for i in range(2):
-                    horizontalThrusters[i] += movementKey.movementModify[i]
-            else:
-                verticalNum += 1
-                for i in range(4):
-                    verticalThrusters[i] += movementKey.movementModify[i]
-        print()
-        if (horizontalNum != 0):
-            for i in range(2):
-                horizontalThrusters[i] /= horizontalNum
-                horizontalThrusters[i] *= self.movementModifier
-                print(f"thruster: {i}, value: {horizontalThrusters[i]}")
-                self.comms.writePWM(i, horizontalThrusters[i])
-        if (verticalNum != 0):
-            for i in range(4):
-                verticalThrusters[i] /= verticalNum
-                verticalThrusters[i] *= self.movementModifier
-                print(f"thruster: {i+2}, value: {verticalThrusters[i]}")
-                self.comms.writePWM(i+2, verticalThrusters[i])
+            Key('w', Move.motion, (0, 1, 0), False),
+            Key('s', Move.motion, (0,-1, 0), False),
 
-    def setThrusterMovement2(self):
-        #storing values in rawThrusterValues, taking them out when onRelease. This is probably better for automation
-        pass
+            Key('i', Move.motion, (0, 0, 1), False),
+            Key('k', Move.motion, (0, 0,-1), False),
+
+            Key('a', Move.rotation, (0, 0,-1), False),
+            Key('d', Move.rotation, (0, 0, 1), False),
+
+            Key('u', Move.rotation, (0, 1, 0), False),
+            Key('j', Move.rotation, (0,-1, 0), False),
+
+            Key('l', Move.rotation, (-1, 0, 0), False),
+            Key(';', Move.rotation, (1, 0, 0), False),
+
+            Key('q', Move.killswtich, None, False),
+            Key('e', Move.toggle, [findAngle, (0, 90), 0], False),
+        ]
+
+        self.currClawAngle = 0
+
+        for key in self.keys:
+            self.acceptedChars[key.keyStr] = key
+
+    def findNets(self):
+        netMotion = [0, 0, 0]
+        netRotation = [0, 0, 0]
+        clawAngle = self.currClawAngle
+
+
+        for key in self.acceptedChars.values():
+            if key.isDown:
+                # Adding is okay since there aren't any conflicting values
+                # And each thruster acts along only one axis
+                if key.mType == Move.motion:
+                    # print("Adding to motion")
+                    netMotion[key.effectAxis] += key.effect[key.effectAxis]
+                elif key.mType == Move.rotation:
+                    netRotation[key.effectAxis] += key.effect[key.effectAxis]
+                elif key.mType == Move.killswtich:
+                    return ([0, 0, 0], [0, 0, 0], 0)
+                elif key.mType == Move.toggle:
+
+                    clawAngle = key.effect[0](currValue=self.currClawAngle, 
+                                              changeAmount=None,
+                                              minMax=key.effect[1],
+                                              changeType=Move.toggle)
+
+                    self.currClawAngle = clawAngle
+
+
+
+        # print((netMotion, netRotation, clawAngle))
+        self.q.put(["k", (netMotion, netRotation, clawAngle)])
+
+    def updateKeyState(self, keyStr, isDown):
+        if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:
+            self.acceptedChars[keyStr].isDown = isDown
+            print(self.findNets())
 
     def onPress(self, key):
-        #working wtih setThrusterMovement right now
-        for movementKey in self.keys:
-            if movementKey.key == key.char and movementKey.keydown == False:
-                print("key found")
-                movementKey.keydown = True
-                self.setThrusterMovement()
+        try:
+            char = key.char
+        except AttributeError:
+            print(f"Special key {key} pressed")
+            return
+
+        self.updateKeyState(char, isDown=True)
+        # print(self.findNets())
 
     def onRelease(self, key):
-        #working with setThrusterMovement right now
-        for movementKey in self.keys:
-            if movementKey.key == key.char:
-                print("key found")
-                movementKey.keydown = False
-                self.setThrusterMovement()
+        try:
+            char = key.char
+        except AttributeError:
+            print(f"Special key {key} pressed")
+            return
+
+        self.updateKeyState(char, isDown=False)
+        # print(self.findNets())
+
+    def startPolling(self):
+        self.keyboardListener = keyboard.Listener(on_press=self.onPress, on_release=self.onRelease)
+        self.keyboardListener.start()
+
+
+class Key():
+    def __init__(self, keyStr, mType, effect, isDown=False):
+        self.keyStr = keyStr
+        self.mType = mType
+        self.effect = effect
         
+        self.effectAxis = 0 
+        if self.mType == Move.motion or self.mType == Move.rotation:
+            for axis, m in enumerate(effect):
+                if m != 0:
+                    self.effectAxis = axis
 
-    def startInputReading(self):
-        keyboardListener = keyboard.Listener(on_press=self.onPress, on_release=self.onRelease)
-        keyboardListener.start()
-
-def main():
-    comms = Comms()
-    keyboard = Keyboard(comms)
-    keyboard.startInputReading()
-    while True:
-        pass
+        self.isDown = isDown
 
 
-if (__name__ == "__main__"):
-    main()
+if __name__ == "__main__":
+    KManager = KeyManager()
+    KManager.startPolling()
+    KManager.keyboardListener.join()

@@ -1,6 +1,6 @@
 
 class ThrustManager():
-    def __init__(self, controls=None, multiplier=1):
+    def __init__(self, multiplier=1, controls=None):
         self.thrusters = [
             Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
             Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
@@ -10,8 +10,8 @@ class ThrustManager():
             Thruster(pin=5, power=(1, 1, 0), position=( 1, 0)),
         ]
 
-        self.controls = controls
         self.multiplier = multiplier
+        self.controls = controls
         self.x, self.y, self.z = 0, 1, 2
 
     def getTSpeeds(self, reqMotion, reqRotation, normalizeZ=True, normalizeY=True):
