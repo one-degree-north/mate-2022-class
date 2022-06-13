@@ -9,6 +9,9 @@ from controls import Controls
 class Automator():
 
     controls = Controls()
+    controls.comms.startThread()
+    controls.setOrientationAutoreport(1)
+    
     q: Queue = Queue()
     
     class Axis():
