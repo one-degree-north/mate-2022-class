@@ -151,7 +151,7 @@ if __name__ == '__main__':
         settings = yaml.safe_load(f)
 
     app = QApplication([])
-    # app.setStyle('Fusion')
+    app.setStyle('Fusion')
 
     window = CrimsonUI(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     window.show()

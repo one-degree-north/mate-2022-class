@@ -58,6 +58,17 @@ class Logs(QDialog, QPlainTextEdit):
                 font: 12px;
                 color: white
             }
+
+            QScrollBar:handle {
+                background: rgb(35, 35, 35);
+                border-radius: 5px
+            }
+
+            QScrollBar:up-arrow, QScrollBar:down-arrow {
+                height: 0px;
+                width: 0px
+
+            }
         """)
 
         self.logger = LoggerBox(self)
@@ -88,7 +99,7 @@ class CommandLine(QLineEdit):
                 border-top-left-radius: 10px;
                 border-top-right-radius: 10px;
 
-                color: lightgrey
+                color: rgb(200, 200, 200)
             }
         """)
 
