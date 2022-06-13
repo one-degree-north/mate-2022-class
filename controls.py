@@ -86,8 +86,9 @@ class Controls:
                 modifiedThrusterValue = 200
             if (modifiedThrusterValue < 100):
                 modifiedThrusterValue = 100
-            #print(modifiedThrusterValue)
+            print(modifiedThrusterValue)
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
+        print(modifiedThrusters)
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
     def moveClaw(self, deg):
@@ -113,8 +114,8 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    #controls.comms.startThread()
-    """inputNum = 0;
+    controls.comms.startThread()
+    inputNum = 0;
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -125,7 +126,7 @@ if __name__ == "__main__":
         print(inputs)
         controls.writeAllThrusters(inputs)
         inputs = [0, 0, 0, 0, 0,0]
-    """
+    
     """while True:
         print(f"thrusterNum: {inputNum}")
         inputs[inputNum] = float(input())
@@ -134,5 +135,5 @@ if __name__ == "__main__":
             controls.writeAllThrusters(inputs)
             inputNum = 0
         inputNum += 1"""
-    controls.setAccelAutoreport(100)
-    controls.comms.readThread()
+    #controls.setAccelAutoreport(100)
+    #controls.comms.readThread()

@@ -19,7 +19,7 @@ class AccelData:
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
         self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem142401", baudrate=115200)
-        #self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14240", baudrate=115200)
+        self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14220", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -79,17 +79,18 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         if (output[0] == 0):
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
-                #print(value)
+                print(value)
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
         else:
+            print("AAAA")
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
             """for value in output[0][1]:
                 print(value)
                 self.onshoreArduino.write(value)"""
             for value in output[1][1]:
-                #print(value)
+                print(value)
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
 
