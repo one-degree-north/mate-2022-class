@@ -59,6 +59,8 @@ class Automator():
         self.roll = self.Axis(interval)
         self.yaw = self.Axis(interval)
 
+        self.forces()
+
     def collectErrors(self, errors):
         errors = self.controls.orientationData
         self.yaw.update(errors[0])
@@ -93,6 +95,6 @@ class Automator():
 #     print(control.orientationData)
 
 
-# test = Automation(10)
+test = Automator(10)
 
 
