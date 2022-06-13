@@ -38,6 +38,7 @@ class Controls:
         #self.movements = Movements()
         #self.gyroData = GyroData()
         #self.accelData = AccelData()
+        self.reversed = [0, 2, 3, 4, 5]
         self.gyroData = [0, 0, 0] #rad/s
         self.orientationData = [0, 0, 0] #EULER: yaw (0-360), pitch (values are a bit weird, -90 to 90), roll (-180 to 180), may try using gyro instead of euler later
         self.accelData = [0, 0, 0] #m/s^2
@@ -77,6 +78,8 @@ class Controls:
         modifiedThrusters = []
         for i in range(6):
             print(thrusterValues[i])
+            if i in self.reversed:
+                thrusterValues[i] *= -1
             modifiedThrusterValue = int(thrusterValues[i]*50 + 150) #passed thruster values are between 100 and 200 (translates into 1000 and 2000 microseconds)
             print(int(thrusterValues[i]*50 + 150))
             if (modifiedThrusterValue > 200):

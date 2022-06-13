@@ -175,6 +175,7 @@ if __name__ == "__main__":
     backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
     sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
     sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+    Thruster.setMultiplier(0.2)
 
 
     w = Key('w', Move.motion, (0, 1, 0), False)

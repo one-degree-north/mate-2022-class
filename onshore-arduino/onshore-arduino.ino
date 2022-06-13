@@ -13,7 +13,7 @@ struct Input{
   uint8_t values[6];
 };
 
-int thrusterPins[] = {3, 4, 5, 6, 7, 8};
+int thrusterPins[] = {4, 3, 6, 7, 8, 5};
 Servo thrusters[6];
 int servoPins[] = {2};
 Servo clawServos[1];
