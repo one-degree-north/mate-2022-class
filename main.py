@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 from PyQt5.QtCore import Qt, QTimer
 
 from gui.grid import Grid
@@ -15,9 +15,28 @@ import cv2
 
 from datetime import datetime
 
+# class Title(QLabel):
+#     def __init__(self):
+#         super().__init__('Octopus Prime')
+
+#         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+#         self.setStyleSheet("""
+#             QWidget {
+#                 background: rgb(26, 26, 26);
+#                 border-bottom-left-radius: 10px;
+#                 border-bottom-right-radius: 10px;
+
+#                 font: bold 30px;
+#                 color: white
+#             }
+#         """)
+
 class CrimsonUI(QMainWindow):
     def __init__(self, front_port, down_port):
         super().__init__()
+
+        self.setWindowTitle('Crimson UI')
 
         self.setStyleSheet("""
             QMainWindow {
@@ -32,6 +51,8 @@ class CrimsonUI(QMainWindow):
         self.timer_control = TimerControlBar(self)
 
         self.console = ConsoleModule()
+        self.console.hide()
+        # self.title = Title()
 
 
         self.control_frame = QWidget()
@@ -69,6 +90,9 @@ class CrimsonUI(QMainWindow):
         
         self.timer_frame.layout.addWidget(self.timer)
         self.timer_frame.layout.addStretch(1)
+        # self.timer_frame.layout.addWidget(self.title)
+        # self.timer_frame.layout.addStretch(1)
+
         self.timer_frame.layout.addWidget(self.timer_control)
 
         self.timer_frame.layout.setContentsMargins(0,0,0,0)

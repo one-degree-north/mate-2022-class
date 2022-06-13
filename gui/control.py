@@ -21,13 +21,13 @@ class ControlBar(QWidget):
         self.help_button = Button('gui/icons/help_icon.png', 'Help')
         self.help_button.clicked.connect(self.help)
 
+        self.inputs_button = Button('gui/icons/inputs_icon.png', 'Inputs')
+        self.inputs_button.clicked.connect(self.inputs)
+
         self.console_button = Button('gui/icons/console_icon.png', 'Console')
         self.console_button.clicked.connect(self.console)
 
         # self.console_window = ConsoleWindow()
-
-        self.reconnect_button = Button('gui/icons/reload_icon.png', 'Reconnect')
-        self.reconnect_button.clicked.connect(self.reconnect)
 
         self.quit_button = Button('gui/icons/quit_icon.png', 'Quit')
         self.quit_button.clicked.connect(self.quit)
@@ -37,7 +37,7 @@ class ControlBar(QWidget):
 
         self.layout.addWidget(self.help_button)
         self.layout.addWidget(self.console_button)
-        self.layout.addWidget(self.reconnect_button)
+        self.layout.addWidget(self.inputs_button)
         self.layout.addWidget(self.quit_button)
 
         self.setLayout(self.layout)
@@ -46,6 +46,10 @@ class ControlBar(QWidget):
 
     def help(self):
         pass
+
+    def inputs(self):
+        pass
+
 
     def console(self):
         # self.console_window.show()
@@ -62,9 +66,6 @@ class ControlBar(QWidget):
 
         else:
             self.parent.console.show()
-
-    def reconnect(self):
-        pass
 
     def quit(self):
         # access camera from other windows and close
