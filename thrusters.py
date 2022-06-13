@@ -1,160 +1,118 @@
-"""
-DEPRECATED
-FOR TESTING PURPOSES ONLY
+
+class ThrustManager():
+    def __init__(self, controls=None, multiplier=1):
+        self.thrusters = [
+            Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
+            Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
+            Thruster(pin=2, power=(0, 0, 1), position=(-1,-1)),
+            Thruster(pin=3, power=(0, 0, 1), position=( 1,-1)),
+            Thruster(pin=4, power=(1, 1, 0), position=(-1, 0)),
+            Thruster(pin=5, power=(1, 1, 0), position=( 1, 0)),
+        ]
+
+        self.controls = controls
+        self.multiplier = multiplier
+        self.x, self.y, self.z = 0, 1, 2
+
+    def getTSpeeds(self, reqMotion, reqRotation, normalizeZ=True, normalizeY=True):
+        if reqMotion[2] == 0:
+            normalizeZ = False
+        if reqMotion[1] == 0:
+            normalizeY = False
+
+        output = {}
+        # each axis' dict is thruster.pin: value_from_findForRotation()
+        #              x   y   z
+        toNormalize = [{}, {}, {}]
+
+        for thruster in self.thrusters:
+            if (normalizeY and thruster.axis == self.y) or (normalizeZ and thruster.axis == self.z):
+                toNormalize[thruster.axis][thruster.pin] = thruster.findForRotation(reqRotation)
+
+            else:
+                speeds = (thruster.findForMotion(reqMotion), thruster.findForRotation(reqRotation))
+                divisor = 0
+                for speed in speeds:
+                    if speed != 0:
+                        divisor += 1
+                try:
+                    output[thruster.pin] = self.multiplier * sum(speeds) / divisor
+                except ZeroDivisionError:
+                    output[thruster.pin] = divisor
+
+        # print(f"{toNormalize = }")
+        
+        for axis, axisDict in enumerate(toNormalize):
+            searchType = None
+            if reqMotion[axis] > 0:
+                searchType = max
+            elif reqMotion[axis] < 0:
+                searchType = min
+
+            if searchType != None and axisDict: # axisDict part checks if dictionary has content
+                bump = (1 - abs(searchType(list(axisDict.values())))) * reqMotion[axis]
+            else:
+                bump = 0
+            
+            for pin, value in axisDict.items():
+                output[pin] = self.multiplier * (value + bump)
 
 
-import this if thruster pin number is needed
-don't need to keep making the same
-variables in each file
-"""
+        thrusterSpeeds = []
+        for pin in sorted(list(output.keys()), reverse=False):
+            thrusterSpeeds.append(output[pin])
 
-# from math import cos, sin, radians
-import numpy as np
-from joystick import Joystick, JoystickData
-from time import sleep
+        if self.controls != None:
+            self.controls.writeAllThrusters(thrusterSpeeds)
+        else:
+            print("Not connected...")
 
-import time
+        return output
 
+    def displayTSpeeds(speeds):
+        for pin in sorted(list(speeds.keys()), reverse=False):
+            print(f"{pin=} -> {round(speeds[pin], 5)}")
 
-class Thruster:
-    createdThrusters = []
-
+class Thruster():
     def __init__(self, pin, power, position):
         self.pin = pin
         self.power = power
+        self.axis = 0
+        for axis, value in enumerate(power):
+            if value != 0:
+                self.axis = axis
+
+        self.invertedPower = (
+            -(self.power[0] - 1),
+            -(self.power[1] - 1),
+            -(self.power[2] - 1)
+        )
+
         self.position = (position[0], position[1], position[0])
-        self.createdThrusters.append(self)
 
-    def normalize(self, thrusterSpeeds: dict, reach):
-        """
-        reach is the maximum power that any one of the vertical thrusters can reach
-        """
-        # print(list(thrusterSpeeds.values())[0:3])
-        greatest = max(list(thrusterSpeeds.values())[0:3])
 
-        try:
-            multiplier = reach / greatest
-        except ZeroDivisionError:
-            multiplier = 1
+    def findForMotion(self, reqMotion):
+        forMotion = (reqMotion[0] * self.power[0] +
+                     reqMotion[1] * self.power[1] +
+                     reqMotion[2] * self.power[2])
+        return forMotion
 
-        for pin in thrusterSpeeds.keys():
-            if pin in (4, 5): # a very ugly way of doing things, will correct later
-                continue
-            speed = thrusterSpeeds[pin]
-            thrusterSpeeds[pin] = round(speed * multiplier, 3)
+    def findForRotation(self, reqRotation):
+        nonZeroNum = 0
+        usedAxes = (
+            reqRotation[0] * self.invertedPower[0],
+            reqRotation[1] * self.invertedPower[1],
+            reqRotation[2] * self.invertedPower[2]
+        )
 
-        return thrusterSpeeds
+        for axisValue in usedAxes:
+            if axisValue != 0:
+                nonZeroNum += 1
 
-    def averager(self, speeds: list):
-        # print(speeds)
-        if len(speeds) != 0:
-            return round(sum(speeds) / len(speeds), 8)
-        return 0
-
-    def scale(self, thrusterSpeeds, multiplier):
-        for pin in thrusterSpeeds.keys():
-            speed = thrusterSpeeds[pin]
-            thrusterSpeeds[pin] = round(speed * multiplier, 3)
-        return thrusterSpeeds
-
-    @property
-    def axis(self) -> int:
-        if sorted(self.power)[-1] == 1 and sorted(self.power)[-2] == 0:
-            return self.power.index(1)
-
-    @property
-    def isUp(self):
-        return self.axis == 2
-    
-    @property
-    def isSide(self):
-        return self.axis == 0
-
-    @property
-    def isForward(self):
-        return self.axis == 1
-
-    @classmethod
-    def determine(cls, intendedMotion: tuple, intendedRotation: tuple, multiplier: float):
-        """
-        intendedMotion -> [x, y, z]
-        intendedRotation -> [roll, pitch, yaw]
-            ordered this way so that attribute 'position' matches 
-        """
-        thrusterSpeeds = {}
-        for thruster in cls.createdThrusters:
-            thrusterSpeeds[thruster.pin] = []
+        forRotation = 0
+        if nonZeroNum != 0:
+            forRotation = -(reqRotation[0] * self.position[0] * self.invertedPower[0] + 
+                            reqRotation[1] * self.position[1] * self.invertedPower[1] + 
+                            reqRotation[2] * self.position[2] * self.invertedPower[2]) / nonZeroNum
         
-        for thruster in cls.createdThrusters:
-            # print(f"{thruster.position = }")
-            # print(f"Appending {intendedMotion[thruster.axis]}")
-
-            for axis, axisMotion in enumerate(intendedMotion):
-                result = axisMotion * thruster.power[axis]
-                if result != 0:
-                    thrusterSpeeds[thruster.pin].append(result)
-
-            if thruster.isUp:
-                for i in (0, 1):
-                    result = -thruster.position[i] * thruster.power[thruster.axis] * intendedRotation[i]
-                    if result != 0:
-                        thrusterSpeeds[thruster.pin].append(result)
-
-            elif thruster.isForward:
-                i = 2
-                result = -thruster.position[i] * thruster.power[thruster.axis] * intendedRotation[i]
-                if result != 0:
-                    thrusterSpeeds[thruster.pin].append(result)
-
-            elif thruster.isSide:
-                pass
-
-        for pin in thrusterSpeeds.keys():
-            speed = thrusterSpeeds[pin]
-            thrusterSpeeds[pin] = cls.averager(cls, speed)
-
-        # thrusterSpeeds = cls.scale(cls,cls.normalize(cls, thrusterSpeeds=thrusterSpeeds, reach=intendedMotion[-1]), multiplier)
-        # thrusterSpeeds = cls.normalize(cls, thrusterSpeeds=thrusterSpeeds, reach=intendedMotion[-1])
-        return thrusterSpeeds
-    
-    @classmethod
-    def showSpeeds(self, intendedMotion, intendedRotation, multiplier):
-        for pin, value in self.determine(intendedMotion, intendedRotation, multiplier).items():
-            print(f"{pin = }, {value}")
-
-
-start = time.time()
-
-if __name__ == "__main__":
-    
-    frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
-    frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
-    backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
-    backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
-    sideL  = Thruster(pin=4, power=(0, 1, 0), position=(-1, 0))
-    sideR  = Thruster(pin=5, power=(0, 1, 0), position=( 1, 0))
-
-    for i in range(1000):
-        Thruster.showSpeeds((0,0,-1), (0.5, 0.25, 0), 1)
-        # count += 
-        # print(cout)
-
-end = time.time()
-
-totalTime = end - start
-print("\n" + str(totalTime))
-
-
-# if __name__ == "__main__":
-#     joystick = Joystick()
-#     while True:
-#         joystick.readJoyData()
-#         Thruster.showSpeeds((0, -joystick.joyData.yAxis, 0), (0, 0, 0), 1)
-
-
-
-
-
-
-
-
+        return forRotation
