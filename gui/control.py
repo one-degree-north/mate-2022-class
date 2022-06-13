@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from .button import Button
 
 class ControlBar(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -15,6 +15,8 @@ class ControlBar(QWidget):
                 border-top-right-radius: 10px
             }
         """)
+
+        self.parent = parent
 
         self.help_button = Button('gui/icons/help_icon.png', 'Help')
         self.help_button.clicked.connect(self.help)
@@ -47,7 +49,19 @@ class ControlBar(QWidget):
 
     def console(self):
         # self.console_window.show()
-        pass
+        print(self.parent.lower_frame.children(), )
+
+        # if self.parent.console not in self.parent.lower_frame():
+        #     self.parent.lower_frame.layout.insertWidget(1, self.parent.console)
+
+        # else:
+        #     self.parent.lower_frame.layout.removeWidget(self.parent.console)
+
+        if self.parent.console.isVisible():
+            self.parent.console.hide()
+
+        else:
+            self.parent.console.show()
 
     def reconnect(self):
         pass

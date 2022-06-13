@@ -26,7 +26,7 @@ class CrimsonUI(QMainWindow):
         """)
 
         self.grid = Grid(front_port, down_port)
-        self.control = ControlBar()
+        self.control = ControlBar(self)
         self.status = StatusBar()
         self.timer = TimerBar()
         self.timer_control = TimerControlBar(self)
@@ -80,7 +80,7 @@ class CrimsonUI(QMainWindow):
         self.lower_frame.layout.setSpacing(10)
 
         self.lower_frame.layout.addWidget(self.control_frame)
-        self.lower_frame.layout.addWidget(self.console_frame)
+        self.lower_frame.layout.addWidget(self.console)
         self.lower_frame.layout.addStretch(1)
         self.lower_frame.layout.addWidget(self.status_frame)
 
