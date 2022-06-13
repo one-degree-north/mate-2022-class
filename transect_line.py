@@ -1,12 +1,14 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 hsv = None
 img = None
 bounding_rect = None
 empty = None
 cam_dex = 0
+baud_rate = 115200
 
 # BECAUSE PARAMETERS ARE CRINGE
 
@@ -54,6 +56,22 @@ def read_frame():
     _, img = vid.read()
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
+def turn(direction):
+    left = False
+    right = True
+    
+    if direction == left:
+        #packet = 
+    elif direction == right:
+        #packet = 
+        
+    send_packet()
+    time.sleep((len(packet)+2)/baud_rate)
+    get_orientation_data()
+    
+    # Get angular acceleration data, then do 0.5at2 and figure out t
+    
+    
 def run():
     finished = False
     start_running()    # Move forward
@@ -69,10 +87,12 @@ def run():
         elif defect_pt != (-1, -1):
             x, y, w, h = bounding_rect
             stop_running() # Stop moving forward
+            left = False
+            right = True
 
             if ((defect_pt[0] - x) > (w / 2.0)):
-                #turn_left
+                turn(left);
             else:
-                #turn_right
+                turn(right);
         
         
