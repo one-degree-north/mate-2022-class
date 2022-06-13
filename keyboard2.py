@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from pynput import keyboard
 
-from thrusters3 import Thruster
+from thrusters import Thruster
 from controls import Controls
 
 import queue

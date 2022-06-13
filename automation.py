@@ -6,7 +6,7 @@ import threading
 import queue
 from time import sleep
 
-from sympy import arg
+
 from controls import Controls
 
 class Automator():
@@ -98,13 +98,5 @@ class Automator():
 
 
 
-# control = Controls()
-# control.setOrientationAutoreport(1)
-# control.comms.startThread()
-# while True:
-#     print(control.orientationData)
-
-
-# test = Automator(10)
 
 
