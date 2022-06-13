@@ -55,7 +55,7 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            #print(f"gyro data: {self.gyroData}")
+            print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
@@ -63,7 +63,7 @@ class Controls:
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            #print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -113,8 +113,8 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    controls.comms.startThread()
-    inputNum = 0;
+    #controls.comms.startThread()
+    """inputNum = 0;
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -125,7 +125,7 @@ if __name__ == "__main__":
         print(inputs)
         controls.writeAllThrusters(inputs)
         inputs = [0, 0, 0, 0, 0,0]
-
+    """
     """while True:
         print(f"thrusterNum: {inputNum}")
         inputs[inputNum] = float(input())
@@ -134,3 +134,5 @@ if __name__ == "__main__":
             controls.writeAllThrusters(inputs)
             inputNum = 0
         inputNum += 1"""
+    controls.setOrientationAutoreport(1)
+    controls.comms.readThread()

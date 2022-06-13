@@ -1,19 +1,19 @@
 #include <Servo.h>
 #define UNDERWATER_TIME_MS 1000
 #define ABOVE_TIME_MS 1000
-#define PUMP_PIN 3
+#define PUMP_PIN 8
 #define ITERATIONS 5
-frequency = 25000
-dc = 0.4
+#define frequency = 25000;
+float dc = 0.4;
 
 Servo pump;
-pinMode(PUMP_PIN, OUTPUT);
 unsigned long now;
 boolean finished = false;
 
 void setup() {
-  pump.attach(PUMP_PIN)
-  now = millis()
+  pinMode(PUMP_PIN, OUTPUT);
+  pump.attach(8);
+  now = millis();
 }
 
 void loop() {
@@ -24,6 +24,6 @@ void loop() {
       digitalWrite(PUMP_PIN, HIGH);
       delay(ABOVE_TIME_MS);
     }
-    finished = true;
+    //finished = true;
   }
 }
