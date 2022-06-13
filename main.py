@@ -5,6 +5,7 @@ from gui.grid import Grid
 from gui.control import ControlBar
 from gui.status import StatusBar
 from gui.timer import TimerBar, TimerControlBar
+from gui.console import ConsoleModule
 
 import sys
 import os
@@ -29,6 +30,8 @@ class CrimsonUI(QMainWindow):
         self.status = StatusBar()
         self.timer = TimerBar()
         self.timer_control = TimerControlBar(self)
+
+        self.console = ConsoleModule()
 
 
         self.control_frame = QWidget()
@@ -66,7 +69,7 @@ class CrimsonUI(QMainWindow):
         self.lower_frame.layout = QHBoxLayout()
 
         self.lower_frame.layout.addWidget(self.control_frame)
-        self.lower_frame.layout.addWidget(ControlBar())
+        self.lower_frame.layout.addWidget(self.console)
         self.lower_frame.layout.addStretch(1)
         self.lower_frame.layout.addWidget(self.status_frame)
 
@@ -144,4 +147,3 @@ if __name__ == '__main__':
 
     sys.exit(app.exec())
 
-# percentage of total movement, axis, rotation
