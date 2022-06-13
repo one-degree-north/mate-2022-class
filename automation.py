@@ -4,11 +4,12 @@
 # from thrusters import *
 from queue import Queue
 from time import sleep
+from controls import Controls
 
 class Automator():
 
-    controls = None
-    q: Queue = None
+    controls = Controls()
+    q: Queue = Queue()
     
     class Axis():
         axes = []
@@ -61,8 +62,9 @@ class Automator():
 
         self.forces()
 
-    def collectErrors(self, errors):
+    def collectErrors(self):
         errors = self.controls.orientationData
+        print(errors)
         self.yaw.update(errors[0])
         self.pitch.update(errors[1])
         self.roll.update(errors[2])
@@ -74,9 +76,9 @@ class Automator():
     def addToQ(cls, stuff):
         cls.q.put(stuff)
 
-    def forces(self, errors):
+    def forces(self):
         while True:
-            self.collectErrors(errors)
+            self.collectErrors()
             # return (self.roll.force(), self.pitch.force(), self.yaw.force())
             self.addToQ(
                 (self.roll.force(), self.pitch.force(), self.yaw.force()),
