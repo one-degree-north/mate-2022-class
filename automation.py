@@ -5,6 +5,15 @@
 from queue import Queue
 from time import sleep
 from controls import Controls
+from thrusters3 import Thruster
+
+frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
+frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
+backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
+backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
+sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
+sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+Thruster.setMultiplier(0.2)
 
 class Automator():
 
@@ -82,6 +91,7 @@ class Automator():
     def forces(self):
         while True:
             self.collectErrors()
+            Thruster.showSpeeds(Thruster.getSpeeds((0,0,0), (self.roll.force(), self.pitch.force(), self.yaw.force())), controls=self.controls)
             # return (self.roll.force(), self.pitch.force(), self.yaw.force())
             self.addToQ(
                 (self.roll.force(), self.pitch.force(), self.yaw.force()),
@@ -89,7 +99,7 @@ class Automator():
             print(self.q.get())
             
 
-            sleep(1)
+            sleep(1 * 0.01)
 
 
 
