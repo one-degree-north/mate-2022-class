@@ -14,10 +14,9 @@ class ConsoleModule(QWidget):
 
         self.setStyleSheet("""
             QWidget {
-                background: rgb(21, 21, 21);
-                border-top-right-radius: 10px;
+                background: rgb(26, 26, 26);
                 border-top-left-radius: 10px;
-                margin: 20px
+                border-top-right-radius: 10px;
             }
         """)
 
@@ -28,12 +27,15 @@ class ConsoleModule(QWidget):
         self.layout = QVBoxLayout()
 
 
-        self.layout.addWidget(self.logs)
+        self.layout.addWidget(self.logs, 100)
         self.layout.addWidget(self.command_line)
 
-        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0,0,0,0)
 
         self.setLayout(self.layout)
+
+        for _ in range(50):
+            logging.debug('ok')
 
 class LoggerBox(logging.Handler):
     def __init__(self, parent):
@@ -50,6 +52,13 @@ class LoggerBox(logging.Handler):
 class Logs(QDialog, QPlainTextEdit):
     def __init__(self):
         super().__init__()
+
+        self.setStyleSheet("""
+            QPlainTextEdit {
+                font: 12px;
+                color: white
+            }
+        """)
 
         self.logger = LoggerBox(self)
         self.logger.setFormatter(logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', '%H:%M:%S'))
@@ -73,10 +82,13 @@ class CommandLine(QLineEdit):
 
         self.setStyleSheet("""
             QWidget {
-                background: rgb(26, 26, 26);
-                border-radius: 5px;
-                padding: 10px;
-                margin: 10px
+                background: rgb(35, 35, 35);
+                padding: 5px;
+
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+
+                color: lightgrey
             }
         """)
 
@@ -94,29 +106,29 @@ class CommandLine(QLineEdit):
 
         self.clear()
 
-        if self.split_text[0] == 'help':
-            logging.info(f"""
-                Hotkeys:
-                ` - shows/hides the tab bar (if styled)
-                t - toggles between styled tabs and regular tabs (styled by default)
-                l - shows mini-logs in tab bar (styled menu only)
-                1 through 3 - switches active tab
-                c - capture a screenshot
-                Commands:
-                help - shows this menu
-                return (++) - returns text to logs
-                save - save a transcript of the logs
-                exit - stops the program
-                controls - toggles key logging for control keys (off by default)
-                key - toggles key logging for keys that aren't controls (off by default)
-                Key:
-                "()" = required
-                "[]" = optional
-                "+" = any value
-                "++" = one or more values
-                """)
+        # if self.split_text[0] == 'help':
+        #     logging.info(f"""
+        #         Hotkeys:
+        #         ` - shows/hides the tab bar (if styled)
+        #         t - toggles between styled tabs and regular tabs (styled by default)
+        #         l - shows mini-logs in tab bar (styled menu only)
+        #         1 through 3 - switches active tab
+        #         c - capture a screenshot
+        #         Commands:
+        #         help - shows this menu
+        #         return (++) - returns text to logs
+        #         save - save a transcript of the logs
+        #         exit - stops the program
+        #         controls - toggles key logging for control keys (off by default)
+        #         key - toggles key logging for keys that aren't controls (off by default)
+        #         Key:
+        #         "()" = required
+        #         "[]" = optional
+        #         "+" = any value
+        #         "++" = one or more values
+        #         """)
 
-        elif self.split_text[0] == 'return':
+        if self.split_text[0] == 'return':
             if not len(self.split_text) > 1:
                 logging.error('Please provide additional argument(s)')
             else:

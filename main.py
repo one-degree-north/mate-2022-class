@@ -44,6 +44,16 @@ class CrimsonUI(QMainWindow):
         self.control_frame.setLayout(self.control_frame.layout)
 
 
+        self.console_frame = QWidget()
+        self.console_frame.layout = QVBoxLayout()
+        
+        self.console_frame.layout.addStretch(1)
+        self.console_frame.layout.addWidget(self.console)
+
+        self.console_frame.layout.setContentsMargins(0,0,0,0)
+        self.console_frame.setLayout(self.console_frame.layout)
+
+
         self.status_frame = QWidget()
         self.status_frame.layout = QVBoxLayout()
         
@@ -67,9 +77,10 @@ class CrimsonUI(QMainWindow):
 
         self.lower_frame = QWidget()
         self.lower_frame.layout = QHBoxLayout()
+        self.lower_frame.layout.setSpacing(10)
 
         self.lower_frame.layout.addWidget(self.control_frame)
-        self.lower_frame.layout.addWidget(self.console)
+        self.lower_frame.layout.addWidget(self.console_frame)
         self.lower_frame.layout.addStretch(1)
         self.lower_frame.layout.addWidget(self.status_frame)
 
@@ -140,7 +151,7 @@ if __name__ == '__main__':
         settings = yaml.safe_load(f)
 
     app = QApplication([])
-    app.setStyle('Fusion')
+    # app.setStyle('Fusion')
 
     window = CrimsonUI(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     window.show()
