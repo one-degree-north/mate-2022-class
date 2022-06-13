@@ -100,7 +100,7 @@ class Key():
             self.isDown = isDown
             reqMotion, reqRotation, clawAngle = Key.findNets()
             speakMovement(reqMotion, reqRotation)
-            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation), controls=controls)
+            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation), controls=None)
             
 
         
@@ -121,7 +121,7 @@ class Key():
                 elif key.mType == Move.rotation:
                     netRotation[key.effectAxis] += key.effect[key.effectAxis]
                 elif key.mType == Move.killswtich:
-                    return ([0, 0, 0], [0, 0, 0])
+                    return ([0, 0, 0], [0, 0, 0], 0)
                 elif key.mType == Move.toggle:
 
                     clawAngle = key.effect[0](currValue=cls.currClawAngle, 
@@ -196,9 +196,9 @@ if __name__ == "__main__":
     q = Key('q', Move.killswtich, None, False)
     e = Key('e', Move.toggle, [findAngle, (0, 90), 0], False)
 
-    controls = Controls()
-    controls.comms.startThread()
-    Key.controls = controls
+    # controls = Controls()
+    # controls.comms.startThread()
+    # Key.controls = controls
     Key.startPolling()
     Key.keyboardListener.join()
 
