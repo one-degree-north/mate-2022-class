@@ -1,13 +1,17 @@
 import time
+# from automation import Automator
 
 class Thruster():
     multiplier = 1
     thrusters = []
     # searchTypeZ = None
     # searchTypeY = None
+    controls = None
+    # balancer = Automator(10, controls)
+
     x, y, z = 0, 1, 2
 
-    def __init__(self, pin, power, position, controls=None):
+    def __init__(self, pin, power, position):
         self.pin = pin
         self.power = power
         self.axis = 0
@@ -23,7 +27,7 @@ class Thruster():
 
         self.position = (position[0], position[1], position[0])
         self.sendToManager(self)
-        self.controls = controls
+
 
     @classmethod
     def sendToManager(cls, thrusterObject):
@@ -104,20 +108,30 @@ class Thruster():
             for pin, value in axisDict.items():
                 output[pin] = cls.multiplier * (value + bump)
 
+
+        thrusterSpeeds = []
+        for pin in sorted(list(output.keys()), reverse=False):
+            thrusterSpeeds.append(output[pin])
+
+        if cls.controls != None:
+            cls.controls.writeAllThrusters(thrusterSpeeds)
+        else:
+            print("Not connected...")
+
         return output
 
-    def showSpeeds(speeds, controls=None):
+    def showSpeeds(speeds):
         for pin in sorted(list(speeds.keys()), reverse=False):
             print(f"{pin=} -> {round(speeds[pin], 5)}")
-        print(list(speeds.values()))
-        controls.writeAllThrusters(list(speeds.values()))
+        # print(list(speeds.values()))
+        # controls.writeAllThrusters(list(speeds.values()))
 
 
 
 
 if __name__ == "__main__":     
 
-    start = time.time()
+    # start = time.time()
 
     # frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
     # frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
@@ -134,15 +148,14 @@ if __name__ == "__main__":
     Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
 
     Thruster.setMultiplier(100)
+    # for i in range(1000):
+    Thruster.showSpeeds(Thruster.getSpeeds((0, 1, -1), (0, 0, 0)))
+        # print("\n" * 3)
 
-    for i in range(1000):
-        Thruster.showSpeeds(Thruster.getSpeeds((0, 1, -1), (0, 0, 0)))
-        print("\n" * 3)
+    # end = time.time()
 
-    end = time.time()
-
-    totalTime = end - start
-    print("\n" + str(totalTime))
+    # totalTime = end - start
+    # print("\n" + str(totalTime))
 
 
 

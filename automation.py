@@ -1,27 +1,20 @@
 
+import threading
 
 
 # from thrusters import *
-from queue import Queue
+import queue
 from time import sleep
-from controls import Controls
-from thrusters3 import Thruster
 
-frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
-frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
-backL  = Thruster(pin=2, power=(0, 0, 1), position=(-1,-1))
-backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
-sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
-sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
-Thruster.setMultiplier(0.2)
+from sympy import arg
+from controls import Controls
 
 class Automator():
 
-    controls = Controls()
-    controls.comms.startThread()
-    controls.setOrientationAutoreport(1)
+    controls = None
     
-    q: Queue = Queue()
+    connector = queue.Queue()
+
     
     class Axis():
         axes = []
@@ -72,11 +65,14 @@ class Automator():
         self.roll = self.Axis(interval)
         self.yaw = self.Axis(interval)
 
-        self.forces()
+
 
     def collectErrors(self):
-        errors = self.controls.orientationData
-        print(errors)
+        try:
+            errors = self.controls.orientationData
+        except:
+            errors = (0,0,0)
+        # print(errors)
         self.yaw.update(errors[0])
         self.pitch.update(errors[1])
         self.roll.update(errors[2])
@@ -84,22 +80,21 @@ class Automator():
 
         # self.collectErrors()
 
-    @classmethod
-    def addToQ(cls, stuff):
-        cls.q.put(stuff)
 
     def forces(self):
         while True:
-            self.collectErrors()
-            Thruster.showSpeeds(Thruster.getSpeeds((0,0,0), (self.roll.force(), self.pitch.force(), self.yaw.force())), controls=self.controls)
-            # return (self.roll.force(), self.pitch.force(), self.yaw.force())
-            self.addToQ(
-                (self.roll.force(), self.pitch.force(), self.yaw.force()),
-            )
-            print(self.q.get())
-            
 
-            sleep(1 * 0.01)
+            self.collectErrors()
+            # return (self.roll.force(), self.pitch.force(), self.yaw.force())
+            self.connector.put((self.roll.force(), self.pitch.force(), self.yaw.force()))
+            # self.addToQ((self.roll.force(), self.pitch.force(), self.yaw.force()),)
+            sleep(0.001)
+
+
+    def startCollectorThread(cls):
+        cls.t = threading.Thread(target=cls.forces)
+        cls.t.start()
+
 
 
 
@@ -110,6 +105,6 @@ class Automator():
 #     print(control.orientationData)
 
 
-test = Automator(10)
+# test = Automator(10)
 
 

@@ -5,6 +5,12 @@ from pynput import keyboard
 from thrusters3 import Thruster
 from controls import Controls
 
+import queue
+import threading
+
+from automation import Automator
+
+from time import sleep
 
 @dataclass
 class Move:
@@ -73,7 +79,7 @@ class Key():
     acceptedChars = {}
     currClawAngle = 0
     keys = [] # deprecated already lol
-    controls = None
+    connector = None
 
     def __init__(self, keyStr, mType, effect, isDown=False):
         self.keyStr = keyStr
@@ -100,7 +106,9 @@ class Key():
             self.isDown = isDown
             reqMotion, reqRotation, clawAngle = Key.findNets()
             speakMovement(reqMotion, reqRotation)
-            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation), controls=self.controls)
+            self.connector.put(Thruster.getSpeeds(reqMotion, reqRotation))
+
+            # Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation))
             
 
         
@@ -167,7 +175,19 @@ class Key():
         cls.keyboardListener.start()
         
 
+def interpret(qObject):
+    while True:
+        if qObject.qsize != 0:
+            output = qObject.get()
+            Thruster.getSpeeds((0,0,0), output)
+
+
 if __name__ == "__main__":
+
+    q = queue.Queue()
+    Automator.connector = q
+    # Key.connector = q
+    print(q)
 
     frontL = Thruster(pin=0, power=(0, 0, 1), position=(-1, 1))
     frontR = Thruster(pin=1, power=(0, 0, 1), position=( 1, 1))
@@ -175,32 +195,43 @@ if __name__ == "__main__":
     backR  = Thruster(pin=3, power=(0, 0, 1), position=( 1,-1))
     sideL  = Thruster(pin=4, power=(1, 1, 0), position=(-1, 0))
     sideR  = Thruster(pin=5, power=(1, 1, 0), position=( 1, 0))
+
     Thruster.setMultiplier(0.2)
 
+    balancer = Automator(10)
 
-    w = Key('w', Move.motion, (0, 1, 0), False)
-    s = Key('s', Move.motion, (0,-1, 0), False)
 
-    i = Key('i', Move.motion, (0, 0, 1), False)
-    k = Key('k', Move.motion, (0, 0,-1), False)
 
-    a = Key('a', Move.rotation, (0, 0,-1), False)
-    d = Key('d', Move.rotation, (0, 0, 1), False)
+    # w = Key('w', Move.motion, (0, 1, 0), False)
+    # s = Key('s', Move.motion, (0,-1, 0), False)
 
-    u = Key('u', Move.rotation, (0, 1, 0), False)
-    j = Key('j', Move.rotation, (0,-1, 0), False)
+    # i = Key('i', Move.motion, (0, 0, 1), False)
+    # k = Key('k', Move.motion, (0, 0,-1), False)
 
-    l = Key('l', Move.rotation, (-1, 0, 0), False)
-    semicolon = Key(';', Move.rotation, (1, 0, 0), False)
+    # a = Key('a', Move.rotation, (0, 0,-1), False)
+    # d = Key('d', Move.rotation, (0, 0, 1), False)
 
-    q = Key('q', Move.killswtich, None, False)
-    e = Key('e', Move.toggle, [findAngle, (0, 90), 0], False)
+    # u = Key('u', Move.rotation, (0, 1, 0), False)
+    # j = Key('j', Move.rotation, (0,-1, 0), False)
+
+    # l = Key('l', Move.rotation, (-1, 0, 0), False)
+    # semicolon = Key(';', Move.rotation, (1, 0, 0), False)
+
+    # q = Key('q', Move.killswtich, None, False)
+    # e = Key('e', Move.toggle, [findAngle, (0, 90), 0], False)
 
     controls = Controls()
     controls.comms.startThread()
-    Key.controls = controls
-    Key.startPolling()
-    Key.keyboardListener.join()
+    Thruster.controls = controls
+    Automator.controls = controls
+    # Key.startPolling()
+    balancer.startCollectorThread()
+    test = threading.Thread(target=interpret, args=(q,))
+    test.start()
+
+    # Key.keyboardListener.join()
+    Automator.connector.join()
+    test.join()
 
 
 
