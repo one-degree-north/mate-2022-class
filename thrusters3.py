@@ -7,7 +7,7 @@ class Thruster():
     # searchTypeY = None
     x, y, z = 0, 1, 2
 
-    def __init__(self, pin, power, position):
+    def __init__(self, pin, power, position, controls=None):
         self.pin = pin
         self.power = power
         self.axis = 0
@@ -23,6 +23,7 @@ class Thruster():
 
         self.position = (position[0], position[1], position[0])
         self.sendToManager(self)
+        self.controls = controls
 
     @classmethod
     def sendToManager(cls, thrusterObject):
@@ -105,9 +106,11 @@ class Thruster():
 
         return output
 
-    def showSpeeds(speeds):
+    def showSpeeds(speeds, controls=None):
         for pin in sorted(list(speeds.keys()), reverse=False):
             print(f"{pin=} -> {round(speeds[pin], 5)}")
+        print(list(speeds.values()))
+        controls.writeAllThrusters(list(speeds.values()))
 
 
 

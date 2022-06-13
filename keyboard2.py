@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from pynput import keyboard
 
 from thrusters3 import Thruster
+from controls import Controls
 
 
 @dataclass
@@ -72,6 +73,7 @@ class Key():
     acceptedChars = {}
     currClawAngle = 0
     keys = [] # deprecated already lol
+    controls = None
 
     def __init__(self, keyStr, mType, effect, isDown=False):
         self.keyStr = keyStr
@@ -98,7 +100,7 @@ class Key():
             self.isDown = isDown
             reqMotion, reqRotation, clawAngle = Key.findNets()
             speakMovement(reqMotion, reqRotation)
-            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation))
+            Thruster.showSpeeds(Thruster.getSpeeds(reqMotion, reqRotation), controls=controls)
             
 
         
@@ -193,6 +195,9 @@ if __name__ == "__main__":
     q = Key('q', Move.killswtich, None, False)
     e = Key('e', Move.toggle, [findAngle, (0, 90), 0], False)
 
+    controls = Controls()
+    controls.comms.startThread()
+    Key.controls = controls
     Key.startPolling()
     Key.keyboardListener.join()
 
