@@ -59,7 +59,7 @@ class Controls:
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            #print(f"accel data: {self.accelData}")
+            print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
@@ -77,16 +77,16 @@ class Controls:
     def writeAllThrusters(self, thrusterValues): #assuming thrusterValues is between -1 and 1
         modifiedThrusters = []
         for i in range(6):
-            print(thrusterValues[i])
+            #print(thrusterValues[i])
             if i in self.reversed:
                 thrusterValues[i] *= -1
             modifiedThrusterValue = int(thrusterValues[i]*50 + 150) #passed thruster values are between 100 and 200 (translates into 1000 and 2000 microseconds)
-            print(int(thrusterValues[i]*50 + 150))
+            #print(int(thrusterValues[i]*50 + 150))
             if (modifiedThrusterValue > 200):
                 modifiedThrusterValue = 200
             if (modifiedThrusterValue < 100):
                 modifiedThrusterValue = 100
-            print(modifiedThrusterValue)
+            #print(modifiedThrusterValue)
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
@@ -134,5 +134,5 @@ if __name__ == "__main__":
             controls.writeAllThrusters(inputs)
             inputNum = 0
         inputNum += 1"""
-    controls.setOrientationAutoreport(1)
+    controls.setAccelAutoreport(100)
     controls.comms.readThread()

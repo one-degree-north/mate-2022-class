@@ -18,8 +18,8 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14201", baudrate=115200)
-        # self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-1420", baudrate=115200)
+        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem142401", baudrate=115200)
+        #self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14240", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -52,20 +52,20 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         footerFound = False
         headerFound = False
         while (not headerFound):
-            print(currByte)
-            print(currByte == b'\xAB')
+            #print(currByte)
+            #print(currByte == b'\xAB')
             if (currByte == self.HEADER):
-                print("header found")
+                #print("header found")
                 headerFound = True
                 returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
-                print(returnValue)
+                #print(returnValue)
                 if (returnValue[-1] == int.from_bytes(self.FOOTER, "big")):
-                    print("footer found")
+                    #print("footer found")
                     footerFound=True
                     break
             currByte = self.offshoreArduino.read()
         if (len(returnValue) != 14):
-            print(len(returnValue))
+            #print(len(returnValue))
             return -1
         structValue = struct.unpack("=cfffc", returnValue)
         if (headerFound):
@@ -79,7 +79,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         if (output[0] == 0):
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
-                print(value)
+                #print(value)
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
         else:
@@ -89,7 +89,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
                 print(value)
                 self.onshoreArduino.write(value)"""
             for value in output[1][1]:
-                print(value)
+                #print(value)
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
 

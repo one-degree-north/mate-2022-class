@@ -110,7 +110,7 @@ class Thruster():
         for pin in sorted(list(speeds.keys()), reverse=False):
             print(f"{pin=} -> {round(speeds[pin], 5)}")
         print(list(speeds.values()))
-        # controls.writeAllThrusters(list(speeds.values()))
+        controls.writeAllThrusters(list(speeds.values()))
 
 
 
