@@ -10,6 +10,7 @@ class Move:
     toggle: int = 3
     bumpUp: int = 4
     bumpDown: int = 5
+    scale: int = 6
 
 def findAngle(currValue, changeAmount, minMax, changeType):
     if changeType == Move.bumpUp:
@@ -84,9 +85,17 @@ class KeyManager():
 
             Key('q', Move.killswtich, None, False),
             Key('e', Move.toggle, [findAngle, (0, 90), 0], False),
+
+            Key('1', Move.scale, None, False),
+            Key('2', Move.scale, None, False),
+            Key('3', Move.scale, None, False),
+            Key('4', Move.scale, None, False),
+            Key('5', Move.scale, None, False),
+            Key('0', Move.scale, None, False)
         ]
 
         self.currClawAngle = 0
+        self.thrustScale = 1
 
         for key in self.keys:
             self.acceptedChars[key.keyStr] = key
@@ -95,7 +104,6 @@ class KeyManager():
         netMotion = [0, 0, 0]
         netRotation = [0, 0, 0]
         clawAngle = self.currClawAngle
-
 
         for key in self.acceptedChars.values():
             if key.isDown:
@@ -117,10 +125,13 @@ class KeyManager():
 
                     self.currClawAngle = clawAngle
 
+                elif key.mType == Move.scale:
+                    self.thrustScale = int(key.keyStr) * 0.2
+
 
 
         # print((netMotion, netRotation, clawAngle))
-        self.q.put(["k", (netMotion, netRotation, clawAngle)])
+        self.q.put(["k", (netMotion, netRotation, clawAngle, self.thrustScale)])
 
     def updateKeyState(self, keyStr, isDown):
         if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:
