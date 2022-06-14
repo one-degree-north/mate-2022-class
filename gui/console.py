@@ -16,7 +16,7 @@ class ConsoleModule(QWidget):
             QWidget {
                 background: rgb(26, 26, 26);
                 border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
+                border-top-right-radius: 10px
             }
         """)
 
@@ -65,9 +65,10 @@ class Logs(QDialog, QPlainTextEdit):
             }
 
             QScrollBar:up-arrow, QScrollBar:down-arrow {
-                height: 0px;
-                width: 0px
 
+                height: 0px;
+                width: 0px;
+                background: rgb(26, 26, 26)
             }
         """)
 

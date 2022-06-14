@@ -21,7 +21,6 @@ class Grid(QWidget):
         self.front_cam = self.Camera(self, port1)
         self.down_cam = self.Camera(self, port2)
 
-
         self.layout.addWidget(self.front_cam)
         self.layout.addWidget(self.down_cam)
 

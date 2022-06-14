@@ -21,8 +21,8 @@ class ControlBar(QWidget):
         self.help_button = Button('gui/icons/help_icon.png', 'Help')
         self.help_button.clicked.connect(self.help)
 
-        self.inputs_button = Button('gui/icons/inputs_icon.png', 'Inputs')
-        self.inputs_button.clicked.connect(self.inputs)
+        self.info_button = Button('gui/icons/inputs_icon.png', 'Inputs')
+        self.info_button.clicked.connect(self.info)
 
         self.console_button = Button('gui/icons/console_icon.png', 'Console')
         self.console_button.clicked.connect(self.console)
@@ -37,7 +37,7 @@ class ControlBar(QWidget):
 
         self.layout.addWidget(self.help_button)
         self.layout.addWidget(self.console_button)
-        self.layout.addWidget(self.inputs_button)
+        self.layout.addWidget(self.info_button)
         self.layout.addWidget(self.quit_button)
 
         self.setLayout(self.layout)
@@ -47,23 +47,18 @@ class ControlBar(QWidget):
     def help(self):
         pass
 
-    def inputs(self):
-        pass
+    def info(self):
+        if self.parent.thruster_display.isVisible():
+            self.parent.thruster_display.hide()
+            self.parent.axis_display.hide()
+        else:
+            self.parent.thruster_display.show()
+            self.parent.axis_display.show()
 
 
     def console(self):
-        # self.console_window.show()
-        print(self.parent.lower_frame.children(), )
-
-        # if self.parent.console not in self.parent.lower_frame():
-        #     self.parent.lower_frame.layout.insertWidget(1, self.parent.console)
-
-        # else:
-        #     self.parent.lower_frame.layout.removeWidget(self.parent.console)
-
         if self.parent.console.isVisible():
             self.parent.console.hide()
-
         else:
             self.parent.console.show()
 

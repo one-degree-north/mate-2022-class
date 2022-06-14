@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QLabel
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 
 from gui.grid import Grid
 from gui.control import ControlBar
 from gui.status import StatusBar
 from gui.timer import TimerBar, TimerControlBar
 from gui.console import ConsoleModule
+from gui.info import ThrusterDisplayModule, AxisDisplayModule
 
 import sys
 import os
@@ -32,6 +33,21 @@ from datetime import datetime
 #             }
 #         """)
 
+# self.animation = QPropertyAnimation(self.menu, b'pos')
+# self.animation.setStartValue(QPoint(-260,self.pos))
+# self.animation.setEndValue(QPoint(0,0))
+# self.animation.setDuration(200)
+# self.animation.start()
+
+# else:
+# self.animation = QPropertyAnimation(self.menu, b'pos')
+# self.animation.setStartValue(QPoint(0,0))
+# self.animation.setEndValue(QPoint(-260,0))
+# self.animation.setDuration(200)
+# self.animation.start()
+
+# self.animation.finished.connect(lambda: self.menu.hide())
+
 class CrimsonUI(QMainWindow):
     def __init__(self, front_port, down_port):
         super().__init__()
@@ -52,7 +68,12 @@ class CrimsonUI(QMainWindow):
 
         self.console = ConsoleModule()
         self.console.hide()
-        # self.title = Title()
+        
+        self.thruster_display = ThrusterDisplayModule()
+        self.thruster_display.hide()
+
+        self.axis_display = AxisDisplayModule()
+        self.axis_display.hide()
 
 
         self.control_frame = QWidget()
@@ -65,14 +86,33 @@ class CrimsonUI(QMainWindow):
         self.control_frame.setLayout(self.control_frame.layout)
 
 
-        self.console_frame = QWidget()
-        self.console_frame.layout = QVBoxLayout()
+        # self.console_frame = QWidget()
+        # self.console_frame.layout = QVBoxLayout()
         
-        self.console_frame.layout.addStretch(1)
-        self.console_frame.layout.addWidget(self.console)
+        # self.console_frame.layout.addStretch(1)
+        # self.console_frame.layout.addWidget(self.console)
 
-        self.console_frame.layout.setContentsMargins(0,0,0,0)
-        self.console_frame.setLayout(self.console_frame.layout)
+        # self.console_frame.layout.setContentsMargins(0,0,0,0)
+        # self.console_frame.setLayout(self.console_frame.layout)
+
+        self.thruster_display_frame = QWidget()
+        self.thruster_display_frame.layout = QVBoxLayout()
+        
+        self.thruster_display_frame.layout.addStretch(1)
+        self.thruster_display_frame.layout.addWidget(self.thruster_display)
+
+        self.thruster_display_frame.layout.setContentsMargins(0,0,0,0)
+        self.thruster_display_frame.setLayout(self.thruster_display_frame.layout)
+
+
+        self.axis_display_frame = QWidget()
+        self.axis_display_frame.layout = QVBoxLayout()
+        
+        self.axis_display_frame.layout.addStretch(1)
+        self.axis_display_frame.layout.addWidget(self.axis_display)
+
+        self.axis_display_frame.layout.setContentsMargins(0,0,0,0)
+        self.axis_display_frame.setLayout(self.axis_display_frame.layout)
 
 
         self.status_frame = QWidget()
@@ -100,12 +140,17 @@ class CrimsonUI(QMainWindow):
 
 
         self.lower_frame = QWidget()
+
+        self.lower_frame.setFixedHeight(250)
+
         self.lower_frame.layout = QHBoxLayout()
-        self.lower_frame.layout.setSpacing(10)
+        self.lower_frame.layout.setSpacing(20)
 
         self.lower_frame.layout.addWidget(self.control_frame)
         self.lower_frame.layout.addWidget(self.console)
+        self.lower_frame.layout.addWidget(self.thruster_display_frame)
         self.lower_frame.layout.addStretch(1)
+        self.lower_frame.layout.addWidget(self.axis_display_frame)
         self.lower_frame.layout.addWidget(self.status_frame)
 
         self.lower_frame.layout.setContentsMargins(0,0,0,0)
@@ -167,6 +212,9 @@ class CrimsonUI(QMainWindow):
                 pass
 
             print(os.listdir(f'captures/{timestamp}'))
+
+        else:
+            pass
             
 
 
