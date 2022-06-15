@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QWidget, QPlainTextEdit, QDialog, QLine
 from PyQt5.QtCore import Qt
 
 import os
+import shutil
 from datetime import datetime
 
 import logging
@@ -117,22 +118,15 @@ class CommandLine(QLineEdit):
         self.clear()
 
         if self.split_text[0] == 'help':
-            # logging.info(f"""
-            #     Hotkeys:
-            #     ` - shows/hides the tab bar (if styled)
-            #     t - toggles between styled tabs and regular tabs (styled by default)
-            #     l - shows mini-logs in tab bar (styled menu only)
-            #     1 through 3 - switches active tab
-                # c - capture a screenshot
-
             logging.info("""
 
             Commands:
             help - shows this menu
             return (++) - returns text to logs
             exit - stops the program
-            key - toggles key logging
 
+            clear - clear captures directory (permanently)
+            key - toggles key logging
 
             Key:
             "()" = required
@@ -152,6 +146,9 @@ class CommandLine(QLineEdit):
             print('\033[93m\033[1mSuccessfully stopped Crimson UI\033[0m')
 
             exit()
+
+        elif self.split_text[0] == 'clear':
+            shutil.rmtree('captures')
 
         elif self.split_text[0] == 'key':
             logging.info('keylogging')

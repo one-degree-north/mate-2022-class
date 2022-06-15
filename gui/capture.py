@@ -80,7 +80,7 @@ class CaptureControlBar(QWidget):
             filename = f'captures/{folder}/front_camera.png'
             cv2.imwrite(filename, self.parent.grid.front_cam.thread.image)
 
-            logging.info(f'Captured: captures/{folder}/front_camera.png')
+            logging.info(f'Image captured under: captures/{folder}/front_camera.png')
         except cv2.error:
             logging.error('An error occurred while attempting to capture an image from the FRONT camera')
             # pass
@@ -90,7 +90,7 @@ class CaptureControlBar(QWidget):
             cv2.imwrite(filename, self.parent.grid.down_cam.thread.image)
 
 
-            logging.info(f'Captured: captures/{folder}/down_camera.png')
+            logging.info(f'Image captured under: captures/{folder}/down_camera.png')
         except cv2.error:
             logging.error('An error occurred while attempting to capture an image from the DOWN camera')
             # pass
