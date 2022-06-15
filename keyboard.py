@@ -6,7 +6,7 @@ from pynput import keyboard
 class Move:
     motion: int = 0
     rotation: int = 1
-    killswtich: int = 'q'
+    pauseAuto: int = 2
     toggle: int = 3
     bumpUp: int = 4
     bumpDown: int = 5
@@ -29,6 +29,11 @@ def findAngle(currValue, changeAmount, minMax, changeType):
         currValue = minMax[1]
 
     return currValue
+
+def findFlipVal(currValue):
+    if currValue:
+        return False
+    return True
 
 def speakMovement(reqMotion, reqRotation=None):
     output = "\n---------------\n"
@@ -83,7 +88,7 @@ class KeyManager():
             Key('l', Move.rotation, (-1, 0, 0), False),
             Key(';', Move.rotation, (1, 0, 0), False),
 
-            Key('q', Move.killswtich, None, False),
+            Key('q', Move.pauseAuto, None, False),
             Key('e', Move.toggle, [findAngle, (0, 90), 0], False),
 
             Key('1', Move.scale, None, False),
@@ -96,6 +101,7 @@ class KeyManager():
 
         self.currClawAngle = 0
         self.thrustScale = 1
+        self.allowAutoInfluence = True
 
         for key in self.keys:
             self.acceptedChars[key.keyStr] = key
@@ -114,8 +120,8 @@ class KeyManager():
                     netMotion[key.effectAxis] += key.effect[key.effectAxis]
                 elif key.mType == Move.rotation:
                     netRotation[key.effectAxis] += key.effect[key.effectAxis]
-                elif key.mType == Move.killswtich:
-                    return ([0, 0, 0], [0, 0, 0], 0)
+                # elif key.mType == Move.killswtich:
+                #     return ([0, 0, 0], [0, 0, 0], 0)
                 elif key.mType == Move.toggle:
 
                     clawAngle = key.effect[0](currValue=self.currClawAngle, 
@@ -127,11 +133,14 @@ class KeyManager():
 
                 elif key.mType == Move.scale:
                     self.thrustScale = int(key.keyStr) * 0.2
+                
+                elif key.mType == Move.pauseAuto:
+                    self.allowAutoInfluence = findFlipVal(self.allowAutoInfluence)
 
 
 
         # print((netMotion, netRotation, clawAngle))
-        self.q.put(["k", (netMotion, netRotation, clawAngle, self.thrustScale)])
+        self.q.put(["k", (netMotion, netRotation, clawAngle, self.thrustScale, self.allowAutoInfluence)])
 
     def updateKeyState(self, keyStr, isDown):
         if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:

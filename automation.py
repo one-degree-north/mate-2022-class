@@ -3,38 +3,40 @@ import threading
 import time
 
 class Axis():
-
-
-    """
-    If error is +45 (rightward of target), force should be negative (counter-clockwise rotation)
-    If error is -45 (leftward of target), force should be positive (clockwise rotation)
-    
-    """
     def __init__(self, interval):
         self.interval = interval
         self.kp = -0.005
         # self.ki = -0.01
         self.kd = -0.005
         self.errorHistory = [0, 90] # test values only
-        self.offset = 0
+        self.offset = 0 # positive value shifts the target rightward, negative leftward
 
     def force(self):
         p = self.kp * (self.errorHistory[-1] - self.offset)
-        # d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
-
+        d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
         # print(f"{p = }, {d = }")
-        print(f"Without derivative: {p}")
+        # print(f"Without derivative: {p}")
         # print(f"With derivative: {p + d}")
-
-        return p 
+        return p + d
 
     def update(self, error):
         self.errorHistory.append(error)
         while len(self.errorHistory) > 2:
             self.errorHistory.remove(self.errorHistory[0])
 
-    def setReference(self, newDegree):
-        self.offset = newDegree
+    def shiftTarget(self, extent):
+        """
+        ABOUT YAW ONLY:
+        extent < 0 for leftward shift
+        extent > 0 for rightward shift
+        """
+        self.offset = (self.offset + extent) % 360
+        
+    def shiftTargetRight(self):
+        self.shiftTarget(90)
+
+    def shiftTargetLeft(self):
+        self.shiftTarget(-90)
 
 class PIDController():
     def __init__(self, interval, controls=None, q=None):
@@ -57,7 +59,7 @@ class PIDController():
         while True:
             try:
                 data = self.controls.orientationData
-            except AttributeError:
+            except AttributeError: # controls still None
                 data = (0, 0, 0)
             if data != lastReading:
                 # add data manager here
@@ -81,23 +83,15 @@ class PIDController():
 
 
 
-if __name__ == "__main__":
-    # pidC = PIDController(10)
-    # pidC.startListening()
 
-    yaw = Axis(10)
-    yaw.update(45)
-    print(yaw.force())
-    yaw.update(30)
-    print(yaw.force())
-    yaw.update(25)
-    print(yaw.force())
-    yaw.update(15)
-    print(yaw.force())
-    yaw.update(7.5)
-    print(yaw.force())
-    yaw.update(0)
-    print(yaw.force())
+if __name__ == "__main__":
+    pidC = PIDController(10)
+    pidC.startListening()
+
+    # yaw = Axis(10)
+    # yaw.errorHistory = [20, 50]
+    # print(yaw.force())
+
 
 
 

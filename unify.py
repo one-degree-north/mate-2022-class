@@ -12,9 +12,22 @@ class Unifier():
         self.TManager = TManager
         self.q = q
         self.interval = interval
+        
         self.readLasts = False
-        self.lastFromKeyboard = ((0,0,0), (0,0,0))
+
+        self.lastFromKeyboard = ((0,0,0), (0,0,0), 0, 1)
+        # [0] -> reqMotion
+        # [1] -> reqRotation
+        # [2] -> clawAngle
+        # [3] -> thrustScale
+
+
         self.lastFromAutomation = (0,0,0)
+
+        # allows/disallows automation to affect thruster speed calculations
+        self.allowAutoInfluence = True
+
+        self.combineType = self.getAverage
 
     def delegateFromQ(self):
         while True:
@@ -22,7 +35,8 @@ class Unifier():
                 command = self.q.get()
                 if command[0] == "k" and self.lastFromKeyboard != command[1]:
                     # print("Delegating to keyboard")
-                    self.lastFromKeyboard = command[1]
+                    self.lastFromKeyboard = command[1][0:4]
+                    self.allowAutoInfluence = command[1][4]
                     self.readLasts = True
                 elif command[0] == "a" and self.lastFromAutomation != command[1]:
                     # print("Delegating to automation")
@@ -32,12 +46,26 @@ class Unifier():
                 if self.readLasts:
                     print(f"\n{self.lastFromKeyboard = }")
                     print(f"{self.lastFromAutomation = }")
+                    print(f"{self.allowAutoInfluence = }")
+
+
+
+                    reqMotion = self.lastFromKeyboard[0]
+
+                    reqRotation = self.lastFromKeyboard[1]
+                    if self.allowAutoInfluence:
+                        reqRotation = self.combineType(self.lastFromKeyboard[1], self.lastFromAutomation)
+
 
                     # add coalesce code here
+                    # print(f"{self.lastFromKeyboard[0] = }")
+                    # print(f"{self.lastFromKeyboard[1] = }")
+                    # print(f"{self.lastFromKeyboard[2] = }")
+
 
                     displayTSpeeds(self.TManager.getTSpeeds(
-                        self.lastFromKeyboard[0],
-                        self.lastFromKeyboard[1],
+                        reqMotion,
+                        reqRotation,
                         self.lastFromKeyboard[3]
                     ))
 
@@ -47,6 +75,14 @@ class Unifier():
     def initiateWrangling(self):
         self.delegateThread = threading.Thread(target=self.delegateFromQ)
         self.delegateThread.start()
+
+    def getAverage(self, data1, data2):
+        # print(f"{data1 = }")
+        output = []
+        for indexNo, _ in enumerate(data1):
+            output.append((data1[indexNo] + data2[indexNo]) / 2)
+
+        return output
 
 if __name__ == "__main__":
     
