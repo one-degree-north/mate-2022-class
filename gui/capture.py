@@ -117,7 +117,7 @@ class CaptureControlBar(QWidget):
 
             self.record_stopwatch_label.setText('00:00')
 
-            if not self.parent.stopwatch.stopwatch_on:
+            if self.parent.stopwatch.centiseconds == 0 and self.parent.stopwatch.seconds == 0 and self.parent.stopwatch.minutes == 0:
                 self.parent.stopwatch_control.quickstart_button.setDisabled(False)
 
             # output both recordings to captures + delay?
