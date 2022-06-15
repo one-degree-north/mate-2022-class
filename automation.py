@@ -61,6 +61,7 @@ class PIDController():
                 data = self.controls.orientationData
             except AttributeError: # controls still None
                 data = (0, 0, 0)
+            print(data)
             if data != lastReading:
                 # add data manager here
 
@@ -81,11 +82,14 @@ class PIDController():
         self.bnoEar = threading.Thread(target=self.collectData)
         self.bnoEar.start()
 
-
+from controls import Controls
+import queue
 
 
 if __name__ == "__main__":
-    pidC = PIDController(10)
+    controls = Controls()
+
+    pidC = PIDController(10, controls=controls, q=queue.Queue())
     pidC.startListening()
 
     # yaw = Axis(10)
