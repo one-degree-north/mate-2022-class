@@ -64,8 +64,6 @@ class AxisDisplayModule(QWidget):
 
         self.setLayout(self.layout)
 
-        self.yaw_label.update_value(10)
-
         
 class StyledLabel(QLabel):
     def __init__(self, name, units):

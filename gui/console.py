@@ -65,7 +65,6 @@ class Logs(QDialog, QPlainTextEdit):
             }
 
             QScrollBar:up-arrow, QScrollBar:down-arrow {
-
                 height: 0px;
                 width: 0px;
                 background: rgb(26, 26, 26)
@@ -104,7 +103,6 @@ class CommandLine(QLineEdit):
             }
         """)
 
-        self.controls_logging = False
         self.key_logging = False
 
         self.setPlaceholderText('"help" for commands')
@@ -118,59 +116,45 @@ class CommandLine(QLineEdit):
 
         self.clear()
 
-        # if self.split_text[0] == 'help':
-        #     logging.info(f"""
-        #         Hotkeys:
-        #         ` - shows/hides the tab bar (if styled)
-        #         t - toggles between styled tabs and regular tabs (styled by default)
-        #         l - shows mini-logs in tab bar (styled menu only)
-        #         1 through 3 - switches active tab
-        #         c - capture a screenshot
-        #         Commands:
-        #         help - shows this menu
-        #         return (++) - returns text to logs
-        #         save - save a transcript of the logs
-        #         exit - stops the program
-        #         controls - toggles key logging for control keys (off by default)
-        #         key - toggles key logging for keys that aren't controls (off by default)
-        #         Key:
-        #         "()" = required
-        #         "[]" = optional
-        #         "+" = any value
-        #         "++" = one or more values
-        #         """)
+        if self.split_text[0] == 'help':
+            # logging.info(f"""
+            #     Hotkeys:
+            #     ` - shows/hides the tab bar (if styled)
+            #     t - toggles between styled tabs and regular tabs (styled by default)
+            #     l - shows mini-logs in tab bar (styled menu only)
+            #     1 through 3 - switches active tab
+                # c - capture a screenshot
 
-        if self.split_text[0] == 'return':
+            logging.info("""
+
+            Commands:
+            help - shows this menu
+            return (++) - returns text to logs
+            exit - stops the program
+            key - toggles key logging
+
+
+            Key:
+            "()" = required
+            "[]" = optional
+            "+" = any value
+            "++" = one or more values
+            """)
+
+        elif self.split_text[0] == 'return':
             if not len(self.split_text) > 1:
                 logging.error('Please provide additional argument(s)')
             else:
                 logging.info(' '.join(self.split_text[1:]))
 
-        elif self.split_text[0] == 'save':
-            timestamp = datetime.now().strftime(f'%d-%m-%y_%H:%M:%S.%f')[:-4]
-            logging.FileHandler(f'{timestamp}/ok.txt')
 
         elif self.split_text[0] == 'exit':
-            print('\033[93m\033[1mAzure UI has stopped sucessfully\033[0m')
+            print('\033[93m\033[1mSuccessfully stopped Crimson UI\033[0m')
 
             exit()
 
-
-        elif self.split_text[0] == 'controls':
-            if self.controls_logging:
-                self.controls_logging = False
-            else:
-                self.controls_logging = True
-
-            logging.info('Toggled key logging (controls)')
-
         elif self.split_text[0] == 'key':
-            if self.key_logging:
-                self.key_logging = False
-            else:
-                self.key_logging = True
-
-            logging.info('Toggled key logging (excluding controls)')
+            logging.info('keylogging')
 
 
 
