@@ -26,14 +26,24 @@ class StopwatchControlBar(QWidget):
         self.reset_button = Button('gui/icons/reset_icon.png', 'Reset')
         self.reset_button.clicked.connect(self.reset)
 
+        self.quickstart_button = Button('gui/icons/quickstart_icon.png', 'Quickstart')
+        self.quickstart_button.clicked.connect(self.quickstart)
+
         self.layout = QHBoxLayout()
         self.layout.setSpacing(10)
 
         self.layout.addWidget(self.startstop_button)
         self.layout.addWidget(self.reset_button)
+        self.layout.addWidget(self.quickstart_button)
 
 
         self.setLayout(self.layout)
+
+    def quickstart(self):
+        self.startstop()
+        self.parent.capture_control.toggle_record()
+
+        self.quickstart_button.setDisabled(True)
 
     def startstop(self):
         if self.parent.stopwatch.stopwatch_on:
@@ -42,13 +52,11 @@ class StopwatchControlBar(QWidget):
             self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
             self.startstop_button.setToolTip('Resume')
 
-            return
-            
+        else:
+            self.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
+            self.startstop_button.setToolTip('Pause')
 
-        self.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
-        self.startstop_button.setToolTip('Pause')
-
-        self.parent.stopwatch.stopwatch_on = True
+            self.parent.stopwatch.stopwatch_on = True
 
     def reset(self):
         self.parent.stopwatch.stopwatch_on = False
@@ -61,6 +69,9 @@ class StopwatchControlBar(QWidget):
 
         self.startstop_button.setIcon(QIcon('gui/icons/play_icon.png'))
         self.startstop_button.setToolTip('Start')
+
+        if not self.parent.capture_control.recording:
+            self.parent.stopwatch_control.quickstart_button.setDisabled(False)
 
 class Stopwatch(QWidget): #change to stopwatchbar
     def __init__(self):

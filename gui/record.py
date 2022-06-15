@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QTimer
 from .button import Button
 
 class CaptureControlBar(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent): #"parent" needed?
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -20,14 +20,15 @@ class CaptureControlBar(QWidget):
 
         self.parent = parent
 
-        self.record_stopwatch = QLabel('00:00')
-        self.record_stopwatch.setStyleSheet("""
+        self.record_stopwatch_label = QLabel('00:00')
+        self.record_stopwatch_label.setStyleSheet("""
             QLabel {
                 font: bold 20px;
                 color: white
             }
         """)
 
+        self.centiseconds = 0
         self.seconds = 0
         self.minutes = 0
 
@@ -35,7 +36,7 @@ class CaptureControlBar(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_stopwatch)
-        self.timer.start(1000)
+        self.timer.start(10)
 
         self.capture_image_button = Button('gui/icons/capture_image_icon.png', 'Capture image')
         self.capture_image_button.clicked.connect(self.capture_image)
@@ -47,7 +48,7 @@ class CaptureControlBar(QWidget):
         self.layout = QHBoxLayout()
         self.layout.setSpacing(10)
 
-        self.layout.addWidget(self.record_stopwatch)
+        self.layout.addWidget(self.record_stopwatch_label)
         self.layout.addWidget(self.capture_image_button)
         self.layout.addWidget(self.record_button)
 
@@ -57,10 +58,12 @@ class CaptureControlBar(QWidget):
         if not self.recording:
             return
 
-        self.total_seconds = self.seconds + (self.minutes * 60) + 1
-        self.minutes, self.seconds = divmod(self.total_seconds, 60)
+        self.total_centiseconds = self.centiseconds + (self.seconds * 100) + (self.minutes * 6000) + 1
 
-        self.record_stopwatch.setText(f'{self.minutes:02d}:{self.seconds:02d}')
+        self.seconds, self.centiseconds = divmod(self.total_centiseconds, 100)
+        self.minutes, self.seconds = divmod(self.seconds, 60)
+
+        self.record_stopwatch_label.setText(f'{self.minutes:02d}:{self.seconds:02d}')
 
     def capture_image(self):
         pass
@@ -78,9 +81,13 @@ class CaptureControlBar(QWidget):
 
             self.recording = False
 
+            self.centiseconds = 0
             self.seconds = 0
             self.minutes = 0
 
-            self.record_stopwatch.setText('00:00')
+            self.record_stopwatch_label.setText('00:00')
+
+            if not self.parent.stopwatch.stopwatch_on:
+                self.parent.stopwatch_control.quickstart_button.setDisabled(False)
 
             # output both recordings to captures + delay?
