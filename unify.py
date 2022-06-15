@@ -18,46 +18,35 @@ class Unifier():
 
     def delegateFromQ(self):
         while True:
-            if self.q.qsize != 0:
+            while self.q.qsize != 0:
                 command = self.q.get()
                 if command[0] == "k" and self.lastFromKeyboard != command[1]:
-                    print("Delegating to keyboard")
+                    # print("Delegating to keyboard")
                     self.lastFromKeyboard = command[1]
                     self.readLasts = True
                 elif command[0] == "a" and self.lastFromAutomation != command[1]:
-                    print("Delegating to automation")
+                    # print("Delegating to automation")
                     self.lastFromAutomation = command[1]
                     self.readLasts = True
 
+                if self.readLasts:
+                    print(f"\n{self.lastFromKeyboard = }")
+                    print(f"{self.lastFromAutomation = }")
+
+                    # add coalesce code here
+
+                    displayTSpeeds(self.TManager.getTSpeeds(
+                        self.lastFromKeyboard[0],
+                        self.lastFromKeyboard[1],
+                        self.lastFromKeyboard[3]
+                    ))
+
             time.sleep(self.interval * 0.001)  
 
-    def unify(self):
-        time.sleep(1)
-        while True:
-            if self.readLasts:
-
-                print(f"{self.lastFromKeyboard = }")
-                print(f"{self.lastFromAutomation = }")
-
-                # add coalesce code here
-
-                displayTSpeeds(self.TManager.getTSpeeds(
-                    self.lastFromKeyboard[0],
-                    self.lastFromKeyboard[1],
-                ))
-
-            
-            self.readLasts = False
-            time.sleep(self.interval * 0.001)
 
     def initiateWrangling(self):
         self.delegateThread = threading.Thread(target=self.delegateFromQ)
-        self.commandConverterThread = threading.Thread(target=self.unify)
-
         self.delegateThread.start()
-        self.commandConverterThread.start()
-
-
 
 if __name__ == "__main__":
     
@@ -70,9 +59,3 @@ if __name__ == "__main__":
     KManager.startPolling()
     pidC.startListening()
     unit.initiateWrangling()
-            
-
-
-    # KManager.keyboardListener.join()
-
-

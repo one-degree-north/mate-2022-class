@@ -136,7 +136,7 @@ class KeyManager():
     def updateKeyState(self, keyStr, isDown):
         if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:
             self.acceptedChars[keyStr].isDown = isDown
-            print(self.findNets())
+            self.findNets()
 
     def onPress(self, key):
         try:

@@ -65,9 +65,12 @@ class ThrustManager():
         if self.controls != None:
             self.controls.writeAllThrusters(thrusterSpeeds)
         else:
-            print("Controls not connected...")
+            print("WARNING: Controls not connected...")
 
         return output
+
+
+
 
 class Thruster():
     def __init__(self, pin, power, position):
@@ -117,6 +120,8 @@ def displayTSpeeds(speeds):
     for pin in sorted(list(speeds.keys()), reverse=False):
         print(f"{pin=} -> {round(speeds[pin], 5)}")
 
+def sendStopSignal(q):
+    q.put(["s", ()])
 
 if __name__ == "__main__":
     TManager = ThrustManager()

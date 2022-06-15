@@ -3,25 +3,38 @@ import threading
 import time
 
 class Axis():
+
+
+    """
+    If error is +45 (rightward of target), force should be negative (counter-clockwise rotation)
+    If error is -45 (leftward of target), force should be positive (clockwise rotation)
+    
+    """
     def __init__(self, interval):
         self.interval = interval
-        self.kp = 0.01
-        self.ki = 0.01
-        self.kd = 0.01
-        self.errorHistory = [0, 0, 0] # test values only
+        self.kp = -0.005
+        # self.ki = -0.01
+        self.kd = -0.005
+        self.errorHistory = [0, 90] # test values only
+        self.offset = 0
 
     def force(self):
-        p = self.kp * self.errorHistory[-1]
-        d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
-        # d = self.kd * (self.errorHistory[-2] - self.errorHistory[-1]) / self.interval
-        
-        return p + d
+        p = self.kp * (self.errorHistory[-1] - self.offset)
+        # d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
+
+        # print(f"{p = }, {d = }")
+        print(f"Without derivative: {p}")
+        # print(f"With derivative: {p + d}")
+
+        return p 
 
     def update(self, error):
         self.errorHistory.append(error)
         while len(self.errorHistory) > 2:
             self.errorHistory.remove(self.errorHistory[0])
 
+    def setReference(self, newDegree):
+        self.offset = newDegree
 
 class PIDController():
     def __init__(self, interval, controls=None, q=None):
@@ -56,7 +69,6 @@ class PIDController():
             time.sleep(self.interval * 0.001)
 
     def calcForces(self):
-        print("Calculating")
         return (
             self.roll.force(),
             self.pitch.force(),
@@ -70,7 +82,22 @@ class PIDController():
 
 
 if __name__ == "__main__":
-    pidC = PIDController(10)
-    pidC.startListening()
+    # pidC = PIDController(10)
+    # pidC.startListening()
+
+    yaw = Axis(10)
+    yaw.update(45)
+    print(yaw.force())
+    yaw.update(30)
+    print(yaw.force())
+    yaw.update(25)
+    print(yaw.force())
+    yaw.update(15)
+    print(yaw.force())
+    yaw.update(7.5)
+    print(yaw.force())
+    yaw.update(0)
+    print(yaw.force())
+
 
 

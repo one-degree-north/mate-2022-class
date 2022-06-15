@@ -1,16 +1,8 @@
 from dataclasses import dataclass, field
 import hashlib, hid, time, copy, threading
 from struct import unpack
-from controls import Controls, Movements
-# from thrusters import Thruster # , frontL, frontR, backL, backR, sideL, sideR
 
 
-# frontL = Thruster(pin=0, powerMatrix=(0, 0, 1), position=(-1, 1))
-# frontR = Thruster(pin=1, powerMatrix=(0, 0, 1), position=( 1, 1))
-# backL  = Thruster(pin=2, powerMatrix=(0, 0, 1), position=(-1,-1))
-# backR  = Thruster(pin=3, powerMatrix=(0, 0, 1), position=( 1,-1))
-# sideL  = Thruster(pin=4, powerMatrix=(0, 1, 0), position=(-1, 0))
-# sideR  = Thruster(pin=5, powerMatrix=(0, 1, 0), position=( 1, 0))
 
 @dataclass
 class JoystickData:
@@ -22,13 +14,13 @@ class JoystickData:
     buttons:list = field(default_factory=list)
 
 class Joystick:
-    def __init__(self, controls=None):
+    def __init__(self, q=None):
         self.joy = hid.device()
         self.joy.open(vendor_id=1133, product_id=49685)
         self.pastInput = 0
         self.joyData = JoystickData()
         self.pastJoyData = copy.copy(self.joyData)
-        self.controls = controls
+        self.q = q
         self.currReadingThread = None
         self.threadActive = False
         # self.callbackMethod = callbackMethod
@@ -37,13 +29,7 @@ class Joystick:
         # return self.joyData
         if (self.pastJoyData != self.joyData):
             pass
-            # Thruster.showSpeeds((0, self.joyData.yAxis, 0), (0, 0, 0), 1)
-            # print(self.joyData.yAxis)
-            #print(self.joyData)
-            #self.thruster.getJoyData(self.joyData)
-            # self.callbackMethod(self.joyData)
-            #return self.joyData
-            # self.controls.applyJoystickOutput(self.joyData)
+            # self.q.put()
 
     def readJoyData(self):
         """
@@ -107,7 +93,6 @@ class Joystick:
         while self.threadActive:
             self.readJoyData()
             self.sendJoyData()
-            #self.controls.applyJoystickOutput(self.joyData)
 
     def startReadingThread(self):
         self.currReadingThread = threading.Thread(target=self.readingThread)
@@ -134,8 +119,8 @@ class Joystick:
             print(device_dict["vendor_id"])
 
 if __name__ == "__main__":
-    controls = Controls()
-    joystick = Joystick(controls)
+
+    joystick = Joystick()
     joystick.readingThread()
     #while True:
     #    joystick.readHid2()
