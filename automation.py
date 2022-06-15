@@ -57,10 +57,11 @@ class PIDController():
     def collectData(self):
         lastReading = None
         while True:
-            try:
-                data = self.controls.orientationData
-            except AttributeError: # controls still None
-                data = (0, 0, 0)
+            # try:
+            #     data = self.controls.orientationData
+            # except AttributeError: # controls still None
+            #     data = (0, 0, 0)
+            data = self.controls.orientationData
             print(data)
             if data != lastReading:
                 # add data manager here
@@ -88,8 +89,11 @@ import queue
 
 if __name__ == "__main__":
     controls = Controls()
+    controls.comms.startThread()
+    controls.setOrientationAutoreport(1)
 
-    pidC = PIDController(10, controls=controls, q=queue.Queue())
+
+    pidC = PIDController(1000, controls=controls, q=queue.Queue())
     pidC.startListening()
 
     # yaw = Axis(10)

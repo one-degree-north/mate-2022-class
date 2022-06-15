@@ -18,8 +18,8 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem142401", baudrate=115200)
-        self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14220", baudrate=115200)
+        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14101", baudrate=115200)
+        # self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14220", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -97,7 +97,10 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def readThread(self):
         self.threadActive = True
         while self.threadActive:
+            print("doing this too")
+            print(self.offshoreArduino.in_waiting)
             if (self.offshoreArduino.in_waiting >= 15):
+                print("doing this")
                 self.controls.handleInput(self.readOffshore())
             if (not self.outputQueue.empty()):
                 self.writeOutput(self.outputQueue.get())

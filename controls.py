@@ -50,6 +50,8 @@ class Controls:
     #    thrusterValues = [0, 0, 0, 0, 0, 0]
 
     def handleInput(self, input):
+        print("This is being run")
+        print(input)
         if (input == -1):
             return -1
         if (input[0] == b'\x20'):   #GYRO output (degrees)
@@ -115,7 +117,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
-    inputNum = 0;
+    inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
