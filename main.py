@@ -16,40 +16,6 @@ import logging
 import yaml
 import cv2
 
-# from datetime import datetime
-
-# class Title(QLabel):
-#     def __init__(self):
-#         super().__init__('Octopus Prime')
-
-#         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-
-#         self.setStyleSheet("""
-#             QWidget {
-#                 background: rgb(26, 26, 26);
-#                 border-bottom-left-radius: 10px;
-#                 border-bottom-right-radius: 10px;
-
-#                 font: bold 30px;
-#                 color: white
-#             }
-#         """)
-
-# self.animation = QPropertyAnimation(self.menu, b'pos')
-# self.animation.setStartValue(QPoint(-260,self.pos))
-# self.animation.setEndValue(QPoint(0,0))
-# self.animation.setDuration(200)
-# self.animation.start()
-
-# else:
-# self.animation = QPropertyAnimation(self.menu, b'pos')
-# self.animation.setStartValue(QPoint(0,0))
-# self.animation.setEndValue(QPoint(-260,0))
-# self.animation.setDuration(200)
-# self.animation.start()
-
-# self.animation.finished.connect(lambda: self.menu.hide())
-
 class CrimsonUI(QMainWindow):
     def __init__(self, front_port, down_port):
         super().__init__()
@@ -192,36 +158,8 @@ class CrimsonUI(QMainWindow):
             self.status.down_cam_status.set_disconnected()
 
     def keyPressEvent(self, e):
-        # if e.key() == Qt.Key_C:
-        #     timestamp = datetime.now().strftime(f'%d-%m-%y_%H:%M:%S.%f')[:-4]
-        #     os.mkdir(f'captures/{timestamp}')
-
-        #     try:
-        #         filename = f'captures/{timestamp}/front_camera.png'
-        #         cv2.imwrite(filename, self.grid.front_cam.thread.image)
-
-
-        #         # logging.info(f'Captured: captures/{timestamp}.png')
-        #     except cv2.error:
-        #         # logging.error('Camera has not yet loaded, please wait')
-        #         pass
-
-        #     try:
-        #         filename = f'captures/{timestamp}/down_camera.png'
-        #         cv2.imwrite(filename, self.grid.down_cam.thread.image)
-
-
-        #         # logging.info(f'Captured: captures/{timestamp}.png')
-        #     except cv2.error:
-        #         # logging.error('Camera has not yet loaded, please wait')
-        #         pass
-
-        #     print(os.listdir(f'captures/{timestamp}'))
-
-        # else:
-        #     pass
-        pass
-            
+        if self.console.command_line.key_logging and e.text().isprintable() and len(e.text()) == 1:
+            logging.debug(f'{e.text()} ({ord(e.text())})')
 
 
 if __name__ == '__main__':
@@ -240,6 +178,8 @@ if __name__ == '__main__':
         logging.warning('No captures directory detected; one has been generated for you!')
     except FileExistsError:
         pass
+
+    logging.info('Successfully loaded Crimson UI')
 
     sys.exit(app.exec())
 

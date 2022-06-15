@@ -3,9 +3,10 @@ from PyQt5.QtCore import Qt
 
 import os
 import shutil
-from datetime import datetime
 
 import logging
+
+from datetime import datetime
 
 class ConsoleModule(QWidget):
     def __init__(self):
@@ -27,16 +28,12 @@ class ConsoleModule(QWidget):
 
         self.layout = QVBoxLayout()
 
-
         self.layout.addWidget(self.logs, 100)
         self.layout.addWidget(self.command_line)
 
         self.layout.setContentsMargins(0,0,0,0)
 
         self.setLayout(self.layout)
-
-        for _ in range(50):
-            logging.debug('ok')
 
 class LoggerBox(logging.Handler):
     def __init__(self, parent):
@@ -125,7 +122,8 @@ class CommandLine(QLineEdit):
             return (++) - returns text to logs
             exit - stops the program
 
-            clear - clear captures directory (permanently)
+            empty - permanently empties the 
+            captures directory
             key - toggles key logging
 
             Key:
@@ -147,11 +145,19 @@ class CommandLine(QLineEdit):
 
             exit()
 
-        elif self.split_text[0] == 'clear':
+        elif self.split_text[0] == 'empty':
             shutil.rmtree('captures')
+            os.mkdir('captures')
+
+            logging.info('Successfully emptied the captures directory')
 
         elif self.split_text[0] == 'key':
-            logging.info('keylogging')
+            if self.key_logging:
+                self.key_logging = False
+            else:
+                self.key_logging = True
+            
+            logging.info(f'Key logging: {self.key_logging}')
         
         else:
             logging.error(f'Command "{self.split_text[0]}" does not exist')
