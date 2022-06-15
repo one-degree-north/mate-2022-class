@@ -1,6 +1,14 @@
 from dataclasses import dataclass
 from pynput import keyboard
 
+@dataclass
+class KeyMessage:
+    reqMotion: tuple
+    reqRotation: tuple
+    clawAngle: float
+    thrustScale: float
+    allowAutoInfluence: bool
+    tare: bool
 
 @dataclass
 class Move:
@@ -11,6 +19,7 @@ class Move:
     bumpUp: int = 4
     bumpDown: int = 5
     scale: int = 6
+    tare: int = 7
 
 def findAngle(currValue, changeAmount, minMax, changeType):
     if changeType == Move.bumpUp:
@@ -68,8 +77,7 @@ def speakMovement(reqMotion, reqRotation=None):
     print(output)
 
 class KeyManager():
-    def __init__(self, controls=None, q=None):
-        self.controls = controls
+    def __init__(self, q=None):
         self.q = q
         self.acceptedChars = {}
         self.keys = [
@@ -96,7 +104,9 @@ class KeyManager():
             Key('3', Move.scale, None, False),
             Key('4', Move.scale, None, False),
             Key('5', Move.scale, None, False),
-            Key('0', Move.scale, None, False)
+            Key('0', Move.scale, None, False),
+
+            Key('t', Move.tare, None, False),
         ]
 
         self.currClawAngle = 0
@@ -110,6 +120,7 @@ class KeyManager():
         netMotion = [0, 0, 0]
         netRotation = [0, 0, 0]
         clawAngle = self.currClawAngle
+        tare = False
 
         for key in self.acceptedChars.values():
             if key.isDown:
@@ -137,10 +148,20 @@ class KeyManager():
                 elif key.mType == Move.pauseAuto:
                     self.allowAutoInfluence = findFlipVal(self.allowAutoInfluence)
 
+                elif key.mType == Move.tare:
+                    tare = True
 
 
-        # print((netMotion, netRotation, clawAngle))
-        self.q.put(["k", (netMotion, netRotation, clawAngle, self.thrustScale, self.allowAutoInfluence)])
+        output = KeyMessage(
+            reqMotion          = netMotion,
+            reqRotation        = netRotation,
+            clawAngle          = clawAngle,
+            thrustScale        = self.thrustScale,
+            allowAutoInfluence = self.allowAutoInfluence,
+            tare               = tare
+        )
+
+        self.q.put(["k", output])
 
     def updateKeyState(self, keyStr, isDown):
         if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:

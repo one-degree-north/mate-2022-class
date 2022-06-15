@@ -3,23 +3,32 @@ import queue
 import threading
 import time
 
+from controls import Controls
+
 from thrusters import ThrustManager, displayTSpeeds
-from keyboard import KeyManager
+from keyboard import KeyManager, KeyMessage
 from automation import PIDController
 
 class Unifier():
-    def __init__(self, TManager: ThrustManager, q, interval):
-        self.TManager = TManager
+    def __init__(self, q, interval, controls=None):
+        self.TManager = ThrustManager(controls=controls)
+        self.KManager = KeyManager(q=q)
+        self.pidC = PIDController(interval, q=q, controls=controls)
+        self.pidC.roll.kp = 0.01
+        self.pidC.roll.kd = 0.01
+        
         self.q = q
         self.interval = interval
         
         self.readLasts = False
 
-        self.lastFromKeyboard = ((0,0,0), (0,0,0), 0, 1)
+        self.lastFromKeyboard = ((0,0,0), (0,0,0), 0, 1, True, False)
         # [0] -> reqMotion
         # [1] -> reqRotation
         # [2] -> clawAngle
         # [3] -> thrustScale
+        # [4] -> influence
+        # [5]
 
 
         self.lastFromAutomation = (0,0,0)
@@ -33,14 +42,21 @@ class Unifier():
         while True:
             while self.q.qsize != 0:
                 command = self.q.get()
-                if command[0] == "k" and self.lastFromKeyboard != command[1]:
-                    # print("Delegating to keyboard")
-                    self.lastFromKeyboard = command[1][0:4]
-                    self.allowAutoInfluence = command[1][4]
+                payload: KeyMessage = command[1]
+                if command[0] == "k" and self.lastFromKeyboard != payload:
+
+                    tare = payload.tare
+                    if tare:
+                        self.pidC.tareAll()
+                        print("Taring...\n\n\n\n\n\n\n")
+                    # print(f"\n{self.lastFromKeyboard = }")
+                    self.lastFromKeyboard = payload
+                    self.allowAutoInfluence = payload.allowAutoInfluence
+        
                     self.readLasts = True
-                elif command[0] == "a" and self.lastFromAutomation != command[1]:
+                elif command[0] == "a" and self.lastFromAutomation != payload:
                     # print("Delegating to automation")
-                    self.lastFromAutomation = command[1]
+                    self.lastFromAutomation = payload
                     self.readLasts = True
 
                 if self.readLasts:
@@ -50,11 +66,11 @@ class Unifier():
 
 
 
-                    reqMotion = self.lastFromKeyboard[0]
+                    reqMotion = self.lastFromKeyboard.reqMotion
 
-                    reqRotation = self.lastFromKeyboard[1]
+                    reqRotation = self.lastFromKeyboard.reqRotation
                     if self.allowAutoInfluence:
-                        reqRotation = self.combineType(self.lastFromKeyboard[1], self.lastFromAutomation)
+                        reqRotation = self.combineType(reqRotation, self.lastFromAutomation)
 
 
                     # add coalesce code here
@@ -66,13 +82,16 @@ class Unifier():
                     displayTSpeeds(self.TManager.getTSpeeds(
                         reqMotion,
                         reqRotation,
-                        self.lastFromKeyboard[3]
+                        self.lastFromKeyboard.thrustScale
                     ))
 
             time.sleep(self.interval * 0.001)  
 
 
     def initiateWrangling(self):
+        self.KManager.startPolling()
+        self.pidC.startListening()
+
         self.delegateThread = threading.Thread(target=self.delegateFromQ)
         self.delegateThread.start()
 
@@ -85,13 +104,17 @@ class Unifier():
         return output
 
 if __name__ == "__main__":
+
+    # controls = Controls()
+    # controls.setOrientationAutoreport(1)
+    # controls.comms.startThread()
     
     q = queue.Queue()
-    TManager = ThrustManager()
-    KManager = KeyManager(q=q)
-    pidC = PIDController(10, q=q)
-    unit = Unifier(TManager, q, 10)
+    # TManager = ThrustManager(controls=controls)
+    # KManager = KeyManager(q=q)
+    # pidC = PIDController(10, q=q, controls=controls);pidC.tareAll()
+    unit = Unifier(q, 10, controls=None)
     
-    KManager.startPolling()
-    pidC.startListening()
+    # KManager.startPolling()
+    # pidC.startListening()
     unit.initiateWrangling()

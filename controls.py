@@ -50,8 +50,8 @@ class Controls:
     #    thrusterValues = [0, 0, 0, 0, 0, 0]
 
     def handleInput(self, input):
-        print("This is being run")
-        print(input)
+        # print("This is being run")
+        # print(input)
         if (input == -1):
             return -1
         if (input[0] == b'\x20'):   #GYRO output (degrees)
@@ -65,7 +65,7 @@ class Controls:
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -88,9 +88,9 @@ class Controls:
                 modifiedThrusterValue = 200
             if (modifiedThrusterValue < 100):
                 modifiedThrusterValue = 100
-            print(modifiedThrusterValue)
+            # print(modifiedThrusterValue)
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
-        print(modifiedThrusters)
+        # print(modifiedThrusters)
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
     def moveClaw(self, deg):
