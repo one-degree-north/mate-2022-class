@@ -110,6 +110,8 @@ class CommandLine(QLineEdit):
         self.returnPressed.connect(self.command_event)
 
     def command_event(self):
+        self.clearFocus()
+        
         self.split_text = self.text().split(' ')
 
         self.clear()
