@@ -4,7 +4,8 @@ from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 from gui.grid import CameraGrid
 from gui.control import ControlBar
 from gui.status import StatusBar
-from gui.stopwatch import Stopwatch, StopwatchControlBar, CaptureControlBar
+from gui.stopwatch import Stopwatch, StopwatchControlBar#, CaptureControlBar
+from gui.record import CaptureControlBar
 from gui.console import ConsoleModule
 from gui.info import ThrusterDisplayModule, AxisDisplayModule
 

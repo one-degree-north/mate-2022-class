@@ -1,72 +1,8 @@
 from PyQt5.QtWidgets import QHBoxLayout, QHBoxLayout, QWidget, QLabel
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, QSize, QTimer
+from PyQt5.QtCore import Qt, QTimer
 
 from .button import Button
-
-class CaptureControlBar(QWidget):
-    def __init__(self, parent):
-        super().__init__()
-
-        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-
-        self.setStyleSheet("""
-            QWidget {
-                background: rgb(26, 26, 26);
-                border-bottom-left-radius: 10px;
-                border-bottom-right-radius: 10px
-            }
-        """)
-
-        self.parent = parent
-
-        self.capture_image_button = Button('gui/icons/capture_image_icon.png', 'Capture image')
-        self.capture_image_button.clicked.connect(self.capture_image)
-
-        self.record_button = Button('gui/icons/start_record_icon.png', 'Start recording')
-        self.record_button.clicked.connect(self.toggle_record)
-
-        self.recording = False
-
-        self.layout = QHBoxLayout()
-        self.layout.setSpacing(10)
-
-        self.layout.addWidget(self.capture_image_button)
-        self.layout.addWidget(self.record_button)
-
-        self.setLayout(self.layout)
-
-    def capture_image(self):
-        pass
-
-    def toggle_record(self):
-        if not self.recording:
-            self.parent.stopwatch_control.startstop_button.setDisabled(True)
-            self.parent.stopwatch_control.reset_button.setDisabled(True)
-
-            self.parent.stopwatch_control.reset()
-
-            self.record_button.setIcon(QIcon('gui/icons/stop_record_icon.png'))
-            self.record_button.setToolTip('Stop recording')
-
-            self.recording = True
-            self.parent.stopwatch.stopwatch_on = True
-
-            # record stuff or check here from grid
-        else:
-            self.parent.stopwatch_control.startstop_button.setDisabled(False)
-            self.parent.stopwatch_control.reset_button.setDisabled(False)
-            
-
-            self.record_button.setIcon(QIcon('gui/icons/start_record_icon.png'))
-            self.record_button.setToolTip('Start recording')
-
-            self.recording = False
-            print(self.parent.stopwatch.minutes, self.parent.stopwatch.seconds, self.parent.stopwatch.centiseconds)
-
-            self.parent.stopwatch_control.reset()
-
-            # output both recordings to captures + delay?
 
 class StopwatchControlBar(QWidget):
     def __init__(self, parent):
@@ -117,7 +53,7 @@ class StopwatchControlBar(QWidget):
     def reset(self):
         self.parent.stopwatch.stopwatch_on = False
 
-        self.parent.stopwatch.milliseconds = 0
+        self.parent.stopwatch.centiseconds = 0
         self.parent.stopwatch.seconds = 0
         self.parent.stopwatch.minutes = 0
 
