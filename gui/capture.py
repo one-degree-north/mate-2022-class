@@ -4,6 +4,13 @@ from PyQt5.QtCore import Qt, QTimer
 
 from .button import Button
 
+import os
+
+import logging
+import cv2
+
+from datetime import datetime
+
 class CaptureControlBar(QWidget):
     def __init__(self, parent): #"parent" needed?
         super().__init__()
@@ -66,10 +73,33 @@ class CaptureControlBar(QWidget):
         self.record_stopwatch_label.setText(f'{self.minutes:02d}:{self.seconds:02d}')
 
     def capture_image(self):
-        pass
+        folder = f'IMAGE_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
+        os.mkdir(f'captures/{folder}')
+
+        try:
+            filename = f'captures/{folder}/front_camera.png'
+            cv2.imwrite(filename, self.parent.grid.front_cam.thread.image)
+
+            logging.info(f'Captured: captures/{folder}/front_camera.png')
+        except cv2.error:
+            logging.error('An error occurred while attempting to capture an image from the FRONT camera')
+            # pass
+
+        try:
+            filename = f'captures/{folder}/down_camera.png'
+            cv2.imwrite(filename, self.parent.grid.down_cam.thread.image)
+
+
+            logging.info(f'Captured: captures/{folder}/down_camera.png')
+        except cv2.error:
+            logging.error('An error occurred while attempting to capture an image from the DOWN camera')
+            # pass
 
     def toggle_record(self):
         if not self.recording:
+            if self.parent.stopwatch_control.quickstart_button.isEnabled():
+                self.parent.stopwatch_control.quickstart_button.setDisabled(True)
+
             self.record_button.setIcon(QIcon('gui/icons/stop_record_icon.png'))
             self.record_button.setToolTip('Stop recording')
 

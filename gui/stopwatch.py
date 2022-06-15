@@ -53,6 +53,9 @@ class StopwatchControlBar(QWidget):
             self.startstop_button.setToolTip('Resume')
 
         else:
+            if self.quickstart_button.isEnabled():
+                self.quickstart_button.setDisabled(True)
+
             self.startstop_button.setIcon(QIcon('gui/icons/pause_icon.png'))
             self.startstop_button.setToolTip('Pause')
 

@@ -4,18 +4,19 @@ from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 from gui.grid import CameraGrid
 from gui.control import ControlBar
 from gui.status import StatusBar
-from gui.stopwatch import Stopwatch, StopwatchControlBar#, CaptureControlBar
-from gui.record import CaptureControlBar
+from gui.stopwatch import Stopwatch, StopwatchControlBar
+from gui.capture import CaptureControlBar
 from gui.console import ConsoleModule
 from gui.info import ThrusterDisplayModule, AxisDisplayModule
 
 import sys
 import os
 
+import logging
 import yaml
 import cv2
 
-from datetime import datetime
+# from datetime import datetime
 
 # class Title(QLabel):
 #     def __init__(self):
@@ -191,34 +192,35 @@ class CrimsonUI(QMainWindow):
             self.status.down_cam_status.set_disconnected()
 
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_C:
-            timestamp = datetime.now().strftime(f'%d-%m-%y_%H:%M:%S.%f')[:-4]
-            os.mkdir(f'captures/{timestamp}')
+        # if e.key() == Qt.Key_C:
+        #     timestamp = datetime.now().strftime(f'%d-%m-%y_%H:%M:%S.%f')[:-4]
+        #     os.mkdir(f'captures/{timestamp}')
 
-            try:
-                filename = f'captures/{timestamp}/front_camera.png'
-                cv2.imwrite(filename, self.grid.front_cam.thread.image)
-
-
-                # logging.info(f'Captured: captures/{timestamp}.png')
-            except cv2.error:
-                # logging.error('Camera has not yet loaded, please wait')
-                pass
-
-            try:
-                filename = f'captures/{timestamp}/down_camera.png'
-                cv2.imwrite(filename, self.grid.down_cam.thread.image)
+        #     try:
+        #         filename = f'captures/{timestamp}/front_camera.png'
+        #         cv2.imwrite(filename, self.grid.front_cam.thread.image)
 
 
-                # logging.info(f'Captured: captures/{timestamp}.png')
-            except cv2.error:
-                # logging.error('Camera has not yet loaded, please wait')
-                pass
+        #         # logging.info(f'Captured: captures/{timestamp}.png')
+        #     except cv2.error:
+        #         # logging.error('Camera has not yet loaded, please wait')
+        #         pass
 
-            print(os.listdir(f'captures/{timestamp}'))
+        #     try:
+        #         filename = f'captures/{timestamp}/down_camera.png'
+        #         cv2.imwrite(filename, self.grid.down_cam.thread.image)
 
-        else:
-            pass
+
+        #         # logging.info(f'Captured: captures/{timestamp}.png')
+        #     except cv2.error:
+        #         # logging.error('Camera has not yet loaded, please wait')
+        #         pass
+
+        #     print(os.listdir(f'captures/{timestamp}'))
+
+        # else:
+        #     pass
+        pass
             
 
 
@@ -226,11 +228,18 @@ if __name__ == '__main__':
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
 
+
     app = QApplication([])
     app.setStyle('Fusion')
 
     window = CrimsonUI(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     window.show()
+
+    try:
+        os.mkdir('captures')
+        logging.warning('No captures directory detected; one has been generated for you!')
+    except FileExistsError:
+        pass
 
     sys.exit(app.exec())
 
