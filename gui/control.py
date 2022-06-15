@@ -45,7 +45,7 @@ class ControlBar(QWidget):
         self.setFixedWidth(60)
 
     def help(self):
-        pass
+        self.help_button.setDisabled(True)
 
     def info(self):
         if self.parent.thruster_display.isVisible():

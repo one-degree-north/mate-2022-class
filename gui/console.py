@@ -155,14 +155,6 @@ class CommandLine(QLineEdit):
 
         elif self.split_text[0] == 'key':
             logging.info('keylogging')
-
-
-
-        # elif self.split_text[0] == 'ping':
-        #     pass
-        
-        # elif self.split_text[0] == 'clear':
-        #     pass
         
         else:
             logging.error(f'Command "{self.split_text[0]}" does not exist')

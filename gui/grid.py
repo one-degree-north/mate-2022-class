@@ -7,7 +7,7 @@ from numpy import ndarray
 import cv2
 import logging
 
-class Grid(QWidget):
+class CameraGrid(QWidget):
     def __init__(self, port1, port2):
         super().__init__()
 

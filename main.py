@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 
-from gui.grid import Grid
+from gui.grid import CameraGrid
 from gui.control import ControlBar
 from gui.status import StatusBar
-from gui.timer import TimerBar, TimerControlBar
+from gui.stopwatch import Stopwatch, StopwatchControlBar, CaptureControlBar
 from gui.console import ConsoleModule
 from gui.info import ThrusterDisplayModule, AxisDisplayModule
 
@@ -60,11 +60,12 @@ class CrimsonUI(QMainWindow):
             }
         """)
 
-        self.grid = Grid(front_port, down_port)
+        self.grid = CameraGrid(front_port, down_port)
         self.control = ControlBar(self)
         self.status = StatusBar()
-        self.timer = TimerBar()
-        self.timer_control = TimerControlBar(self)
+        self.stopwatch = Stopwatch()
+        self.stopwatch_control = StopwatchControlBar(self)
+        self.capture_control = CaptureControlBar(self)
 
         self.console = ConsoleModule()
         self.console.hide()
@@ -76,6 +77,19 @@ class CrimsonUI(QMainWindow):
         self.axis_display.hide()
 
 
+        # self.stopwatch_status = QLabel('(T)')
+        # self.stopwatch_status.setStyleSheet("""
+        #     QLabel {
+        #         margin-top: 10px;
+
+        #         font: bold 10px;
+        #         color: white
+        #     }
+        # """)
+
+        # self.stopwatch_status.setAlignment(Qt.AlignRight)
+
+
         self.control_frame = QWidget()
         self.control_frame.layout = QVBoxLayout()
         
@@ -85,15 +99,6 @@ class CrimsonUI(QMainWindow):
         self.control_frame.layout.setContentsMargins(0,0,0,0)
         self.control_frame.setLayout(self.control_frame.layout)
 
-
-        # self.console_frame = QWidget()
-        # self.console_frame.layout = QVBoxLayout()
-        
-        # self.console_frame.layout.addStretch(1)
-        # self.console_frame.layout.addWidget(self.console)
-
-        # self.console_frame.layout.setContentsMargins(0,0,0,0)
-        # self.console_frame.setLayout(self.console_frame.layout)
 
         self.thruster_display_frame = QWidget()
         self.thruster_display_frame.layout = QVBoxLayout()
@@ -125,24 +130,22 @@ class CrimsonUI(QMainWindow):
         self.status_frame.setLayout(self.status_frame.layout)
 
 
-        self.timer_frame = QWidget()
-        self.timer_frame.layout = QHBoxLayout()
+        self.stopwatch_frame = QWidget()
+        self.stopwatch_frame.layout = QHBoxLayout()
+        self.stopwatch_frame.layout.setSpacing(20)
         
-        self.timer_frame.layout.addWidget(self.timer)
-        self.timer_frame.layout.addStretch(1)
-        # self.timer_frame.layout.addWidget(self.title)
-        # self.timer_frame.layout.addStretch(1)
+        self.stopwatch_frame.layout.addWidget(self.stopwatch)
+        self.stopwatch_frame.layout.addStretch(1)
+        # self.stopwatch_frame.layout.addWidget(self.stopwatch_status)
+        self.stopwatch_frame.layout.addWidget(self.capture_control)
+        self.stopwatch_frame.layout.addWidget(self.stopwatch_control)
 
-        self.timer_frame.layout.addWidget(self.timer_control)
-
-        self.timer_frame.layout.setContentsMargins(0,0,0,0)
-        self.timer_frame.setLayout(self.timer_frame.layout)
+        self.stopwatch_frame.layout.setContentsMargins(0,0,0,0)
+        self.stopwatch_frame.setLayout(self.stopwatch_frame.layout)
 
 
         self.lower_frame = QWidget()
-
         self.lower_frame.setFixedHeight(250)
-
         self.lower_frame.layout = QHBoxLayout()
         self.lower_frame.layout.setSpacing(20)
 
@@ -160,7 +163,7 @@ class CrimsonUI(QMainWindow):
         self.frame = QWidget()
         self.frame.layout = QVBoxLayout()
         
-        self.frame.layout.addWidget(self.timer_frame)
+        self.frame.layout.addWidget(self.stopwatch_frame)
         self.frame.layout.addWidget(self.grid, 100)
         self.frame.layout.addWidget(self.lower_frame)
 
