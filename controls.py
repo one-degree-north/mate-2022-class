@@ -32,21 +32,21 @@ class Controls:
 
     def handleInput(self, input):
         # print("This is being run")
-        # print(input)
+        #print(input)
         if (input == -1):
             return -1
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            #print(f"gyro data: {self.gyroData}")
+            print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            #print(f"accel data: {self.accelData}")
+            print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -101,7 +101,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     #controls.comms.startThread()
-    
+    #controls.resetOffshore()
     """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:

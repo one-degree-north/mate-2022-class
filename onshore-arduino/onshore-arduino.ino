@@ -1,6 +1,5 @@
 //#define Serial Serial1
 #include <Servo.h>
-//#define Serial Serial1
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 
@@ -85,10 +84,17 @@ void processCommand(Input inputValue){
       }
       halt(inputValue);
     break;
-    case 0x50: //
-      
+    case 0x45: //return offshore or onshore
+      writeOnshore();
     break;
   }
+}
+void writeOnshore(){  //Indicates that this board is the onshore board
+  uint8_t onshore = 0x10;
+  Serial.write(HEADER);
+  Serial.write(0x15);
+  Serial.write(onshore);
+  Serial.write(FOOTER);
 }
 
 void moveMultipleThrusters(Input inputValue){

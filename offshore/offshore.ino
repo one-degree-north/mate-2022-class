@@ -1,4 +1,4 @@
-//#define Serial Serial1
+#define Serial Serial1
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 
@@ -125,10 +125,21 @@ void processCommand(Input inputValue){
       autoData.orientationDelay = inputValue.value*10;
       autoData.orientationTime = 0;
     break;
-    case 0x40:
+    case 0x40:  //reset adafruit qtpy along with bno055
       NVIC_SystemReset();
     break;
+    case 0x45:  //return offshore or onshore
+      writeOffshore();
+    break;
   }
+}
+
+void writeOffshore(){ //indicates that the board is offshore
+  uint8_t offshore = 0x15;
+  Serial.write(HEADER);
+  Serial.write(0x15);
+  Serial.write(offshore);
+  Serial.write(FOOTER);
 }
 
 void writeOrientationOutput(){
