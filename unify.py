@@ -14,8 +14,6 @@ class Unifier():
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyManager(q=q)
         self.pidC = PIDController(interval, q=q, controls=controls)
-        self.pidC.roll.kp = 0.01
-        self.pidC.roll.kd = 0.01
         
         self.q: queue.Queue() = q
         self.interval = interval
@@ -36,7 +34,7 @@ class Unifier():
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
 
-        self.combineType = self.getAverage
+        self.combineType = self.avgWithoutYaw
 
     def delegateFromQ(self):
         commandsReceived = 0
@@ -89,15 +87,26 @@ class Unifier():
         self.delegateThread = threading.Thread(target=self.delegateFromQ)
         self.delegateThread.start()
 
-    def getAverage(self, data1, data2):
-        # print(f"{data1 = }")
+    def getAverage(self, kData, aData):
         output = []
-        for indexNo, _ in enumerate(data1):
-            output.append((data1[indexNo] + data2[indexNo]) / 2)
+        for indexNo, _ in enumerate(kData):
+            output.append((kData[indexNo] + aData[indexNo]) / 2)
+        return output
 
+    def avgWithoutYaw(self, kData, aData):
+        output = []
+        for indexNo, _ in enumerate(kData):
+            if indexNo != self.TManager.z:
+                output.append((kData[indexNo] + aData[indexNo]) / 2)
+            else:
+                output.append(kData[self.TManager.z])
         return output
 
 if __name__ == "__main__":    
+    controls = Controls()
+    controls.setOrientationAutoreport(1)
+    controls.comms.startThread()
+
     q = queue.Queue()
     unit = Unifier(q, 10)
     unit.initiateWrangling()

@@ -12,11 +12,11 @@ class Influence:
 
 
 class Axis():
-    def __init__(self, interval):
+    def __init__(self, interval, kp=-0.005, ki=-0.005, kd=-0.005):
         self.interval = interval
-        self.kp = -0.005
-        self.ki = -0.01
-        self.kd = -0.005
+        self.kp = kp
+        self.ki = ki
+        self.kd = kd
         self.errorHistory = [0, 0] # test values only
         self.offset = 0 # positive value shifts the target rightward, negative leftward
 
@@ -117,9 +117,12 @@ if __name__ == "__main__":
     from controls import Controls
     import queue
     
-    # controls = Controls()
-    # controls.setOrientationAutoreport(1)
-    # controls.comms.startThread()
+    controls = Controls()
+    controls.setOrientationAutoreport(1)
+    controls.comms.startThread()
     
-    pidC = PIDController(10, controls=None, q=queue.Queue())
+    pidC = PIDController(10, controls=controls, q=queue.Queue())
     pidC.startListening()
+
+    # t = Axis(10)
+    # print(t.force())
