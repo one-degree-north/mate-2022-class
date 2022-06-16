@@ -17,7 +17,7 @@ class Unifier():
         self.pidC.roll.kp = 0.01
         self.pidC.roll.kd = 0.01
         
-        self.q = q
+        self.q: queue.Queue() = q
         self.interval = interval
         
         self.readLasts = False
@@ -39,8 +39,12 @@ class Unifier():
         self.combineType = self.getAverage
 
     def delegateFromQ(self):
+        commandsReceived = 0
         while True:
-            while self.q.qsize != 0:
+            while self.q.qsize() != 0:
+                # commandsReceived += 1
+                # print(f"{commandsReceived = }")
+                commandsReceived += 1
                 command = self.q.get()
                 payload: KeyMessage = command[1]
                 if command[0] == "k" and self.lastFromKeyboard != payload:
@@ -48,8 +52,7 @@ class Unifier():
                     tare = payload.tare
                     if tare:
                         self.pidC.tareAll()
-                        print("Taring...\n\n\n\n\n\n\n")
-                    # print(f"\n{self.lastFromKeyboard = }")
+
                     self.lastFromKeyboard = payload
                     self.allowAutoInfluence = payload.allowAutoInfluence
         
@@ -64,20 +67,11 @@ class Unifier():
                     print(f"{self.lastFromAutomation = }")
                     print(f"{self.allowAutoInfluence = }")
 
-
-
                     reqMotion = self.lastFromKeyboard.reqMotion
 
                     reqRotation = self.lastFromKeyboard.reqRotation
                     if self.allowAutoInfluence:
                         reqRotation = self.combineType(reqRotation, self.lastFromAutomation)
-
-
-                    # add coalesce code here
-                    # print(f"{self.lastFromKeyboard[0] = }")
-                    # print(f"{self.lastFromKeyboard[1] = }")
-                    # print(f"{self.lastFromKeyboard[2] = }")
-
 
                     displayTSpeeds(self.TManager.getTSpeeds(
                         reqMotion,
@@ -103,18 +97,7 @@ class Unifier():
 
         return output
 
-if __name__ == "__main__":
-
-    # controls = Controls()
-    # controls.setOrientationAutoreport(1)
-    # controls.comms.startThread()
-    
+if __name__ == "__main__":    
     q = queue.Queue()
-    # TManager = ThrustManager(controls=controls)
-    # KManager = KeyManager(q=q)
-    # pidC = PIDController(10, q=q, controls=controls);pidC.tareAll()
-    unit = Unifier(q, 10, controls=None)
-    
-    # KManager.startPolling()
-    # pidC.startListening()
+    unit = Unifier(q, 10)
     unit.initiateWrangling()
