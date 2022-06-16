@@ -112,6 +112,9 @@ class Controls:
     def setOrientationAutoreport(self, delay):
         self.outputQueue.put((0, (int.to_bytes(0x35, 1, "big"), int.to_bytes(delay, 1, "big"))))
 
+    def resetOffshore(self):
+        self.outputQueue.put((0, (int.to_bytes(0x40, 1, "big"), int.to_bytes(0, 1, "big"))))
+
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
