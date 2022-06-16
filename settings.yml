@@ -1,5 +1,5 @@
 camera-ports:
-  front: 1
+  front: 0
   down: 1
 
 serial-port: "/dev/"
