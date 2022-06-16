@@ -73,7 +73,7 @@ class CaptureControlBar(QWidget):
         self.record_stopwatch_label.setText(f'{self.minutes:02d}:{self.seconds:02d}')
 
     def capture_image(self):
-        folder = f'IMAGE_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
+        folder = f'IMAGES_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
         os.mkdir(f'captures/{folder}')
 
         try:
@@ -103,13 +103,38 @@ class CaptureControlBar(QWidget):
             self.record_button.setIcon(QIcon('gui/icons/stop_record_icon.png'))
             self.record_button.setToolTip('Stop recording')
 
-            self.recording = True
+            
 
+            self.folder = f'VIDEOS_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
+            os.mkdir(f'captures/{self.folder}')
+
+            try:
+                filename = f'captures/{self.folder}/front_video.avi'
+                self.parent.grid.front_cam.thread.video_output = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.parent.grid.front_cam.thread.image.shape[1], self.parent.grid.front_cam.thread.image.shape[0]))
+                # logging.info(f'Video captured under: captures/{folder}/front_video.mp4')
+                logging.info('Started video capture from the FRONT camera')
+            except AttributeError:
+                logging.error('An error occurred while attempting to start video capture from the FRONT camera')
+
+            try:
+                filename = f'captures/{self.folder}/down_video.avi'
+                self.parent.grid.down_cam.thread.video_output = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.parent.grid.down_cam.thread.image.shape[1], self.parent.grid.down_cam.thread.image.shape[0]))
+                
+                logging.info('Started video capture from the DOWN camera')
+            except AttributeError:
+                logging.error('An error occurred while attempting to start video capture from the DOWN camera')
+            
+            # from time import sleep
+            # sleep(1)
+            self.recording = True
+            
         else:
+            self.recording = False
+
+            QTimer.singleShot(100, self.release_record)
+
             self.record_button.setIcon(QIcon('gui/icons/start_record_icon.png'))
             self.record_button.setToolTip('Start recording')
-
-            self.recording = False
 
             self.centiseconds = 0
             self.seconds = 0
@@ -121,3 +146,21 @@ class CaptureControlBar(QWidget):
                 self.parent.stopwatch_control.quickstart_button.setDisabled(False)
 
             # output both recordings to captures + delay?
+
+    def release_record(self):
+        # if self.parent.grid.front_cam.thread.video_output.isOpened():
+        #     print('open1')
+        try:
+            self.parent.grid.front_cam.thread.video_output.release()
+            logging.info(f'Video saved under: captures/{self.folder}/front_video.mp4')
+        except AttributeError:
+            logging.error('An error occurred while attempting to save a video from the FRONT camera')
+        
+        try:
+            self.parent.grid.down_cam.thread.video_output.release()
+            logging.info(f'Video saved under: captures/{self.folder}/front_video.mp4')
+        except AttributeError:
+            logging.error('An error occurred while attempting to save a video from the DOWN camera')
+
+        # print('ok')
+        # print(self.parent.grid.down_cam.thread.video_output)

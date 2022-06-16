@@ -28,7 +28,7 @@ class CrimsonUI(QMainWindow):
             }
         """)
 
-        self.grid = CameraGrid(front_port, down_port)
+        self.grid = CameraGrid(self, front_port, down_port)
         self.control = ControlBar(self)
         self.status = StatusBar()
         self.stopwatch = Stopwatch()
@@ -113,7 +113,7 @@ class CrimsonUI(QMainWindow):
 
 
         self.lower_frame = QWidget()
-        self.lower_frame.setFixedHeight(250)
+        self.lower_frame.setFixedHeight(208)
         self.lower_frame.layout = QHBoxLayout()
         self.lower_frame.layout.setSpacing(20)
 

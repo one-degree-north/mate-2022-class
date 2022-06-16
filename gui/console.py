@@ -111,49 +111,62 @@ class CommandLine(QLineEdit):
 
     def command_event(self):
         self.clearFocus()
-        
-        self.split_text = self.text().split(' ')
+
+        split_text = self.text().split(' ')
 
         self.clear()
 
-        if self.split_text[0] == 'help':
+        if split_text[0] == 'help':
             logging.info("""
 
             Commands:
-            help - shows this menu
-            return (++) - returns text to logs
-            exit - stops the program
+            "help" - shows this menu
+            "return (++)" - returns text to logs
+            "exit" - stops the program
 
-            empty - permanently empties the 
-            captures directory
-            key - toggles key logging
+            "list" - list all folders in
+            the captures directory
+            "empty" - permanently empties
+            the captures directory
+            "key" - toggles key logging
 
             Key:
-            "()" = required
-            "[]" = optional
-            "+" = any value
-            "++" = one or more values
+            '()' = required
+            '[]' = optional
+            '+' = any value
+            '++' = one or more values
             """)
 
-        elif self.split_text[0] == 'return':
-            if not len(self.split_text) > 1:
+        elif split_text[0] == 'return':
+            if not len(split_text) > 1:
                 logging.error('Please provide additional argument(s)')
             else:
-                logging.info(' '.join(self.split_text[1:]))
+                logging.info(' '.join(split_text[1:]))
 
 
-        elif self.split_text[0] == 'exit':
+        elif split_text[0] == 'exit':
             print('\033[93m\033[1mSuccessfully stopped Crimson UI\033[0m')
 
             exit()
 
-        elif self.split_text[0] == 'empty':
+        elif split_text[0] == 'list':
+            captures_dir = sorted([f for f in os.listdir('captures/')])
+
+            
+
+            if captures_dir:
+                stringed_captures = "\n".join(captures_dir)
+                logging.info(f'captures/\n{stringed_captures}')
+            else:
+                logging.info('The captures directory is empty!')
+
+        elif split_text[0] == 'empty':
             shutil.rmtree('captures')
             os.mkdir('captures')
 
             logging.info('Successfully emptied the captures directory')
 
-        elif self.split_text[0] == 'key':
+        elif split_text[0] == 'key':
             if self.key_logging:
                 self.key_logging = False
             else:
@@ -162,4 +175,4 @@ class CommandLine(QLineEdit):
             logging.info(f'Key logging: {self.key_logging}')
         
         else:
-            logging.error(f'Command "{self.split_text[0]}" does not exist')
+            logging.error(f'Command "{split_text[0]}" does not exist')

@@ -55,6 +55,8 @@ class ControlBar(QWidget):
             self.parent.thruster_display.show()
             self.parent.axis_display.show()
 
+        print(self.height())
+
 
     def console(self):
         if self.parent.console.isVisible():

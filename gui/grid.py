@@ -8,8 +8,10 @@ import cv2
 import logging
 
 class CameraGrid(QWidget):
-    def __init__(self, port1, port2):
+    def __init__(self, parent, port1, port2):
         super().__init__()
+
+        self.parent = parent
 
         self.layout = QHBoxLayout()
         self.layout.setSpacing(0)
@@ -103,11 +105,25 @@ class VideoThread(QThread):
 
             if ret:
                 self.parent.connected = True
+
                 self.change_pixmap_signal.emit(self.image)
+
+                if self.parent.parent.parent.capture_control.recording:
+                    self.video_output.write(self.image)
+
             else:
                 self.parent.connected = False
 
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     print('ok')
+
+                
         cap.release()
+        # self.video_output.release()
+
+        
+        print('rel')
+        
 
     def stop(self):
         self.running = False
