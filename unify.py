@@ -15,33 +15,28 @@ class Unifier():
         self.KManager = KeyManager(q=q)
         self.pidC = PIDController(interval, q=q, controls=controls)
         
-        self.q: queue.Queue() = q
+        self.q = q
         self.interval = interval
         
         self.readLasts = False
 
-        self.lastFromKeyboard = ((0,0,0), (0,0,0), 0, 1, True, False)
-        # [0] -> reqMotion
-        # [1] -> reqRotation
-        # [2] -> clawAngle
-        # [3] -> thrustScale
-        # [4] -> influence
-        # [5]
-
-
-        self.lastFromAutomation = (0,0,0)
+        self.lastFromKeyboard = KeyMessage()
+        
+        self.lastFromAutomation = [0,0,0]
 
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
 
-        self.combineType = self.avgWithoutYaw
+        self.combineType = self.averageWithoutYaw
 
     def delegateFromQ(self):
         commandsReceived = 0
         while True:
             while self.q.qsize() != 0:
-                # commandsReceived += 1
-                # print(f"{commandsReceived = }")
+
+
+
+
                 commandsReceived += 1
                 command = self.q.get()
                 payload: KeyMessage = command[1]
@@ -49,7 +44,12 @@ class Unifier():
 
                     tare = payload.tare
                     if tare:
+                        # print("\n\n\n\n\n\n\n")
                         self.pidC.tareAll()
+
+                    command = payload.command
+                    if command:
+                        self.pidC.shiftTargetLeft()
 
                     self.lastFromKeyboard = payload
                     self.allowAutoInfluence = payload.allowAutoInfluence
@@ -93,7 +93,7 @@ class Unifier():
             output.append((kData[indexNo] + aData[indexNo]) / 2)
         return output
 
-    def avgWithoutYaw(self, kData, aData):
+    def averageWithoutYaw(self, kData, aData):
         output = []
         for indexNo, _ in enumerate(kData):
             if indexNo != self.TManager.z:
@@ -103,10 +103,10 @@ class Unifier():
         return output
 
 if __name__ == "__main__":    
-    controls = Controls()
-    controls.setOrientationAutoreport(1)
-    controls.comms.startThread()
+    # controls = Controls()
+    # controls.setOrientationAutoreport(1)
+    # controls.comms.startThread()
 
     q = queue.Queue()
-    unit = Unifier(q, 10)
+    unit = Unifier(q, 10, controls=None)
     unit.initiateWrangling()

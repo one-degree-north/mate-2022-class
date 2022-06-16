@@ -19,8 +19,8 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14201", baudrate=115200)
-        #self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-1420", baudrate=115200)
+        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem14101", baudrate=115200)
+        self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-1420", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()

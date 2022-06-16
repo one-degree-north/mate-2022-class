@@ -100,7 +100,8 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    #controls.comms.startThread()
+    controls.comms.startThread()
+    controls.resetOffshore()
     
     """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
