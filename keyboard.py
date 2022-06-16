@@ -117,6 +117,10 @@ class KeyManager():
             self.acceptedChars[key.keyStr] = key
 
     def findNets(self):
+        """
+        is run every time a new key is pressed/released
+        puts a KeyMessage object in self's queue
+        """
         netMotion = [0, 0, 0]
         netRotation = [0, 0, 0]
         clawAngle = self.currClawAngle
@@ -164,6 +168,10 @@ class KeyManager():
         self.q.put(["k", output])
 
     def updateKeyState(self, keyStr, isDown):
+        """
+        is run every time a new key event is received by pynput,
+        but nothing changes unless a key is pressed or released
+        """
         if keyStr in self.acceptedChars.keys() and self.acceptedChars[keyStr].isDown != isDown:
             self.acceptedChars[keyStr].isDown = isDown
             self.findNets()
@@ -172,7 +180,7 @@ class KeyManager():
         try:
             char = key.char
         except AttributeError:
-            print(f"Special key {key} pressed")
+            # print(f"Special key {key} pressed")
             return
 
         self.updateKeyState(char, isDown=True)
@@ -182,7 +190,7 @@ class KeyManager():
         try:
             char = key.char
         except AttributeError:
-            print(f"Special key {key} pressed")
+            # print(f"Special key {key} pressed")
             return
 
         self.updateKeyState(char, isDown=False)

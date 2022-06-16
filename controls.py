@@ -1,25 +1,6 @@
 from dataclasses import dataclass
-import copy
 from comms import Comms
 import queue
-
-class Movement:
-    def __init__(self, thrusterModify):
-        self.thrusterModify = thrusterModify #[frontL, frontR, midL, midR, backL, backR]
-        self.percentage = 0 #percentage ranges from -1 to 1
-
-class Movements:
-    def __init__(self, movementValues=None):
-        self.movements = [
-            Movement([0, 0, 1, 1, 0, 0]), #y axis movement
-            Movement([0, 0, 0, 1, 0, 0]), #rotate movement
-            Movement([0, 0, 0, 0, 1, 1]), #pitch movement
-            Movement([1, 0, 0, 0, 1, 0]), #tilt movement
-            Movement([1, 1, 0, 0, 1, 1]), #vertical movement
-        ]
-        if movementValues != None:
-            for i in range(len(self.movements)):
-                self.movements[i].percentage = movementValues[i]
 
 @dataclass
 class GyroData:

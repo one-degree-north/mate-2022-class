@@ -2,6 +2,15 @@
 import threading
 import time
 
+from dataclasses import dataclass
+
+@dataclass
+class Influence:
+    override = 1
+    partial = 0.5
+    dearth = 0
+
+
 class Axis():
     def __init__(self, interval):
         self.interval = interval
@@ -59,7 +68,12 @@ class PIDController():
         self.roll.update(errors[2])
 
     def tareAll(self):
-        self.updateErrors(self.controls.orientationData)
+        try:
+            self.updateErrors(self.controls.orientationData)
+            print("Taring")
+        except AttributeError:
+            print("Tare failed. Controls likely not initialized")
+
         self.roll.tare()
         self.pitch.tare()
         self.yaw.tare()
@@ -67,7 +81,7 @@ class PIDController():
 
 
     def collectData(self):
-        self.lastReading = [0, 0, 0]
+        self.lastReading = (0, 0, 0)
         while True:
             if self.controls != None:
                 data = self.controls.orientationData
@@ -75,12 +89,13 @@ class PIDController():
                 data = (0, 0, 0)
 
 
-            self.q.put(["a", self.calcForces()])
+            # self.q.put(["a", self.calcForces()])
             if data != self.lastReading:
+                print(data)
                 self.updateErrors(errors=data)
                 self.q.put(["a", self.calcForces()])
 
-                self.lastReading = [data[0], data[1], data[2]]
+                self.lastReading = (data[0], data[1], data[2])
 
             time.sleep(self.interval * 0.001)
 
