@@ -57,11 +57,11 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            print(f"gyro data: {self.gyroData}")
+            #print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            print(f"accel data: {self.accelData}")
+            #print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
@@ -119,8 +119,9 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    controls.comms.startThread()
-    inputNum = 0
+    #controls.comms.startThread()
+    
+    """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         inputs[index] = value
         print(inputs)
         controls.writeAllThrusters(inputs)
-        inputs = [0, 0, 0, 0, 0,0]
+        inputs = [0, 0, 0, 0, 0,0]"""
     
     """while True:
         print(f"thrusterNum: {inputNum}")
@@ -141,4 +142,4 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     #controls.setAccelAutoreport(100)
-    #controls.comms.readThread()
+    controls.comms.readThread()

@@ -2,8 +2,8 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 
-int HEADER = 0xAB; // 171??
-int FOOTER = 0xB3; // 179??
+int HEADER = 0xAB;
+int FOOTER = 0xB3;
 
 struct Input{
   uint8_t command;
@@ -24,21 +24,19 @@ AutoreportData autoData;
 unsigned long pastMillis;
 
 
-void setup(){ 
+void setup(){
   Serial.begin(115200);
   bnoIMU.begin();
   pastMillis = millis();
-  autoData.gyroDelay = 0;
-  autoData.accelDelay = 0;
-  autoData.orientationDelay = 0;
+  autoData.gyroDelay = 10;
+  autoData.accelDelay = 10;
+  autoData.orientationDelay = 10;
   autoData.gyroTime = 0;
   autoData.accelTime = 0;
   autoData.orientationTime = 0;
-  Serial.println("Starting!!!!!");
 }
 
 void loop(){
-//  Serial.println("This is being executed");
   unsigned long now = millis();
   unsigned long deltaTime = now - pastMillis;
   pastMillis = now;
