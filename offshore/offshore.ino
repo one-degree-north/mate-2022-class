@@ -125,6 +125,9 @@ void processCommand(Input inputValue){
       autoData.orientationDelay = inputValue.value*10;
       autoData.orientationTime = 0;
     break;
+    case 0x40:
+      NVIC_SystemReset();
+    break;
   }
 }
 

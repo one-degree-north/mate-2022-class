@@ -111,9 +111,12 @@ class Controls:
     def setOrientationAutoreport(self, delay):
         self.outputQueue.put((0, (int.to_bytes(0x35, 1, "big"), int.to_bytes(delay, 1, "big"))))
 
+    def resetOffshore(self):
+        self.outputQueue.put((0, (int.to_bytes(0x40, 1, "big"), int.to_bytes(0, 1, "big"))))
+
 if __name__ == "__main__":
     controls = Controls()
-    #controls.comms.startThread()
+    controls.comms.startThread()
     """inputNum = 0;
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
@@ -135,4 +138,8 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     controls.setAccelAutoreport(100)
-    controls.comms.readThread()
+    while True:
+        value = int(input("reset?"))
+        if value == 0:
+            print("AAAA")
+            controls.resetOffshore()
