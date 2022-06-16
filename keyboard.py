@@ -3,12 +3,13 @@ from pynput import keyboard
 
 @dataclass
 class KeyMessage:
-    reqMotion: tuple
-    reqRotation: tuple
-    clawAngle: float
-    thrustScale: float
-    allowAutoInfluence: bool
-    tare: bool
+    reqMotion: tuple = (0, 0, 0)
+    reqRotation: tuple = (0, 0, 0)
+    clawAngle: float = 0
+    thrustScale: float = 1
+    allowAutoInfluence: bool = True
+    tare: bool = False
+    command: bool = False
 
 @dataclass
 class Move:
@@ -20,6 +21,7 @@ class Move:
     bumpDown: int = 5
     scale: int = 6
     tare: int = 7
+    command: int = 8
 
 def findAngle(currValue, changeAmount, minMax, changeType):
     if changeType == Move.bumpUp:
@@ -107,6 +109,7 @@ class KeyManager():
             Key('0', Move.scale, None, False),
 
             Key('t', Move.tare, None, False),
+            Key('c', Move.command, None, False)
         ]
 
         self.currClawAngle = 0
@@ -125,6 +128,7 @@ class KeyManager():
         netRotation = [0, 0, 0]
         clawAngle = self.currClawAngle
         tare = False
+        command = False
 
         for key in self.acceptedChars.values():
             if key.isDown:
@@ -155,6 +159,9 @@ class KeyManager():
                 elif key.mType == Move.tare:
                     tare = True
 
+                elif key.mType == Move.command:
+                    command = True
+
 
         output = KeyMessage(
             reqMotion          = netMotion,
@@ -162,7 +169,8 @@ class KeyManager():
             clawAngle          = clawAngle,
             thrustScale        = self.thrustScale,
             allowAutoInfluence = self.allowAutoInfluence,
-            tare               = tare
+            tare               = tare,
+            command            = command,
         )
 
         self.q.put(["k", output])
@@ -182,10 +190,8 @@ class KeyManager():
         except AttributeError:
             # print(f"Special key {key} pressed")
             return
-
         self.updateKeyState(char, isDown=True)
-        # print(self.findNets())
-
+        
     def onRelease(self, key):
         try:
             char = key.char
@@ -194,8 +200,7 @@ class KeyManager():
             return
 
         self.updateKeyState(char, isDown=False)
-        # print(self.findNets())
-
+        
     def startPolling(self):
         self.keyboardListener = keyboard.Listener(on_press=self.onPress, on_release=self.onRelease)
         self.keyboardListener.start()
