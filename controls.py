@@ -109,8 +109,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
-    #controls.resetOffshore()
-    #controls.resetOffshore()
+    controls.resetOffshore()
     """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
@@ -132,7 +131,7 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     
-    while True:
+    """while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -140,7 +139,7 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)
+            controls.rotateClaw(deg)"""
         #controls.rotateClaw(deg)
     #controls.setAccelAutoreport(100)
     controls.comms.readThread()
