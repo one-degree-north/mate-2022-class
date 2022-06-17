@@ -28,9 +28,9 @@ void setup(){
   Serial.begin(115200);
   bnoIMU.begin();
   pastMillis = millis();
-  autoData.gyroDelay = 0;
-  autoData.accelDelay = 0;
-  autoData.orientationDelay = 0;
+  autoData.gyroDelay = 10;
+  autoData.accelDelay = 10;
+  autoData.orientationDelay = 10;
   autoData.gyroTime = 0;
   autoData.accelTime = 0;
   autoData.orientationTime = 0;
@@ -125,10 +125,27 @@ void processCommand(Input inputValue){
       autoData.orientationDelay = inputValue.value*10;
       autoData.orientationTime = 0;
     break;
+<<<<<<< HEAD
     case 0x40:
       NVIC_SystemReset();
     break;
+=======
+    case 0x40:  //reset adafruit qtpy along with bno055
+      NVIC_SystemReset();
+    break;
+    case 0x45:  //return offshore or onshore
+      writeOffshore();
+    break;
+>>>>>>> 707374d0290222c99680aa1c2e86242097c7ac65
   }
+}
+
+void writeOffshore(){ //indicates that the board is offshore
+  uint8_t offshore = 0x15;
+  Serial.write(HEADER);
+  Serial.write(0x15);
+  Serial.write(offshore);
+  Serial.write(FOOTER);
 }
 
 void writeOrientationOutput(){

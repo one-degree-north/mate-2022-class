@@ -1,25 +1,6 @@
 from dataclasses import dataclass
-import copy
 from comms import Comms
 import queue
-
-class Movement:
-    def __init__(self, thrusterModify):
-        self.thrusterModify = thrusterModify #[frontL, frontR, midL, midR, backL, backR]
-        self.percentage = 0 #percentage ranges from -1 to 1
-
-class Movements:
-    def __init__(self, movementValues=None):
-        self.movements = [
-            Movement([0, 0, 1, 1, 0, 0]), #y axis movement
-            Movement([0, 0, 0, 1, 0, 0]), #rotate movement
-            Movement([0, 0, 0, 0, 1, 1]), #pitch movement
-            Movement([1, 0, 0, 0, 1, 0]), #tilt movement
-            Movement([1, 1, 0, 0, 1, 1]), #vertical movement
-        ]
-        if movementValues != None:
-            for i in range(len(self.movements)):
-                self.movements[i].percentage = movementValues[i]
 
 @dataclass
 class GyroData:
@@ -50,20 +31,22 @@ class Controls:
     #    thrusterValues = [0, 0, 0, 0, 0, 0]
 
     def handleInput(self, input):
+        # print("This is being run")
+        #print(input)
         if (input == -1):
             return -1
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            print(f"gyro data: {self.gyroData}")
+            #print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            print(f"accel data: {self.accelData}")
+            #print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -86,12 +69,21 @@ class Controls:
                 modifiedThrusterValue = 200
             if (modifiedThrusterValue < 100):
                 modifiedThrusterValue = 100
-            #print(modifiedThrusterValue)
+            # print(modifiedThrusterValue)
             modifiedThrusters.append(int.to_bytes(modifiedThrusterValue, 1, "big"))
+        # print(modifiedThrusters)
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
-    def moveClaw(self, deg):
-        self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), int.to_bytes(0x14, 2, "big"))))
+    def rotateClaw(self, deg):  #input values between 0 and 90 (0 is horizontal, 90 is vertical)
+        #values between 90-160
+        outputVal = int((deg*7/9)+90)
+        self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
+
+    def moveClaw(self, deg):    #input values between 0 and 1 (0 is fully closed, 1 is fully open)
+        #match to values between 180-117
+        outputVal = int((deg*63)+117)
+        print(outputVal)
+        self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
     def getAccelValue(self):
         self.outputQueue.put((0, (int.to_bytes(0x10, 1, "big"), int.to_bytes(0, 1, "big"))))
@@ -117,7 +109,9 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
-    """inputNum = 0;
+    # controls.resetOffshore()
+    #controls.resetOffshore()
+    """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -127,8 +121,8 @@ if __name__ == "__main__":
         inputs[index] = value
         print(inputs)
         controls.writeAllThrusters(inputs)
-        inputs = [0, 0, 0, 0, 0,0]
-    """
+        inputs = [0, 0, 0, 0, 0,0]"""
+    
     """while True:
         print(f"thrusterNum: {inputNum}")
         inputs[inputNum] = float(input())
@@ -137,9 +131,18 @@ if __name__ == "__main__":
             controls.writeAllThrusters(inputs)
             inputNum = 0
         inputNum += 1"""
-    controls.setAccelAutoreport(100)
+    
+    """while True:
+        servo = int(input("servoNum"))
+        deg = float(input("deg\n"))
+        if (servo == 0):
+            print("moveClaw")
+            controls.moveClaw(deg)
+        else:
+            print("rotateClaw")
+            controls.rotateClaw(deg)"""
+        #controls.rotateClaw(deg)
+    #controls.setAccelAutoreport(100)
+    #controls.comms.readThread()
     while True:
-        value = int(input("reset?"))
-        if value == 0:
-            print("AAAA")
-            controls.resetOffshore()
+        pass
