@@ -18,9 +18,6 @@ class ControlBar(QWidget):
 
         self.parent = parent
 
-        self.help_button = Button('gui/icons/help_icon.png', 'Help')
-        self.help_button.clicked.connect(self.help)
-
         self.info_button = Button('gui/icons/inputs_icon.png', 'Info')
         self.info_button.clicked.connect(self.info)
 
@@ -28,6 +25,8 @@ class ControlBar(QWidget):
         self.console_button.clicked.connect(self.console)
 
         # self.console_window = ConsoleWindow()
+        self.automation_button = Button('gui/icons/automation_icon.png', 'Automation window')
+        self.automation_button.clicked.connect(self.automation)
 
         self.quit_button = Button('gui/icons/quit_icon.png', 'Quit')
         self.quit_button.clicked.connect(self.quit)
@@ -35,17 +34,18 @@ class ControlBar(QWidget):
         self.layout = QVBoxLayout()
         self.layout.setSpacing(10)
 
-        self.layout.addWidget(self.help_button)
         self.layout.addWidget(self.info_button)
         self.layout.addWidget(self.console_button)
+        self.layout.addWidget(self.automation_button)
         self.layout.addWidget(self.quit_button)
 
         self.setLayout(self.layout)
 
         self.setFixedWidth(60)
 
-    def help(self):
-        self.help_button.setDisabled(True)
+    def automation(self):
+        self.automation_button.setDisabled(True)
+        self.parent.automation_window.show()
 
     def info(self):
         if self.parent.thruster_display.isVisible():

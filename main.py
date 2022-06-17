@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
         self.axis_display.hide()
 
         self.automation_window = AutomationWindow()
-        self.automation_window.show()
+        # self.automation_window.show()
 
         # self.stopwatch_status = QLabel('(T)')
         # self.stopwatch_status.setStyleSheet("""
@@ -171,7 +171,7 @@ class AutomationWindow(QWidget):
         super().__init__()
         # self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
-        self.setWindowTitle('Crimson UI')
+        self.setWindowTitle('Crimson UI (Automation)')
 
         self.setStyleSheet("""
             QWidget {
