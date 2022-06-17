@@ -1,5 +1,3 @@
-
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget
 
 import sys
