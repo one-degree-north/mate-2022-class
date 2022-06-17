@@ -193,7 +193,7 @@ class AutomationWindow(QWidget):
         
         self.preview_frame.layout.addWidget(self.preview_widget)
 
-        self.setLayout(self.preview_frame.layout)
+        self.setLayout(self.automation_control_frame.layout)
 
 
 
