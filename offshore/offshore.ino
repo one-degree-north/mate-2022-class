@@ -125,18 +125,12 @@ void processCommand(Input inputValue){
       autoData.orientationDelay = inputValue.value*10;
       autoData.orientationTime = 0;
     break;
-<<<<<<< HEAD
-    case 0x40:
-      NVIC_SystemReset();
-    break;
-=======
     case 0x40:  //reset adafruit qtpy along with bno055
       NVIC_SystemReset();
     break;
     case 0x45:  //return offshore or onshore
       writeOffshore();
     break;
->>>>>>> 707374d0290222c99680aa1c2e86242097c7ac65
   }
 }
 
