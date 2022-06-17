@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pynput import keyboard
-from pyqt5
+
 
 @dataclass
 class KeyMessage:

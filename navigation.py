@@ -1,8 +1,8 @@
 import time
 
-def time_delay(distance, accel):
+def time_delay(distance, acceleration):
     # d = 0.5at^2
-    delay = sqrt(d*2.0/a)
+    delay = sqrt(d * 2.0 / a)
     return delay
     
 
