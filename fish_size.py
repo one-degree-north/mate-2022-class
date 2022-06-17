@@ -11,7 +11,7 @@ class FishSize:
         self.upper_blue = np.array([125, 255, 255])
         
     def preprocess_image(self, img, filter_size = 5):
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         img_hsv = cv2.GaussianBlur(img_hsv, (filter_size, filter_size), 0)
         return img_hsv
     
