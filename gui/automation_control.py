@@ -28,10 +28,10 @@ class AutomationControlBar(QWidget):
         self.measure_button = Button('gui/icons/measure_icon.png', 'Measure fish size')
         # self.quit_button.clicked.connect(self.quit)
 
-        self.endurance_button = Button('gui/icons/Endurance_icon.png', 'Transect over endurance area')
+        self.endurance_button = Button('gui/icons/Endurance_icon.png', 'Transect over Endurance area')
         # self.quit_button.clicked.connect(self.quit)
 
-        self.measure_endurance_button = Button('gui/icons/measure_Endurance_icon.png', 'Measure endurance area')
+        self.measure_endurance_button = Button('gui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
         # self.quit_button.clicked.connect(self.quit)
 
         self.photomosaic_button = Button('gui/icons/photomosaic_icon.png', 'Photomosaic')

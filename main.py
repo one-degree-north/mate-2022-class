@@ -163,7 +163,7 @@ class MainWindow(QMainWindow):
         if self.console.command_line.key_logging and e.text().isprintable() and len(e.text()) == 1:
             logging.debug(f'{e.text()} ({ord(e.text())})')
 
-class AutomationWindow(QWidget):
+class AutomationWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -193,7 +193,8 @@ class AutomationWindow(QWidget):
         
         # self.preview_frame.layout.addWidget(self.preview_widget)
 
-        self.setLayout(self.automation_control_frame.layout)
+        self.automation_control_frame.setLayout(self.automation_control_frame.layout)
+        self.setCentralWidget(self.automation_control_frame)
 
 
 
@@ -208,8 +209,8 @@ if __name__ == '__main__':
     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
 
-    # automation = AutomationWindow()
-    # automation.show()
+    automation = AutomationWindow()
+    automation.show()
 
     try:
         os.mkdir('captures')
