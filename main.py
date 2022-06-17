@@ -162,6 +162,14 @@ class MainWindow(QMainWindow):
         else:
             self.status.down_cam_status.set_disconnected()
 
+    def update_thruster_values(self, values_dict):
+        self.thruster_display.front_left_thruster_label.update_value(values_dict[0])
+        self.thruster_display.front_right_thruster_label.update_value(values_dict[1])
+        self.thruster_display.back_left_thruster_label.update_value(values_dict[2])
+        self.thruster_display.back_right_thruster_label.update_value(values_dict[3])
+        self.thruster_display.left_thruster_label.update_value(values_dict[4])
+        self.thruster_display.right_thruster_label.update_value(values_dict[5])
+
     def keyPressEvent(self, event):
 
         if self.console.command_line.key_press_logging and event.text().isprintable() and len(event.text()) == 1:
@@ -221,6 +229,10 @@ if __name__ == '__main__':
 
     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
+
+    main.thruster_display.back_left_thruster_label.update_value(-10)
+
+    # 0 is 
 
     # automation = AutomationWindow()
     # automation.show()
