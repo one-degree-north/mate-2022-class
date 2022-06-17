@@ -9,6 +9,9 @@ from gui.capture import CaptureControlBar
 from gui.console import ConsoleModule
 from gui.info import ThrusterDisplayModule, AxisDisplayModule
 
+from gui.automation_control import AutomationControlBar
+from gui.preview import PreviewWidget
+
 import sys
 import os
 
@@ -43,7 +46,6 @@ class MainWindow(QMainWindow):
 
         self.axis_display = AxisDisplayModule()
         self.axis_display.hide()
-
 
         # self.stopwatch_status = QLabel('(T)')
         # self.stopwatch_status.setStyleSheet("""
@@ -173,6 +175,25 @@ class AutomationWindow(QWidget):
                 background: rgb(21, 21, 21)
             }
         """)
+
+        self.automation_control = AutomationControlBar()
+        self.preview_widget = PreviewWidget()
+
+        self.automation_control_frame = QWidget()
+        self.automation_control_frame.layout = QVBoxLayout()
+        
+        self.automation_control_frame.layout.addStretch(1)
+        self.automation_control_frame.layout.addWidget(self.automation_control)
+
+        self.automation_control_frame.layout.setContentsMargins(0,0,0,0)
+        # self.automation_control_frame.setLayout(self.automation_control_frame.layout)
+
+        self.preview_frame = QWidget()
+        self.preview_frame.layout = QVBoxLayout()
+        
+        self.preview_frame.layout.addWidget(self.preview_widget)
+
+        self.setLayout(self.preview_frame.layout)
 
 
 

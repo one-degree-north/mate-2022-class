@@ -1,6 +1,6 @@
 camera-ports:
-  front: 0
-  down: 10
+  front: 1
+  down: 1
 
 serial-port: "/dev/"
 baud-rate: 115200
