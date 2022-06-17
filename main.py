@@ -16,7 +16,7 @@ import logging
 import yaml
 import cv2
 
-class CrimsonUI(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self, front_port, down_port):
         super().__init__()
 
@@ -161,6 +161,20 @@ class CrimsonUI(QMainWindow):
         if self.console.command_line.key_logging and e.text().isprintable() and len(e.text()) == 1:
             logging.debug(f'{e.text()} ({ord(e.text())})')
 
+class AutomationWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        # self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
+        self.setWindowTitle('Crimson UI')
+
+        self.setStyleSheet("""
+            QWidget {
+                background: rgb(21, 21, 21)
+            }
+        """)
+
+
 
 if __name__ == '__main__':
     with open('settings.yml', 'r') as f:
@@ -170,8 +184,11 @@ if __name__ == '__main__':
     app = QApplication([])
     app.setStyle('Fusion')
 
-    window = CrimsonUI(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
-    window.show()
+    main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
+    main.show()
+
+    automation = AutomationWindow()
+    automation.show()
 
     try:
         os.mkdir('captures')

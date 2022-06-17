@@ -113,16 +113,8 @@ class VideoThread(QThread):
 
             else:
                 self.parent.connected = False
-
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     print('ok')
-
                 
         cap.release()
-        # self.video_output.release()
-
-        
-        print('rel')
         
 
     def stop(self):
