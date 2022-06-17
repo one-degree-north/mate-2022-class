@@ -47,6 +47,9 @@ class MainWindow(QMainWindow):
         self.axis_display = AxisDisplayModule()
         self.axis_display.hide()
 
+        self.automation_window = AutomationWindow()
+        self.automation_window.show()
+
         # self.stopwatch_status = QLabel('(T)')
         # self.stopwatch_status.setStyleSheet("""
         #     QLabel {
@@ -163,7 +166,7 @@ class MainWindow(QMainWindow):
         if self.console.command_line.key_logging and e.text().isprintable() and len(e.text()) == 1:
             logging.debug(f'{e.text()} ({ord(e.text())})')
 
-class AutomationWindow(QMainWindow):
+class AutomationWindow(QWidget):
     def __init__(self):
         super().__init__()
         # self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -193,8 +196,8 @@ class AutomationWindow(QMainWindow):
         
         # self.preview_frame.layout.addWidget(self.preview_widget)
 
-        self.automation_control_frame.setLayout(self.automation_control_frame.layout)
-        self.setCentralWidget(self.automation_control_frame)
+        self.setLayout(self.automation_control_frame.layout)
+        # self.setCentralWidget(self.automation_control_frame)
 
 
 
@@ -209,8 +212,8 @@ if __name__ == '__main__':
     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
 
-    automation = AutomationWindow()
-    automation.show()
+    # automation = AutomationWindow()
+    # automation.show()
 
     try:
         os.mkdir('captures')
