@@ -101,7 +101,8 @@ class CommandLine(QLineEdit):
             }
         """)
 
-        self.key_logging = False
+        self.key_press_logging = False
+        self.key_release_logging = False
 
         self.setPlaceholderText('"help" for commands')
         self.setAttribute(Qt.WA_MacShowFocusRect, False) # Mac only
@@ -128,7 +129,8 @@ class CommandLine(QLineEdit):
             the captures directory
             "empty" - permanently empties
             the captures directory
-            "key" - toggles key logging
+            "key [press/release]" - toggles key logging,
+            default is both
 
             Key:
             '()' = required
@@ -167,12 +169,34 @@ class CommandLine(QLineEdit):
             logging.info('Successfully emptied the captures directory')
 
         elif split_text[0] == 'key':
-            if self.key_logging:
-                self.key_logging = False
+            if len(split_text) > 1 and (split_text[1] == 'press' or split_text[1] == 'release'):
+                if split_text[1] == 'press':
+                    if self.key_press_logging:
+                        self.key_press_logging = False
+                    else:
+                        self.key_press_logging = True
+
+                    logging.info(f'Key press logging: {self.key_press_logging}')
+                else:
+                    if self.key_release_logging:
+                        self.key_release_logging = False
+                    else:
+                        self.key_release_logging = True
+
+                    logging.info(f'Key release logging: {self.key_release_logging}')
             else:
-                self.key_logging = True
+                if self.key_press_logging:
+                    self.key_press_logging = False
+                else:
+                    self.key_press_logging = True
+
+                if self.key_release_logging:
+                    self.key_release_logging = False
+                else:
+                    self.key_release_logging = True
             
-            logging.info(f'Key logging: {self.key_logging}')
+                logging.info(f'Key press logging: {self.key_press_logging}')
+                logging.info(f'Key release logging: {self.key_release_logging}')
         
         else:
             logging.error(f'Command "{split_text[0]}" does not exist')

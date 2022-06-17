@@ -164,13 +164,13 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event):
 
-        if self.console.command_line.key_logging and event.text().isprintable() and len(event.text()) == 1:
-            logging.debug(f'P: {event.text()} ({ord(event.text())})')
+        if self.console.command_line.key_press_logging and event.text().isprintable() and len(event.text()) == 1:
+            logging.debug(f'Press: {event.text()} ({ord(event.text())})')
 
     def keyReleaseEvent(self, event):
-        
-        if self.console.command_line.key_logging and event.text().isprintable() and len(event.text()) == 1:
-            logging.debug(f'R: {event.text()} ({ord(event.text())})')
+
+        if self.console.command_line.key_release_logging and event.text().isprintable() and len(event.text()) == 1:
+            logging.debug(f'Release: {event.text()} ({ord(event.text())})')
 
 class AutomationWindow(QWidget):
     def __init__(self):
