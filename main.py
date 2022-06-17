@@ -162,7 +162,9 @@ class MainWindow(QMainWindow):
         else:
             self.status.down_cam_status.set_disconnected()
 
-    def keyPressEvent(self, event):
+    def keyReleaseEvent(self, event):
+        
+
         if self.console.command_line.key_logging and event.text().isprintable() and len(event.text()) == 1:
             logging.debug(f'{event.text()} ({ord(event.text())})')
 
