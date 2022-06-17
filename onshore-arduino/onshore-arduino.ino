@@ -14,8 +14,8 @@ struct Input{
 
 int thrusterPins[] = {4, 3, 6, 7, 8, 5};
 Servo thrusters[6];
-int servoPins[] = {2};
-Servo clawServos[1];
+int servoPins[] = {10, 11};
+Servo clawServos[2];
 
 Adafruit_BNO055 bnoIMU = Adafruit_BNO055(55, 0x28);
 unsigned long pastMillis;
@@ -24,8 +24,8 @@ void setup(){
   for (int i = 0; i < 6; i++){
     thrusters[i].attach(thrusterPins[i]);
   }
-  for (int i = 0; i < 1; i++){
-    clawServos[i].attach(servoPins[i], 1200, 1800);
+  for (int i = 0; i < 2; i++){
+    clawServos[i].attach(servoPins[i]);
   }
   Serial.begin(115200);
 }
@@ -73,10 +73,16 @@ void processCommand(Input inputValue){
       moveMultipleThrusters(inputValue);
     break;
     case 0x1C: //move claw servo
-      if (inputValue.paramNum != 2){
+      if (inputValue.paramNum != 1){
         break;
       }
       moveClawServo(inputValue);
+    break;
+    case 0x5A:
+      if (inputValue.paramNum != 1){
+        break;
+      }
+      rotateClaw(inputValue);
     break;
     case 0x32: //halt
       if (inputValue.paramNum != 0){
@@ -107,9 +113,15 @@ void moveSingleThruster(Input inputValue){
   thrusters[inputValue.values[0]].writeMicroseconds(inputValue.values[1]*10);
 }
 
+void rotateClaw(Input inputValue){
+  //uint16_t deg = (inputValue.values[0]<<8) + inputValue.values[1];
+  //Serial.println(deg);
+  clawServos[1].write(inputValue.values[0]);
+}
+
 void moveClawServo(Input inputValue){
-  uint16_t deg = (inputValue.values[0]<<8) + inputValue.values[1];
-  clawServos[0].write(deg); //I'm not sure if the system uses small or big endian, too lazy to check
+  //uint16_t deg = (inputValue.values[0]<<8) + inputValue.values[1];
+  clawServos[0].write(inputValue.values[0]); //I'm not sure if the system uses small or big endian, too lazy to check
 }
 
 void halt(Input inputValue){

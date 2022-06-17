@@ -38,15 +38,15 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            print(f"gyro data: {self.gyroData}")
+            #print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            print(f"accel data: {self.accelData}")
+            #print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            #print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -74,8 +74,16 @@ class Controls:
         # print(modifiedThrusters)
         self.outputQueue.put((1, (int.to_bytes(0x14, 1, "big"), modifiedThrusters)))
 
-    def moveClaw(self, deg):
-        self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), int.to_bytes(0x14, 2, "big"))))
+    def rotateClaw(self, deg):  #input values between 0 and 90 (0 is horizontal, 90 is vertical)
+        #values between 90-160
+        outputVal = int((deg*7/9)+90)
+        self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
+
+    def moveClaw(self, deg):    #input values between 0 and 1 (0 is fully closed, 1 is fully open)
+        #match to values between 180-117
+        outputVal = int((deg*63)+117)
+        print(outputVal)
+        self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
     def getAccelValue(self):
         self.outputQueue.put((0, (int.to_bytes(0x10, 1, "big"), int.to_bytes(0, 1, "big"))))
@@ -100,9 +108,9 @@ class Controls:
 
 if __name__ == "__main__":
     controls = Controls()
-    #controls.comms.startThread()
+    controls.comms.startThread()
     #controls.resetOffshore()
-    controls.resetOffshore()
+    #controls.resetOffshore()
     """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
@@ -123,5 +131,16 @@ if __name__ == "__main__":
             controls.writeAllThrusters(inputs)
             inputNum = 0
         inputNum += 1"""
+    
+    while True:
+        servo = int(input("servoNum"))
+        deg = float(input("deg\n"))
+        if (servo == 0):
+            print("moveClaw")
+            controls.moveClaw(deg)
+        else:
+            print("rotateClaw")
+            controls.rotateClaw(deg)
+        #controls.rotateClaw(deg)
     #controls.setAccelAutoreport(100)
     controls.comms.readThread()
