@@ -1,8 +1,6 @@
-from math import floor
-
 
 class ThrustManager():
-    def __init__(self, multiplier=1, controls=None):
+    def __init__(self, controls=None, multiplier=1):
         self.thrusters = [
             Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
             Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
@@ -12,11 +10,11 @@ class ThrustManager():
             Thruster(pin=5, power=(1, 1, 0), position=( 1, 0)),
         ]
 
-        self.multiplier = multiplier
         self.controls = controls
+        self.multiplier = multiplier
         self.x, self.y, self.z = 0, 1, 2
 
-    def getTSpeeds(self, reqMotion, reqRotation, scale=1, normalizeZ=True, normalizeY=True):
+    def getTSpeeds(self, reqMotion, reqRotation, normalizeZ=True, normalizeY=True):
         if reqMotion[2] == 0:
             normalizeZ = False
         if reqMotion[1] == 0:
@@ -38,7 +36,7 @@ class ThrustManager():
                     if speed != 0:
                         divisor += 1
                 try:
-                    output[thruster.pin] = scale * self.multiplier * sum(speeds) / divisor
+                    output[thruster.pin] = self.multiplier * sum(speeds) / divisor
                 except ZeroDivisionError:
                     output[thruster.pin] = divisor
 
@@ -57,7 +55,7 @@ class ThrustManager():
                 bump = 0
             
             for pin, value in axisDict.items():
-                output[pin] = scale * self.multiplier * (value + bump)
+                output[pin] = self.multiplier * (value + bump)
 
 
         thrusterSpeeds = []
@@ -67,12 +65,13 @@ class ThrustManager():
         if self.controls != None:
             self.controls.writeAllThrusters(thrusterSpeeds)
         else:
-            print("WARNING: Controls not connected...")
+            print("Not connected...")
 
         return output
 
-
-
+    def displayTSpeeds(speeds):
+        for pin in sorted(list(speeds.keys()), reverse=False):
+            print(f"{pin=} -> {round(speeds[pin], 5)}")
 
 class Thruster():
     def __init__(self, pin, power, position):
