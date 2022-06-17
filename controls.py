@@ -46,7 +46,7 @@ class Controls:
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
-            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            #print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -109,7 +109,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
-    # controls.resetOffshore()
+    controls.resetOffshore()
     #controls.resetOffshore()
     """inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]

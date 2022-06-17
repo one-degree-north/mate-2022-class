@@ -112,8 +112,8 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             if (self.offshoreArduino.in_waiting >= 15):
                 # print("doing this")
                 self.controls.handleInput(self.readOffshore())
-            if (not self.outputQueue.empty()):
-                self.writeOutput(self.outputQueue.get())
+            #if (not self.outputQueue.empty()):
+            #    self.writeOutput(self.outputQueue.get())
 
             # time.sleep(1)
 
