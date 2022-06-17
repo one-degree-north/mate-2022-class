@@ -177,7 +177,7 @@ class AutomationWindow(QWidget):
         """)
 
         self.automation_control = AutomationControlBar()
-        self.preview_widget = PreviewWidget()
+        # self.preview_widget = PreviewWidget()
 
         self.automation_control_frame = QWidget()
         self.automation_control_frame.layout = QVBoxLayout()
@@ -188,10 +188,10 @@ class AutomationWindow(QWidget):
         self.automation_control_frame.layout.setContentsMargins(0,0,0,0)
         # self.automation_control_frame.setLayout(self.automation_control_frame.layout)
 
-        self.preview_frame = QWidget()
-        self.preview_frame.layout = QVBoxLayout()
+        # self.preview_frame = QWidget()
+        # self.preview_frame.layout = QVBoxLayout()
         
-        self.preview_frame.layout.addWidget(self.preview_widget)
+        # self.preview_frame.layout.addWidget(self.preview_widget)
 
         self.setLayout(self.automation_control_frame.layout)
 
