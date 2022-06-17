@@ -3,14 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class WreckSize:
-    def __init__(self, read_path, write_path, gaussian_blur_filter):
+    def __init__(self, path, gaussian_blur_filter = 5):
         self.img = cv2.imread(path)
-        self.write_path = write_path
-        self.filter = gaussian_blur_filter
+        self.filter_size = gaussian_blur_filter
         self.lower_black = np.array([0, 0, 0])
         self.upper_black = np.array([350, 55, 100])
         
-    def preprocess_image(self, img, filter_size = 5):
+    def preprocess_image(self, img, filter_size):
         img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         img_hsv = cv2.GaussianBlur(img_hsv, (filter_size, filter_size), 0)
         return img_hsv
