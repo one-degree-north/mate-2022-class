@@ -52,9 +52,9 @@ class AxisDisplayModule(QWidget):
             }
         """)
 
-        self.roll_label = StyledLabel('Roll',  '°')
-        self.pitch_label = StyledLabel('Pitch', '°')
-        self.yaw_label = StyledLabel('Yaw', '°')
+        self.roll_label = StyledLabel('Roll',  '%')
+        self.pitch_label = StyledLabel('Pitch', '%')
+        self.yaw_label = StyledLabel('Yaw', '%')
 
         self.layout = QVBoxLayout()
 

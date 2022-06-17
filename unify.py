@@ -80,11 +80,12 @@ class Unifier():
                         self.lastFromKeyboard.thrustScale
                     ))
 
-                    self.KrishnaQ.put(self.TManager.getTSpeeds(
+                    self.KrishnaQ.put([self.TManager.getTSpeeds(
                         reqMotion,
                         reqRotation,
                         self.lastFromKeyboard.thrustScale
-                    ))
+                    ), reqRotation])
+                    # print("Putting in KQ")
 
 
 
