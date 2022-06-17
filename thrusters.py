@@ -1,3 +1,5 @@
+from math import floor
+
 
 class ThrustManager():
     def __init__(self, multiplier=1, controls=None):

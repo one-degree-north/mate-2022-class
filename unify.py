@@ -27,7 +27,7 @@ class Unifier():
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
 
-        self.combineType = self.averageWithoutYaw
+        self.combineType = self.getAverage
 
     def delegateFromQ(self):
         commandsReceived = 0
@@ -53,6 +53,8 @@ class Unifier():
 
                     self.lastFromKeyboard = payload
                     self.allowAutoInfluence = payload.allowAutoInfluence
+                    self.pidC.isActive = self.allowAutoInfluence
+
         
                     self.readLasts = True
                 elif command[0] == "a" and self.lastFromAutomation != payload:
@@ -102,11 +104,12 @@ class Unifier():
                 output.append(kData[self.TManager.z])
         return output
 
-if __name__ == "__main__":    
+if __name__ == "__main__":  
+    controls = None  
     # controls = Controls()
     # controls.setOrientationAutoreport(1)
     # controls.comms.startThread()
 
     q = queue.Queue()
-    unit = Unifier(q, 10, controls=None)
+    unit = Unifier(q, 10, controls=controls)
     unit.initiateWrangling()

@@ -20,17 +20,17 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        ports = list_ports.comports()
-        offshorePort = ""
-        onshorePort = ""
-        for port in ports:
-           if port.description == "USB Serial":
-               onshorePort = port.device
-           elif port.description == "FT232R USB UART - FT232R USB UART":
-               offshorePort = port.device
+        # ports = list_ports.comports()
+        offshorePort = "/dev/cu.usbmodem14201"
+        # onshorePort = ""
+        # for port in ports:
+        #    if port.description == "USB Serial":
+        #        onshorePort = port.device
+        #    elif port.description == "FT232R USB UART - FT232R USB UART":
+        #        offshorePort = port.device
 
         self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
-        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
+        # self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -95,15 +95,16 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             self.offshoreArduino.write(self.FOOTER)
         else:
             # print("AAAA")
-            self.onshoreArduino.write(self.HEADER)
-            self.onshoreArduino.write(output[1][0])
+            # self.onshoreArduino.write(self.HEADER)
+            # self.onshoreArduino.write(output[1][0])
             """for value in output[0][1]:
                 print(value)
                 self.onshoreArduino.write(value)"""
             for value in output[1][1]:
                 # print(value)
-                self.onshoreArduino.write(value)
-            self.onshoreArduino.write(self.FOOTER)
+                pass
+            #     self.onshoreArduino.write(value)
+            # self.onshoreArduino.write(self.FOOTER)
 
     def readThread(self):
         self.threadActive = True
