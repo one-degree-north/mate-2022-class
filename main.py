@@ -162,9 +162,9 @@ class MainWindow(QMainWindow):
         else:
             self.status.down_cam_status.set_disconnected()
 
-    def keyPressEvent(self, e):
-        if self.console.command_line.key_logging and e.text().isprintable() and len(e.text()) == 1:
-            logging.debug(f'{e.text()} ({ord(e.text())})')
+    def keyPressEvent(self, event):
+        if self.console.command_line.key_logging and event.text().isprintable() and len(event.text()) == 1:
+            logging.debug(f'{event.text()} ({ord(event.text())})')
 
 class AutomationWindow(QWidget):
     def __init__(self):
@@ -198,6 +198,10 @@ class AutomationWindow(QWidget):
 
         self.setLayout(self.automation_control_frame.layout)
         # self.setCentralWidget(self.automation_control_frame)
+
+    def closeEvent(self, event):
+        main.control.automation_button.setDisabled(False)
+        event.accept()
 
 
 

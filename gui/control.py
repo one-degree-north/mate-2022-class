@@ -25,7 +25,7 @@ class ControlBar(QWidget):
         self.console_button.clicked.connect(self.console)
 
         # self.console_window = ConsoleWindow()
-        self.automation_button = Button('gui/icons/automation_icon.png', 'Automation window')
+        self.automation_button = Button('gui/icons/automation_icon.png', 'Automation')
         self.automation_button.clicked.connect(self.automation)
 
         self.quit_button = Button('gui/icons/quit_icon.png', 'Quit')
