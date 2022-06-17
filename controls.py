@@ -109,6 +109,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
+    controls.setOrientationAutoreport(1)
     # controls.resetOffshore()
     #controls.resetOffshore()
     """inputNum = 0

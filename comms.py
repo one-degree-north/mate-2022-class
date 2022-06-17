@@ -21,7 +21,7 @@ class AccelData:
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
         ports = list_ports.comports()
-        offshorePort = "/dev/cu.usbmodem142101"
+        offshorePort = "/dev/cu.usbmodem14201"
         #onshorePort = "/dev/cu.usbserial-14210"
         """for port in ports:
            if port.description == "USB Serial":
@@ -112,8 +112,8 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             if (self.offshoreArduino.in_waiting >= 15):
                 # print("doing this")
                 self.controls.handleInput(self.readOffshore())
-            if (not self.outputQueue.empty()):
-                self.writeOutput(self.outputQueue.get())
+            #if (not self.outputQueue.empty()):
+            #    self.writeOutput(self.outputQueue.get())
 
             # time.sleep(1)
 

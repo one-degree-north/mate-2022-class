@@ -10,12 +10,13 @@ from keyboard import KeyManager, KeyMessage
 from automation import PIDController
 
 class Unifier():
-    def __init__(self, q, interval, controls=None):
+    def __init__(self, q, KrishnaQ, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyManager(q=q)
         self.pidC = PIDController(interval, q=q, controls=controls)
         
         self.q = q
+        self.KrishnaQ: queue.Queue() = KrishnaQ
         self.interval = interval
         
         self.readLasts = False
@@ -79,8 +80,19 @@ class Unifier():
                         self.lastFromKeyboard.thrustScale
                     ))
 
+                    self.KrishnaQ.put(self.TManager.getTSpeeds(
+                        reqMotion,
+                        reqRotation,
+                        self.lastFromKeyboard.thrustScale
+                    ))
+
+
+
             time.sleep(self.interval * 0.001)  
 
+
+    def getKrishnaQ(self):
+        return self.KrishnaQ
 
     def initiateWrangling(self):
         self.KManager.startPolling()
@@ -111,5 +123,6 @@ if __name__ == "__main__":
     controls.comms.startThread()
 
     q = queue.Queue()
-    unit = Unifier(q, 10, controls=controls)
+    kq = queue.Queue()
+    unit = Unifier(q, kq, 10, controls=controls)
     unit.initiateWrangling()

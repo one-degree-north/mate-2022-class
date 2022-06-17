@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-from thrusters import Thruster
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    pass
-=======
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
 
@@ -254,4 +245,3 @@ if __name__ == '__main__':
 
     sys.exit(app.exec())
 
->>>>>>> 707374d0290222c99680aa1c2e86242097c7ac65
