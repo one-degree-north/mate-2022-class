@@ -1,7 +1,9 @@
 #import RPi.GPIO as GPIO
 from dataclasses import dataclass
 from serial import *
+from serial.tools import list_ports
 import threading, struct
+import time
 #assuming only RPi, onboard electronics communicating via serial
 
 @dataclass
@@ -18,8 +20,17 @@ class AccelData:
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
-        self.offshoreArduino = Serial(port=f"/dev/cu.usbmodem142401", baudrate=115200)
-        #self.onshoreArduino = Serial(port=f"/dev/cu.usbserial-14240", baudrate=115200)
+        ports = list_ports.comports()
+        #offshorePort = ""
+        onshorePort = "/dev/cu.usbserial-14210"
+        """for port in ports:
+           if port.description == "USB Serial":
+               onshorePort = port.device
+           elif port.description == "FT232R USB UART - FT232R USB UART":
+               offshorePort = port.device"""
+
+        #self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
+        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -79,7 +90,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         if (output[0] == 0):
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
-                #print(value)
+                print(value)
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
         else:
@@ -89,17 +100,22 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
                 print(value)
                 self.onshoreArduino.write(value)"""
             for value in output[1][1]:
-                #print(value)
+                print(value)
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
 
     def readThread(self):
         self.threadActive = True
         while self.threadActive:
-            if (self.offshoreArduino.in_waiting >= 15):
-                self.controls.handleInput(self.readOffshore())
+            # print("doing this too")
+            # print(f"{self.offshoreArduino.in_waiting = }")
+            #if (self.offshoreArduino.in_waiting >= 15):
+                # print("doing this")
+            #    self.controls.handleInput(self.readOffshore())
             if (not self.outputQueue.empty()):
                 self.writeOutput(self.outputQueue.get())
+
+            # time.sleep(1)
 
     def startThread(self):
         currThread = threading.Thread(target=self.readThread)

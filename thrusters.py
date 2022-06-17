@@ -117,7 +117,14 @@ class Thruster():
         
         return forRotation
 
+def displayTSpeeds(speeds):
+    for pin in sorted(list(speeds.keys()), reverse=False):
+        print(f"{pin=} -> {round(speeds[pin], 5)}")
 
+def sendStopSignal(q):
+    q.put(["s", ()])
 
-
-
+if __name__ == "__main__":
+    TManager = ThrustManager()
+    displayTSpeeds(TManager.getTSpeeds((0,1,1), (0,0,0)))
+    
