@@ -208,8 +208,8 @@ if __name__ == '__main__':
     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
 
-    automation = AutomationWindow()
-    automation.show()
+    # automation = AutomationWindow()
+    # automation.show()
 
     try:
         os.mkdir('captures')
