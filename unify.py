@@ -9,7 +9,7 @@ from thrusters import ThrustManager, displayTSpeeds
 from keyboard import KeyboardManager
 from automation import PIDController
 
-class Unifier():
+class Unify():
     def __init__(self, requestQueue, guiQueue, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyboardManager(requestQueue=requestQueue)
