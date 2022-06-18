@@ -39,7 +39,7 @@ if __name__ == '__main__':
     unify_listener_thread.start()
 
     unify = Unify(q, q_out, 10)
-    unify.initiateWrangling()
+    unify.start()
 
     try:
         os.mkdir('captures')
