@@ -1,18 +1,18 @@
-from dataclasses import dataclass
+
 from comms import Comms
 import queue
 
-@dataclass
-class GyroData:
-    xOrientation:float = 0
-    yOrientation:float = 0
-    zOrientation:float = 0
+# @dataclass
+# class GyroData:
+#     xOrientation:float = 0
+#     yOrientation:float = 0
+#     zOrientation:float = 0
 
-@dataclass
-class AccelData:
-    xAccel:float = 0
-    yAccel:float = 0
-    zAccel:float = 0
+# @dataclass
+# class AccelData:
+#     xAccel:float = 0
+#     yAccel:float = 0
+#     zAccel:float = 0
 
 class Controls:
     def __init__(self):

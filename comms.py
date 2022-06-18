@@ -22,12 +22,13 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
         ports = list_ports.comports()
         # offshorePort = "/dev/cu.usbmodem14201"
+        #onshorePort = "/dev/cu.usbserial-14110"
         onshorePort = "/dev/cu.usbserial-14110"
-        """for port in ports:
+        for port in ports:
            if port.description == "USB Serial":
                onshorePort = port.device
            elif port.description == "FT232R USB UART - FT232R USB UART":
-               offshorePort = port.device"""
+               offshorePort = port.device
 
         # self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
         self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
