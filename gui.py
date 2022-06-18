@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QVBoxLayout, QWidget, QLabel
-from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtCore import QTimer
 
 from ui.grid import CameraGrid
 from ui.control import ControlBar
@@ -12,17 +12,12 @@ from ui.info import ThrusterDisplayModule, AxisDisplayModule
 from ui.automation_control import AutomationControlBar
 from ui.preview import PreviewWidget
 
-import sys
-import os
-
 import logging
-import yaml
-import cv2
 
 class MainWindow(QMainWindow):
-    def __init__(self, front_port, down_port):#, q_out):
+    def __init__(self, front_port, down_port):
         super().__init__()
-        # self.KrishnaQ = KrishnaQ
+
         self.setWindowTitle('Crimson UI')
 
         self.setStyleSheet("""
@@ -132,50 +127,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.frame)
 
 
-
         self.status_thread = QTimer()
         self.status_thread.timeout.connect(self.status_listener)
         self.status_thread.start(10)
 
-    # def update_status(self):
-    #     if self.grid.front_cam.connected:
-    #         self.status.front_cam_status.set_connected()
-    #     else:
-    #         self.status.front_cam_status.set_disconnected()
-
-    #     if self.grid.down_cam.connected:
-    #         self.status.down_cam_status.set_connected()
-    #     else:
-    #         self.status.down_cam_status.set_disconnected()
-
-    # def update_thruster_values(self, values_dict):
-    #     self.thruster_display.front_left_thruster_label.update_value(round(values_dict[0]*100, 1))
-    #     self.thruster_display.front_right_thruster_label.update_value(round(values_dict[1]*100, 1))
-    #     self.thruster_display.back_left_thruster_label.update_value(round(values_dict[2]*100, 1))
-    #     self.thruster_display.back_right_thruster_label.update_value(round(values_dict[3]*100, 1))
-    #     self.thruster_display.left_thruster_label.update_value(round(values_dict[4]*100, 1))
-    #     self.thruster_display.right_thruster_label.update_value(round(values_dict[5]*100, 1))
-
-    # def update_axis_values(self, values_dict):
-    #     self.axis_display.roll_label.update_value(round(values_dict[0]*100, 1))
-    #     self.axis_display.pitch_label.update_value(round(values_dict[1]*100, 1))
-    #     self.axis_display.yaw_label.update_value(round(values_dict[2]*100, 1))
-
-    # def listenForThrusterSpeeds(self):
-    #     while True:
-    #         # print(self.KrishnaQ.qsize())
-    #         if self.KrishnaQ.qsize() != 0:
-    #             # print("getting")
-    #             KQoutput = self.KrishnaQ.get()
-    #             # print(KQoutput)
-    #             # print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-    #             self.update_thruster_values(KQoutput[0])
-    #             self.update_axis_values(KQoutput[1])
-
-            
-    # def startKrishnaQListener(self):
-    #     l = threading.Thread(target=self.listenForThrusterSpeeds)
-    #     l.start()
 
     def status_listener(self):
         if self.grid.front_cam.connected:
@@ -247,38 +202,4 @@ class AutomationWindow(QWidget):
         self.parent.control.automation_button.setDisabled(False)
         event.accept()
 
-
-
-# if __name__ == '__main__':
-#     with open('settings.yml', 'r') as f:
-#         settings = yaml.safe_load(f)
-
-#     app = QApplication([])
-#     app.setStyle('Fusion')
-#     KrishnaQ = queue.Queue()
-
-#     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']), KrishnaQ=KrishnaQ)
-#     main.show()
-#     main.startKrishnaQListener()
-
-
-#     q = queue.Queue()
-    
-#     unifier = Unifier(q, KrishnaQ, 10)
-#     unifier.initiateWrangling()
-
-#     # 0 is 
-
-#     # automation = AutomationWindow()
-#     # automation.show()
-
-#     try:
-#         os.mkdir('captures')
-#         logging.warning('No captures directory detected; one has been generated for you!')
-#     except FileExistsError:
-#         pass
-
-#     logging.info('Successfully loaded Crimson UI')
-
-#     sys.exit(app.exec())
 
