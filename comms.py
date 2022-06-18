@@ -26,8 +26,8 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         for port in ports:
            if port.description == "USB Serial":
                onshorePort = port.device
-           elif port.description == "FT232R USB UART - FT232R USB UART":
-               offshorePort = port.device
+           #elif port.description == "FT232R USB UART - FT232R USB UART":
+           #    offshorePort = port.device
 
         # self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
         self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
