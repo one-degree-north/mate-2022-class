@@ -6,100 +6,74 @@ import time
 from controls import Controls
 
 from thrusters import ThrustManager, displayTSpeeds
-from keyboard import KeyManager, KeyMessage
+from keyboard import KeyboardManager
 from automation import PIDController
 
-class Unify():
-    def __init__(self, q, outQ, interval, controls=None):
+class Unifier():
+    def __init__(self, requestQueue, guiQueue, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
-        self.KManager = KeyManager(q=q)
-        self.pidC = PIDController(interval, q=q, controls=controls)
+        self.KManager = KeyboardManager(requestQueue=requestQueue)
+        self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
         
-        self.q = q
-        self.outQ: queue.Queue() = outQ
+        self.requestQueue = requestQueue
+        self.guiQueue = guiQueue
         self.interval = interval
         
         self.readLasts = False
 
-        self.lastFromKeyboard = KeyMessage()
-        
-        self.lastFromAutomation = [0,0,0]
+        self.lastPayloadFromKeyboard = {"reqMotion": [0, 0, 0], "reqRotation": [0, 0, 0]}
+        self.lastPayloadFromAutomation = {"reqRotation": (0, 0, 0)}
 
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
 
         self.combineType = self.getAverage
 
-    def delegateFromQ(self):
-        commandsReceived = 0
+
+
+    def readRequestQueue(self):
         while True:
-            while self.q.qsize() != 0:
+            # print(self.requestQueue.qsize())
 
-
-
-
-                commandsReceived += 1
-                command = self.q.get()
-                payload: KeyMessage = command[1]
-                if command[0] == "k" and self.lastFromKeyboard != payload:
-
-                    tare = payload.tare
-                    if tare:
-                        # print("\n\n\n\n\n\n\n")
-                        self.pidC.tareAll()
-
-                    command = payload.command
-                    if command:
-                        self.pidC.shiftTargetLeft()
-
-                    self.lastFromKeyboard = payload
-                    self.allowAutoInfluence = payload.allowAutoInfluence
-                    self.pidC.isActive = self.allowAutoInfluence
-
-        
+            while self.requestQueue.qsize() != 0:
+                message = self.requestQueue.get()
+                source, payload = message.source, message.payload
+                if source == "keyboard" and self.lastPayloadFromKeyboard != payload:
+                    self.lastPayloadFromKeyboard = payload
                     self.readLasts = True
-                elif command[0] == "a" and self.lastFromAutomation != payload:
-                    # print("Delegating to automation")
-                    self.lastFromAutomation = payload
+                
+                elif source == "automation" and self.lastPayloadFromAutomation != payload:
+                    self.lastPayloadFromAutomation = payload
                     self.readLasts = True
 
                 if self.readLasts:
-                    print(f"\n{self.lastFromKeyboard = }")
-                    print(f"{self.lastFromAutomation = }")
-                    print(f"{self.allowAutoInfluence = }")
+                    # print(f"\n{self.lastPayloadFromKeyboard = }")
+                    # print(f"{self.lastPayloadFromAutomation = }")
 
-                    reqMotion = self.lastFromKeyboard.reqMotion
+                    reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
+                    reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
 
-                    reqRotation = self.lastFromKeyboard.reqRotation
-                    if self.allowAutoInfluence:
-                        reqRotation = self.combineType(reqRotation, self.lastFromAutomation)
+                    thrusterSpeeds = self.TManager.getTSpeeds(reqMotion, reqRotation, 1)
 
-                    displayTSpeeds(self.TManager.getTSpeeds(
-                        reqMotion,
-                        reqRotation,
-                        self.lastFromKeyboard.thrustScale
-                    ))
+                    displayTSpeeds(thrusterSpeeds)
 
-                    self.outQ.put([self.TManager.getTSpeeds(
-                        reqMotion,
-                        reqRotation,
-                        self.lastFromKeyboard.thrustScale
-                    ), reqRotation])
+                    self.guiQueue.put([thrusterSpeeds, reqRotation])
 
-
+                    self.readLasts = False
 
             time.sleep(self.interval * 0.001)  
 
 
-    def getoutQ(self):
-        return self.outQ
+    def getKrishnaQ(self):
+        return self.KrishnaQ
 
-    def initiateWrangling(self):
-        self.KManager.startPolling()
-        self.pidC.startListening()
+    def start(self):
+        self.KManager.start()
+        self.pidC.start()
+        # print("doing this")
 
-        self.delegateThread = threading.Thread(target=self.delegateFromQ, daemon=True)
-        self.delegateThread.start()
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue)
+        self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
         output = []
@@ -118,11 +92,11 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    controls = Controls()
-    controls.setOrientationAutoreport(1)
-    controls.comms.startThread()
+    # controls = Controls()
+    # controls.setOrientationAutoreport(1)
+    # controls.comms.startThread()
 
-    q = queue.Queue()
-    oq = queue.Queue()
-    unit = Unify(q, oq, 10, controls=controls)
-    unit.initiateWrangling()
+    requestQueue = queue.Queue()
+    guiQueue = queue.Queue()
+    u = Unifier(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
+    u.start()
