@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QApplication
 from gui import MainWindow
 from unify import Unify
 
+from controls import Controls
+
 import sys
 import os
 
@@ -23,6 +25,12 @@ def unify_listener():
             sleep(0.01)
 
 if __name__ == '__main__':
+    controls = None  
+    controls = Controls()
+    #controls.setOrientationAutoreport(1)
+    controls.comms.startThread()
+
+
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
     
@@ -38,7 +46,7 @@ if __name__ == '__main__':
     unify_listener_thread = Thread(target=unify_listener, daemon=True)
     unify_listener_thread.start()
 
-    unify = Unify(q, q_out, 10)
+    unify = Unify(q, q_out, 10, controls)
     unify.start()
 
     try:
