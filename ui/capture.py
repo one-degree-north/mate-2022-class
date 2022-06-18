@@ -45,10 +45,10 @@ class CaptureControlBar(QWidget):
         self.timer.timeout.connect(self.update_stopwatch)
         self.timer.start(10)
 
-        self.capture_image_button = Button('gui/icons/capture_image_icon.png', 'Capture image')
+        self.capture_image_button = Button('ui/icons/capture_image_icon.png', 'Capture image')
         self.capture_image_button.clicked.connect(self.capture_image)
 
-        self.record_button = Button('gui/icons/start_record_icon.png', 'Start recording')
+        self.record_button = Button('ui/icons/start_record_icon.png', 'Start recording')
         self.record_button.clicked.connect(self.toggle_record)
 
 
@@ -100,7 +100,7 @@ class CaptureControlBar(QWidget):
             if self.parent.stopwatch_control.quickstart_button.isEnabled():
                 self.parent.stopwatch_control.quickstart_button.setDisabled(True)
 
-            self.record_button.setIcon(QIcon('gui/icons/stop_record_icon.png'))
+            self.record_button.setIcon(QIcon('ui/icons/stop_record_icon.png'))
             self.record_button.setToolTip('Stop recording')
 
             
@@ -133,7 +133,7 @@ class CaptureControlBar(QWidget):
 
             QTimer.singleShot(100, self.release_record)
 
-            self.record_button.setIcon(QIcon('gui/icons/start_record_icon.png'))
+            self.record_button.setIcon(QIcon('ui/icons/start_record_icon.png'))
             self.record_button.setToolTip('Start recording')
 
             self.centiseconds = 0

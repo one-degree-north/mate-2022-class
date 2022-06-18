@@ -130,7 +130,7 @@ class PIDController():
             time.sleep(self.interval * 0.001)
 
     def startInternalUpdater(self):
-        self.internalUpdater = threading.Thread(target=self.updateEverything)
+        self.internalUpdater = threading.Thread(target=self.updateEverything, daemon=True)
         self.internalUpdater.start()
 
     def sendRequests(self):
@@ -159,7 +159,7 @@ class PIDController():
 
     def startListening(self):
         self.startInternalUpdater()
-        self.bnoEar = threading.Thread(target=self.sendRequests)
+        self.bnoEar = threading.Thread(target=self.sendRequests, daemon=True)
         self.bnoEar.start()
 
 

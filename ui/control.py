@@ -18,17 +18,17 @@ class ControlBar(QWidget):
 
         self.parent = parent
 
-        self.info_button = Button('gui/icons/inputs_icon.png', 'Info')
+        self.info_button = Button('ui/icons/inputs_icon.png', 'Info')
         self.info_button.clicked.connect(self.info)
 
-        self.console_button = Button('gui/icons/console_icon.png', 'Console')
+        self.console_button = Button('ui/icons/console_icon.png', 'Console')
         self.console_button.clicked.connect(self.console)
 
         # self.console_window = ConsoleWindow()
-        self.automation_button = Button('gui/icons/automation_icon.png', 'Automation')
+        self.automation_button = Button('ui/icons/automation_icon.png', 'Automation')
         self.automation_button.clicked.connect(self.automation)
 
-        self.quit_button = Button('gui/icons/quit_icon.png', 'Quit')
+        self.quit_button = Button('ui/icons/quit_icon.png', 'Quit')
         self.quit_button.clicked.connect(self.quit)
 
         self.layout = QVBoxLayout()
