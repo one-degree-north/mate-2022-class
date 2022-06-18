@@ -80,7 +80,7 @@ class Unify():
         self.pidC.start()
         # print("doing this")
 
-        self.readRequestThread = threading.Thread(target=self.readRequestQueue)
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=True)
         self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
