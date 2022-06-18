@@ -49,8 +49,8 @@ class Photomosaic:
         # Use trees and graph algorithms and stuff, but I'm lazy af
         combined_imgs = [self.combine_images(self.imgs[i], self.imgs[7-i], height) for i in range(self.num_img/2)]
         combined_imgs = [
-                         self.combine_images(combined_imgs[0], combined_imgs[1]),
-                         self.combine_images(combined_imgs[2], combined_imgs[3])
+                         self.combine_images(combined_imgs[0], combined_imgs[1], width),
+                         self.combine_images(combined_imgs[2], combined_imgs[3], width)
                         ]
-        combined_img = self.combine_images(combined_imgs[0], combined_imgs[1])
+        combined_img = self.combine_images(combined_imgs[0], combined_imgs[1], width)
         return combined_img
