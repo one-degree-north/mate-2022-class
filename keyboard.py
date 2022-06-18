@@ -9,6 +9,8 @@ class Action:
     motion = 0
     rotation = 1
     scale = 2
+    toggleOpen = 3
+    toggleRotate = 4
 
 class Key():
     def __init__(self, actionType, action=None):
@@ -45,6 +47,9 @@ class KeyboardManager():
             "4": Key(Action.scale),
             "5": Key(Action.scale),
             "0": Key(Action.scale),
+
+            "e": Key(Action.toggleOpen),
+            "r": Key(Action.toggleRotate),
         }
 
         self.thrustScale = 1
@@ -77,6 +82,10 @@ class KeyboardManager():
                     reqRotation[key.actionAxis] += key.action[key.actionAxis]
                 elif key.actionType == Action.scale:
                     self.thrustScale = int(keyString) * 0.2
+                elif key.actionType == Action.toggleOpen:
+                    toggleOpenner = True
+                elif key.actionType == Action.toggleRotate:
+                    toggleRotater = True
 
         payload["reqMotion"] = reqMotion
         payload["reqRotation"] = reqRotation
@@ -84,7 +93,7 @@ class KeyboardManager():
         payload["toggleOpenner"] = toggleOpenner
         payload["toggleRotater"] = toggleRotater
 
-        # print(payload)
+        print(payload)
         self.requestQueue.put(Message("keyboard", payload))
         # print("putting")
 

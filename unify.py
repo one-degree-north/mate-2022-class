@@ -56,6 +56,11 @@ class Unify():
                     reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
                     thrustScale = self.lastPayloadFromKeyboard["thrustScale"]
 
+                    if self.lastPayloadFromKeyboard["toggleOpenner"]:
+                        self.SManager.openner.toggle()
+                    if self.lastPayloadFromKeyboard["toggleRotater"]:
+                        self.SManager.rotater.toggle()
+
                     thrusterSpeeds = self.TManager.getTSpeeds(reqMotion, reqRotation, thrustScale)
 
                     displayTSpeeds(thrusterSpeeds)
