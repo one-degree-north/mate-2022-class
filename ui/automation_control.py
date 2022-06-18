@@ -16,25 +16,25 @@ class AutomationControlBar(QWidget):
             }
         """)
 
-        self.docking_button = Button('gui/icons/docking_icon.png', 'Autonomous docking')
+        self.docking_button = Button('ui/icons/docking_icon.png', 'Autonomous docking')
         # self.help_button.clicked.connect(self.help)
 
-        self.transect_button = Button('gui/icons/transect_icon.png', 'Transect line')
+        self.transect_button = Button('ui/icons/transect_icon.png', 'Transect line')
         # self.info_button.clicked.connect(self.info)
 
-        self.morts_button = Button('gui/icons/morts_icon.png', 'Differentiate morts')
+        self.morts_button = Button('ui/icons/morts_icon.png', 'Differentiate morts')
         # self.console_button.clicked.connect(self.console)
 
-        self.measure_button = Button('gui/icons/measure_icon.png', 'Measure fish size')
+        self.measure_button = Button('ui/icons/measure_icon.png', 'Measure fish size')
         # self.quit_button.clicked.connect(self.quit)
 
-        self.endurance_button = Button('gui/icons/Endurance_icon.png', 'Transect over Endurance area')
+        self.endurance_button = Button('ui/icons/Endurance_icon.png', 'Transect over Endurance area')
         # self.quit_button.clicked.connect(self.quit)
 
-        self.measure_endurance_button = Button('gui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
+        self.measure_endurance_button = Button('ui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
         # self.quit_button.clicked.connect(self.quit)
 
-        self.photomosaic_button = Button('gui/icons/photomosaic_icon.png', 'Photomosaic')
+        self.photomosaic_button = Button('ui/icons/photomosaic_icon.png', 'Photomosaic')
         # self.quit_button.clicked.connect(self.quit)
 
 
