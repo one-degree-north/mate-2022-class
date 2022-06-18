@@ -3,7 +3,7 @@ from math import sqrt
 import threading
 import time
 
-from dataclasses import dataclass
+from message import Message
 
 
 class RotationAxis():
@@ -63,25 +63,22 @@ class TranslationAxis():
             self.displacement += 0.5 * value * (self.interval / 1000) * (self.interval / 1000)
 
 class PIDController():
-    def __init__(self, interval, controls=None, q=None):
+    def __init__(self, interval, controls=None, requestQueue=None):
         self.interval = interval
         self.controls = controls
         self.controlsConnected = controls != None
-        self.q = q
+        if controls == None:
+            print("\nMessage from PID Controller:\n\tControls is None\n\tControls not connected\n")
 
-        self.pitch = RotationAxis(interval, kp=-0.01)
-        self.roll = RotationAxis(interval, kp=-0.01)
+        self.requestQueue = requestQueue
+
+        self.pitch = RotationAxis(interval)
+        self.roll = RotationAxis(interval)
         self.yaw = RotationAxis(interval)
 
-        self.x = TranslationAxis(interval)
-        self.y = TranslationAxis(interval)
-        self.z = TranslationAxis(interval)
-
-        # assumes zero roll and pitch and zero initial velocity
-        self.displacement = 0
 
         self.lastOrientationReading = [0, 0, 0]
-        self.lastAccelReading       = [0, 0, 0]
+        # self.lastAccelReading       = [0, 0, 0]
 
         self.sendNewRequest = False
         self.isActive = True
@@ -117,30 +114,32 @@ class PIDController():
         return sqrt(self.x.displacement * self.x.displacement + self.y.displacement * self.y.displacement)
 
     def tareAll(self):
-        # self.updateOrientation()
         self.roll.tare()
         self.pitch.tare()
         self.yaw.tare()
 
-    def updateEverything(self):
-        while True:
-            self.updateOrientation()
-            self.updateDisplacements()
-            # print(self.planarDisplacement())
-            time.sleep(self.interval * 0.001)
+    def startReadingBNO(self):
+        def updateInternalvalues():
+            while True:
+                self.updateOrientation()
+                time.sleep(self.interval * 0.001)
 
-    def startInternalUpdater(self):
-        self.internalUpdater = threading.Thread(target=self.updateEverything, daemon=True)
-        self.internalUpdater.start()
+        self.internalUpdateThread = threading.Thread(target=updateInternalvalues)
+        self.internalUpdateThread.start()
 
-    def sendRequests(self):
-        while True:
-            if self.sendNewRequest and self.isActive:
-                # print("changing")
-                self.q.put(["a", self.calcForces()])
-                self.sendNewRequest = False
-            
-            time.sleep(self.interval * 0.001)
+    def startSendingRequests(self):
+        def sendRequests():
+            while True:
+
+                if self.sendNewRequest and self.isActive:
+                    self.requestQueue.put(
+                        Message("automation", {"reqMotion": self.calcForces()})
+                    )
+                    self.sendNewRequest = False
+                time.sleep(self.interval * 0.001)
+
+        self.sendRequestsThread = threading.Thread(target=sendRequests)
+        self.sendRequestsThread.start()
 
     def calcForces(self):
         return (
@@ -157,43 +156,15 @@ class PIDController():
         self.yaw.shiftTarget(-90)
         self.sendNewRequest = True
 
-    def startListening(self):
-        self.startInternalUpdater()
-        self.bnoEar = threading.Thread(target=self.sendRequests, daemon=True)
-        self.bnoEar.start()
-
-
+    def start(self):
+        self.startReadingBNO()
+        self.startSendingRequests()
+        pass
 
 
 if __name__ == "__main__":
-    from controls import Controls
+    # from controls import Controls
     import queue
     
-    # test = MotionController(1000)
-    # test.accelHistory = [10, 9, 8]
-    # test.updateDisplacement()
-    # print(test.displacement)
-    # test.startReadingAccel()
-
-    controls = Controls()
-    controls.setOrientationAutoreport(1)
-    controls.setAccelAutoreport(1)
-    controls.comms.startThread()
-    
-    pidC = PIDController(10, controls=controls, q=queue.Queue())
-    # pidC = PIDController(10, q=queue.Queue())
-    # pidC.updateDisplacements()
-    # print(pidC.getPlanarDisplacement())
-    # pidC.updateOrientation([0, 0, 0])
-    # pidC.updateDisplacement([1,1,1])
-    # pidC.updateErrors([0, 0, 0])
-    # pidC.updateErrors([0, 0, 0])
-
-    # pidC.shiftTargetLeft()
-    # print(pidC.yaw.offset)
-    # print(pidC.yaw.force())
-
-    pidC.startListening()
-
-    # t = Axis(10)
-    # print(t.force())
+    pidC = PIDController(10, controls=None, requestQueue=queue.Queue())
+    pidC.start()
