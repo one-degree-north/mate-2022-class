@@ -10,7 +10,7 @@ from ui.console import ConsoleModule
 from ui.info import ThrusterDisplayModule, AxisDisplayModule
 
 from ui.automation_control import AutomationControlBar
-from ui.preview import PreviewWidget
+from ui.selector import SelectorWidget
 
 import logging
 
@@ -164,6 +164,7 @@ class MainWindow(QMainWindow):
         if self.console.command_line.key_release_logging and event.text().isprintable() and len(event.text()) == 1:
             logging.debug(f'Release: {event.text()} ({ord(event.text())})')
 
+
 class AutomationWindow(QWidget):
     def __init__(self, parent):
         super().__init__()
@@ -178,8 +179,9 @@ class AutomationWindow(QWidget):
 
         self.parent = parent
 
+        self.selector = SelectorWidget()
+
         self.automation_control = AutomationControlBar()
-        # self.preview_widget = PreviewWidget()
 
         self.automation_control_frame = QWidget()
         self.automation_control_frame.layout = QVBoxLayout()
@@ -188,6 +190,13 @@ class AutomationWindow(QWidget):
         self.automation_control_frame.layout.addWidget(self.automation_control)
 
         self.automation_control_frame.layout.setContentsMargins(0,0,0,0)
+        self.automation_control_frame.setLayout(self.automation_control_frame.layout)
+
+
+        self.layout = QHBoxLayout()
+        
+        self.layout.addWidget(self.automation_control_frame)
+        self.layout.addWidget(self.selector, 100)
         # self.automation_control_frame.setLayout(self.automation_control_frame.layout)
 
         # self.preview_frame = QWidget()
@@ -195,7 +204,8 @@ class AutomationWindow(QWidget):
         
         # self.preview_frame.layout.addWidget(self.preview_widget)
 
-        self.setLayout(self.automation_control_frame.layout)
+        self.layout.setContentsMargins(0,0,0,0)
+        self.setLayout(self.layout)
         # self.setCentralWidget(self.automation_control_frame)
 
     def closeEvent(self, event):
