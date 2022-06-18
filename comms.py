@@ -90,7 +90,6 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         if (output[0] == 0):
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
-                print(value)
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
         else:
@@ -100,7 +99,6 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
                 print(value)
                 self.onshoreArduino.write(value)"""
             for value in output[1][1]:
-                print(value)
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
 
