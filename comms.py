@@ -22,7 +22,6 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
         ports = list_ports.comports()
         # offshorePort = "/dev/cu.usbmodem14201"
-        #onshorePort = "/dev/cu.usbserial-14110"
         onshorePort = "/dev/cu.usbserial-14110"
         for port in ports:
            if port.description == "USB Serial":
