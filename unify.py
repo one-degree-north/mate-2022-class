@@ -98,7 +98,7 @@ class Unify():
         self.KManager.startPolling()
         self.pidC.startListening()
 
-        self.delegateThread = threading.Thread(target=self.delegateFromQ, daemon=True)
+        self.delegateThread = threading.Thread(target=self.delegateFromQ)
         self.delegateThread.start()
 
     def getAverage(self, kData, aData):
@@ -118,9 +118,9 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    controls = Controls()
-    controls.setOrientationAutoreport(1)
-    controls.comms.startThread()
+    # controls = Controls()
+    # controls.setOrientationAutoreport(1)
+    # controls.comms.startThread()
 
     q = queue.Queue()
     oq = queue.Queue()
