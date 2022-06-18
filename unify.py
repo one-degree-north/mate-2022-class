@@ -4,7 +4,6 @@ import threading
 import time
 
 from controls import Controls
-
 from servos import ServoManager
 from thrusters import ThrustManager, displayTSpeeds
 from keyboard import KeyboardManager
