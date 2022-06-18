@@ -14,7 +14,7 @@ struct Input{
 
 int thrusterPins[] = {4, 3, 6, 7, 8, 5};
 Servo thrusters[6];
-int servoPins[] = {10, 11};
+int servoPins[] = {11, 10};
 Servo clawServos[2];
 
 Adafruit_BNO055 bnoIMU = Adafruit_BNO055(55, 0x28);

@@ -76,11 +76,21 @@ class Controls:
 
     def rotateClaw(self, deg):  #input values between 0 and 90 (0 is horizontal, 90 is vertical)
         #values between 90-160
+        if deg < 0:
+            deg = 0
+        if deg > 90:
+            deg = 90
         outputVal = int((deg*7/9)+90)
+        print("BBB")
+        print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
     def moveClaw(self, deg):    #input values between 0 and 1 (0 is fully closed, 1 is fully open)
         #match to values between 180-117
+        if deg < 0:
+            deg = 0
+        if deg > 1:
+            deg = 1
         outputVal = int((deg*63)+117)
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
@@ -109,7 +119,7 @@ class Controls:
 if __name__ == "__main__":
     controls = Controls()
     controls.comms.startThread()
-    controls.setOrientationAutoreport(1)
+    #controls.setOrientationAutoreport(1)
     # controls.resetOffshore()
     #controls.resetOffshore()
     """inputNum = 0
@@ -133,7 +143,7 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     
-    """while True:
+    while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -141,7 +151,7 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)"""
+            controls.rotateClaw(deg)
         #controls.rotateClaw(deg)
     #controls.setAccelAutoreport(100)
     #controls.comms.readThread()
