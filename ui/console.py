@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 
 class ConsoleModule(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -22,8 +22,10 @@ class ConsoleModule(QWidget):
             }
         """)
 
+        self.parent = parent
+
         self.logs = Logs()
-        self.command_line = CommandLine()
+        self.command_line = CommandLine(self)
 
 
         self.layout = QVBoxLayout()
@@ -86,7 +88,7 @@ class Logs(QDialog, QPlainTextEdit):
 
 
 class CommandLine(QLineEdit):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
         self.setStyleSheet("""
@@ -100,6 +102,8 @@ class CommandLine(QLineEdit):
                 color: rgb(200, 200, 200)
             }
         """)
+
+        self.parent = parent
 
         self.key_press_logging = False
         self.key_release_logging = False
@@ -129,8 +133,11 @@ class CommandLine(QLineEdit):
             the captures directory
             "empty" - permanently empties
             the captures directory
-            "key [press/release]" - toggles key logging,
-            default is both
+
+            timer (seconds; int) - sets a timer
+
+            "key [press/release]" - toggles
+            key logging, default is both
 
             Key:
             '()' = required
@@ -168,6 +175,15 @@ class CommandLine(QLineEdit):
 
             logging.info('Successfully emptied the captures directory')
 
+        elif split_text[0] == 'timer':
+            if not (len(split_text) > 1 and isint(split_text[1])):
+                logging.error('Please provide additional argument(s)')
+                return
+
+            self.parent.parent.stopwatch_control.timer()
+
+            
+
         elif split_text[0] == 'key':
             if len(split_text) > 1 and (split_text[1] == 'press' or split_text[1] == 'release'):
                 if split_text[1] == 'press':
@@ -200,3 +216,10 @@ class CommandLine(QLineEdit):
         
         else:
             logging.error(f'Command "{split_text[0]}" does not exist')
+
+def isint(x):
+    try:
+        int(x)
+        return True
+    except ValueError:
+        return False

@@ -9,7 +9,7 @@ from thrusters import ThrustManager, displayTSpeeds
 from keyboard import KeyManager, KeyMessage
 from automation import PIDController
 
-class Unifiy():
+class Unify():
     def __init__(self, q, outQ, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyManager(q=q)
@@ -124,5 +124,5 @@ if __name__ == "__main__":
 
     q = queue.Queue()
     oq = queue.Queue()
-    unit = Unifier(q, oq, 10, controls=controls)
+    unit = Unify(q, oq, 10, controls=controls)
     unit.initiateWrangling()

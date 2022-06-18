@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
         self.stopwatch_control = StopwatchControlBar(self)
         self.capture_control = CaptureControlBar(self)
 
-        self.console = ConsoleModule()
+        self.console = ConsoleModule(self)
         self.console.hide()
         
         self.thruster_display = ThrusterDisplayModule()

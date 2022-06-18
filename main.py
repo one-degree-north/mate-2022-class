@@ -19,7 +19,7 @@ def unify_listener():
             output = q_out.get()
             main.update_thruster_values(output[0])
             main.update_axis_values(output[1])
-            
+
             sleep(0.01)
 
 if __name__ == '__main__':
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     app = QApplication([])
     app.setStyle('Fusion')
 
-    main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))#, q_out)
+    main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
 
     unify_listener_thread = Thread(target=unify_listener, daemon=True)
@@ -47,6 +47,7 @@ if __name__ == '__main__':
     except FileExistsError:
         pass
 
+    print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
     logging.info('Successfully loaded Crimson UI')
 
     sys.exit(app.exec())

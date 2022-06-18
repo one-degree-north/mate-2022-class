@@ -39,6 +39,9 @@ class StopwatchControlBar(QWidget):
 
         self.setLayout(self.layout)
 
+    def timer(self):
+        print('ok')
+
     def quickstart(self):
         self.startstop()
         self.parent.capture_control.toggle_record()
@@ -76,7 +79,7 @@ class StopwatchControlBar(QWidget):
         if not self.parent.capture_control.recording:
             self.parent.stopwatch_control.quickstart_button.setDisabled(False)
 
-class Stopwatch(QWidget): #change to stopwatchbar
+class Stopwatch(QWidget):
     def __init__(self):
         super().__init__()
 

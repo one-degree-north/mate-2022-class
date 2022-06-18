@@ -65,7 +65,8 @@ class ControlBar(QWidget):
             self.parent.console.show()
 
     def quit(self):
-        # access camera from other windows and close
+        # access camera from other windows and close + threads
+        # self.parent.status_thread.stop()
         print('\033[93m\033[1mSuccessfully stopped Crimson UI\033[0m') 
 
         exit()
