@@ -17,7 +17,7 @@ class ThrustManager():
         self.multiplier = multiplier
         self.x, self.y, self.z = 0, 1, 2
 
-    def getTSpeeds(self, reqMotion, reqRotation, normalizeZ=True, normalizeY=True):
+    def getTSpeeds(self, reqMotion, reqRotation, thrustScale, normalizeZ=True, normalizeY=True):
         if reqMotion[2] == 0:
             normalizeZ = False
         if reqMotion[1] == 0:
@@ -39,7 +39,7 @@ class ThrustManager():
                     if speed != 0:
                         divisor += 1
                 try:
-                    output[thruster.pin] = self.multiplier * sum(speeds) / divisor
+                    output[thruster.pin] = thrustScale * self.multiplier * sum(speeds) / divisor
                 except ZeroDivisionError:
                     output[thruster.pin] = divisor
 
@@ -58,7 +58,7 @@ class ThrustManager():
                 bump = 0
             
             for pin, value in axisDict.items():
-                output[pin] = self.multiplier * (value + bump)
+                output[pin] = thrustScale * self.multiplier * (value + bump)
 
 
         thrusterSpeeds = []

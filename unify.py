@@ -5,6 +5,7 @@ import time
 
 from controls import Controls
 
+from servos import ServoManager
 from thrusters import ThrustManager, displayTSpeeds
 from keyboard import KeyboardManager
 from automation import PIDController
@@ -13,6 +14,7 @@ class Unify():
     def __init__(self, requestQueue, guiQueue, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyboardManager(requestQueue=requestQueue)
+        self.SManager = ServoManager(controls=None)
         self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
         
         self.requestQueue = requestQueue
@@ -52,8 +54,9 @@ class Unify():
 
                     reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
                     reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
+                    thrustScale = self.lastPayloadFromKeyboard["thrustScale"]
 
-                    thrusterSpeeds = self.TManager.getTSpeeds(reqMotion, reqRotation, 1)
+                    thrusterSpeeds = self.TManager.getTSpeeds(reqMotion, reqRotation, thrustScale)
 
                     displayTSpeeds(thrusterSpeeds)
 
@@ -98,5 +101,5 @@ if __name__ == "__main__":
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()
-    u = Unifier(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
+    u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
     u.start()

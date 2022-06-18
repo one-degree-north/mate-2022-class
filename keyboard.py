@@ -8,9 +8,10 @@ from message import Message
 class Action:
     motion = 0
     rotation = 1
+    scale = 2
 
 class Key():
-    def __init__(self, actionType, action):
+    def __init__(self, actionType, action=None):
         self.actionType = actionType
         self.action = action
         self.isDown = False
@@ -37,7 +38,16 @@ class KeyboardManager():
             'j': Key(Action.rotation, (0, -1, 0)),
             'l': Key(Action.rotation, (-1, 0, 0)),
             ';': Key(Action.rotation, (1, 0, 0)),
+
+            "1": Key(Action.scale),
+            "2": Key(Action.scale),
+            "3": Key(Action.scale),
+            "4": Key(Action.scale),
+            "5": Key(Action.scale),
+            "0": Key(Action.scale),
         }
+
+        self.thrustScale = 1
 
     def updateKeyState(self, keyString, isDown):
         if keyString in self.keys.keys() and self.keys[keyString].isDown != isDown:
@@ -47,11 +57,17 @@ class KeyboardManager():
     def sendRequest(self):
         reqMotion = [0, 0, 0]
         reqRotation = [0, 0, 0]
+        toggleRotater = False
+        toggleOpenner = False
+
 
 
         payload = {
             "reqMotion": (),
             "reqRotation": (),
+            "thrustScale": (),
+            "toggleRotater": False,
+            "toggleOpenner": False,
         }
         for keyString, key in self.keys.items():
             if key.isDown:
@@ -59,9 +75,14 @@ class KeyboardManager():
                     reqMotion[key.actionAxis] += key.action[key.actionAxis]
                 elif key.actionType == Action.rotation:
                     reqRotation[key.actionAxis] += key.action[key.actionAxis]
+                elif key.actionType == Action.scale:
+                    self.thrustScale = int(keyString) * 0.2
 
         payload["reqMotion"] = reqMotion
         payload["reqRotation"] = reqRotation
+        payload["thrustScale"] = self.thrustScale
+        payload["toggleOpenner"] = toggleOpenner
+        payload["toggleRotater"] = toggleRotater
 
         # print(payload)
         self.requestQueue.put(Message("keyboard", payload))
