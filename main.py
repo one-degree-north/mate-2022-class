@@ -11,6 +11,7 @@ import logging
 import yaml
 
 from threading import Thread
+from time import sleep
 
 def unify_listener():
     while True:
@@ -18,6 +19,7 @@ def unify_listener():
             output = q_out.get()
             main.update_thruster_values(output[0])
             main.update_axis_values(output[1])
+            sleep(0.01)
 
 if __name__ == '__main__':
     with open('settings.yml', 'r') as f:
