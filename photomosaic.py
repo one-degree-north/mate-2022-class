@@ -22,8 +22,8 @@ class Photomosaic:
             src = np.float32([ kp1[m.queryIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
             dst = np.float32([ kp2[m.trainIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
             H, masked = cv2.findHomography(src, dst, cv2.RANSAC, 5.0)
-        else:
-            raise AssertionError('Can’t find enough keypoints.')
+        else: 
+            raise AssertionError('Not enough keypoints.')
 
         if dimension is width:
             dst = cv2.warpPerspective(img1, H, ((img1.shape[1] + img2.shape[1]), img2.shape[0]))

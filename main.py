@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 
 from gui import MainWindow
-from unify import Unifiy
+from unify import Unify
 
 import sys
 import os
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     unify_listener_thread = Thread(target=unify_listener, daemon=True)
     unify_listener_thread.start()
 
-    unifiy = Unifiy(q, q_out, 10)
-    unifiy.initiateWrangling()
+    unify = Unify(q, q_out, 10)
+    unify.initiateWrangling()
 
     try:
         os.mkdir('captures')

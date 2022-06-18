@@ -17,25 +17,25 @@ class AutomationControlBar(QWidget):
         """)
 
         self.docking_button = Button('ui/icons/docking_icon.png', 'Autonomous docking')
-        # self.help_button.clicked.connect(self.help)
+        self.docking_button.clicked.connect(self.docking)
 
         self.transect_button = Button('ui/icons/transect_icon.png', 'Transect line')
-        # self.info_button.clicked.connect(self.info)
+        self.transect_button.clicked.connect(self.transect)
 
         self.morts_button = Button('ui/icons/morts_icon.png', 'Differentiate morts')
-        # self.console_button.clicked.connect(self.console)
+        self.morts_button.clicked.connect(self.morts)
 
         self.measure_button = Button('ui/icons/measure_icon.png', 'Measure fish size')
-        # self.quit_button.clicked.connect(self.quit)
+        self.measure_button.clicked.connect(self.measure)
 
         self.endurance_button = Button('ui/icons/Endurance_icon.png', 'Transect over Endurance area')
-        # self.quit_button.clicked.connect(self.quit)
+        self.endurance_button.clicked.connect(self.endurance)
 
         self.measure_endurance_button = Button('ui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
-        # self.quit_button.clicked.connect(self.quit)
+        self.measure_endurance_button.clicked.connect(self.measure_endurance)
 
         self.photomosaic_button = Button('ui/icons/photomosaic_icon.png', 'Photomosaic')
-        # self.quit_button.clicked.connect(self.quit)
+        self.photomosaic_button.clicked.connect(self.photomosaic)
 
 
 
@@ -53,3 +53,32 @@ class AutomationControlBar(QWidget):
         self.setLayout(self.layout)
 
         self.setFixedWidth(60)
+
+
+    def docking(self):
+        print('dock')
+        pass
+
+    def transect(self):
+        print('transect')
+        pass
+
+    def morts(self):
+        print('dead fish')
+        pass
+
+    def measure(self):
+        print('measure')
+        pass
+
+    def endurance(self):
+        print('ok')
+        pass
+
+    def measure_endurance(self):
+        print('not ok')
+        pass
+
+    def photomosaic(self):
+        print('photomosaic')
+        pass
