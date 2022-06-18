@@ -9,14 +9,14 @@ from thrusters import ThrustManager, displayTSpeeds
 from keyboard import KeyManager, KeyMessage
 from automation import PIDController
 
-class Unifier():
-    def __init__(self, q, KrishnaQ, interval, controls=None):
+class Unifiy():
+    def __init__(self, q, outQ, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyManager(q=q)
         self.pidC = PIDController(interval, q=q, controls=controls)
         
         self.q = q
-        self.KrishnaQ: queue.Queue() = KrishnaQ
+        self.outQ: queue.Queue() = outQ
         self.interval = interval
         
         self.readLasts = False
@@ -80,26 +80,25 @@ class Unifier():
                         self.lastFromKeyboard.thrustScale
                     ))
 
-                    self.KrishnaQ.put([self.TManager.getTSpeeds(
+                    self.outQ.put([self.TManager.getTSpeeds(
                         reqMotion,
                         reqRotation,
                         self.lastFromKeyboard.thrustScale
                     ), reqRotation])
-                    # print("Putting in KQ")
 
 
 
             time.sleep(self.interval * 0.001)  
 
 
-    def getKrishnaQ(self):
-        return self.KrishnaQ
+    def getoutQ(self):
+        return self.outQ
 
     def initiateWrangling(self):
         self.KManager.startPolling()
         self.pidC.startListening()
 
-        self.delegateThread = threading.Thread(target=self.delegateFromQ)
+        self.delegateThread = threading.Thread(target=self.delegateFromQ, daemon=True)
         self.delegateThread.start()
 
     def getAverage(self, kData, aData):
@@ -124,6 +123,6 @@ if __name__ == "__main__":
     controls.comms.startThread()
 
     q = queue.Queue()
-    kq = queue.Queue()
-    unit = Unifier(q, kq, 10, controls=controls)
+    oq = queue.Queue()
+    unit = Unifier(q, oq, 10, controls=controls)
     unit.initiateWrangling()
