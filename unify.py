@@ -14,7 +14,7 @@ class Unify():
     def __init__(self, requestQueue, guiQueue, interval, controls=None):
         self.TManager = ThrustManager(controls=controls)
         self.KManager = KeyboardManager(requestQueue=requestQueue)
-        self.SManager = ServoManager(controls=None)
+        self.SManager = ServoManager(controls=controls)
         self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
         
         self.requestQueue = requestQueue
@@ -100,9 +100,9 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    # controls = Controls()
-    # controls.setOrientationAutoreport(1)
-    # controls.comms.startThread()
+    controls = Controls()
+    #controls.setOrientationAutoreport(1)
+    controls.comms.startThread()
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()
