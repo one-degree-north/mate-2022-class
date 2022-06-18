@@ -35,8 +35,8 @@ if __name__ == '__main__':
     main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     main.show()
 
-    unify_listener_thread = Thread(target=unify_listener, daemon=True)
-    unify_listener_thread.start()
+    # unify_listener_thread = Thread(target=unify_listener, daemon=True)
+    # unify_listener_thread.start()
 
     unify = Unify(q, q_out, 10)
     unify.start()
