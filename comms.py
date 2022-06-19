@@ -39,7 +39,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             #    onshorePort = port.device
         
         self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
-        #self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
+        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
