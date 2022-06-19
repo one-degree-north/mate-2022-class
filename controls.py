@@ -1,4 +1,4 @@
-from pyparsing import rest_of_line
+
 from comms import Comms
 import queue, time
 

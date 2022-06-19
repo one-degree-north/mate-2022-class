@@ -35,7 +35,7 @@ class Unify():
         self.allowAutoInfluence = True
         # either "balancing", "full", or "off"
         # balancing excludes yaw, full includes it
-        self.automationMode = "off"
+        self.automationMode = "full"
 
         self.combineType = self.getAverage
 
@@ -49,8 +49,8 @@ class Unify():
                 message = self.requestQueue.get()
                 source, payload = message.source, message.payload
                 if source == "keyboard" and self.lastPayloadFromKeyboard != payload:
-                    print("doing this")
-                    print(payload)
+                    # print("doing this")
+                    # print(payload)
                     self.lastPayloadFromKeyboard = payload
                     self.readLasts = True
                 
@@ -59,8 +59,8 @@ class Unify():
                     self.readLasts = True
 
                 if self.readLasts:
-                    # print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
-                    # print(f"AUtomation: {self.lastPayloadFromAutomation}")
+                    print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
+                    print(f"Automation: {self.lastPayloadFromAutomation}")
 
                     reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
 
@@ -120,8 +120,8 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    controls = Controls()
-    controls.comms.startThread()
+    controls = Controls(offshoreEnabled=True)
+
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()

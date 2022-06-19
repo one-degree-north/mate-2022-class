@@ -14,10 +14,10 @@ class RotationAxis():
         self.kd = kd
         
         self.errorHistory = [0, 0] # test values only
-        self.offset = 0 # positive value shifts the target rightward, negative leftward
+        self.targetValue = 0 # positive value shifts the target rightward, negative leftward
 
     def force(self):
-        p = self.kp * (self.errorHistory[-1] - self.offset)
+        p = self.kp * (self.errorHistory[-1] - self.targetValue)
         d = self.kd * (self.errorHistory[-1] - self.errorHistory[-2]) / self.interval
         return p + d
 
@@ -32,12 +32,12 @@ class RotationAxis():
         extent < 0 for leftward shift
         extent > 0 for rightward shift
         """
-        print(f"offset changed from {self.offset} to", end=" ")
-        self.offset = (self.offset + extent) % 360
-        print(f"{self.offset}")
+        print(f"targetValue changed from {self.targetValue} to", end=" ")
+        self.targetValue = (self.targetValue + extent) % 360
+        print(f"{self.targetValue}")
         
     def tare(self):
-        self.offset = self.errorHistory[-1]
+        self.targetValue = self.errorHistory[-1]
 
 class TranslationAxis():
     """
@@ -49,18 +49,12 @@ class TranslationAxis():
 
     def __init__(self, interval):
         self.interval = interval # in milliseconds
-
-        self.accelHistory = []
         self.displacement = 0 # in meters
 
     def update(self, value):
-        self.accelHistory.append(value)
-        self.updateDisplacement()
-        # print(self.displacement)
+        self.displacement += 0.5 * value * (self.interval / 1000) * (self.interval / 1000)
+        # print(f"dy: {self.displacement}")
 
-    def updateDisplacement(self):
-        for value in self.accelHistory:
-            self.displacement += 0.5 * value * (self.interval / 1000) * (self.interval / 1000)
 
 class PIDController():
     def __init__(self, interval, controls=None, requestQueue=None):
@@ -76,13 +70,13 @@ class PIDController():
         self.roll = RotationAxis(interval)
         self.yaw = RotationAxis(interval)
 
-        self.x = TranslationAxis(interval)
         self.y = TranslationAxis(interval)
-        self.z = TranslationAxis(interval)
+
+
 
 
         self.lastOrientationReading = [0, 0, 0]
-        self.lastAccelReading       = [0, 0, 0]
+        # self.lastAccelReading       = [0, 0, 0]
 
         self.sendNewRequest = False
         self.isActive = True
@@ -104,18 +98,18 @@ class PIDController():
             self.sendNewRequest = True
         # print(f"{self.lastOrientationReading = }")
 
-    def updateDisplacements(self, accelData=None):
-        if self.controlsConnected:
-            accelData = self.controls.accelData
-        else:
-            accelData = [0, 0, 0]
-        # accelData = self.controls.accelData
-        self.x.update(accelData[0])
-        self.y.update(accelData[1])
-        self.z.update(accelData[2])
+    def updateDisplacement(self, accelData=None):
+        # if self.controlsConnected:
+        #     accelData = self.controls.accelData
+        # else:
+        #     accelData = [0, 0, 0]
+        accelData = self.controls.accelData
 
-        self.lastAccelReading = [accelData[0], accelData[1], accelData[2]]
-        # print(f"{self.lastAccelReading = }")
+        self.y.update(accelData[1])
+
+        # self.lastAccelReading = [accelData[0], accelData[1], accelData[2]]
+        print(f"{accelData = }")
+        print(f"{self.y.displacement = }")
 
     def planarDisplacement(self):
         return sqrt(self.x.displacement * self.x.displacement + self.y.displacement * self.y.displacement)
@@ -129,8 +123,8 @@ class PIDController():
         def updateInternalvalues():
             while True:
                 self.updateOrientation()
-                # self.updateDisplacements()
-                # print()
+                self.updateDisplacement()
+
                 time.sleep(self.interval * 0.001)
 
         self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=False)
@@ -158,6 +152,21 @@ class PIDController():
             round(self.yaw.force(), 5),
         )
 
+    def moveForward(self, reqDistance):
+        self.initialDisplacement = self.y.displacement
+        while (self.y.displacement - self.initialDisplacement) < reqDistance:
+            # print("doing this")
+            power = (reqDistance - 50 * abs(self.y.displacement - self.initialDisplacement)) / reqDistance
+            # print(f"Difference: {power}")
+            
+            self.requestQueue.put(
+                        Message("automation", {"reqRotation": (0, round(power, 2), 0)})
+                    )
+            time.sleep(self.interval * 0.001)
+        self.requestQueue.put(
+                        Message("automation", {"reqRotation": (0, 0, 0)})
+                    )
+
     def shiftTargetRight(self):
         self.yaw.shiftTarget(90)
         self.sendNewRequest = True
@@ -168,15 +177,19 @@ class PIDController():
 
     def start(self):
         self.startReadingBNO()
-        self.startSendingRequests()
+        time.sleep(1)
+        moveThread = threading.Thread(target=self.moveForward, args=(1, ))
+        moveThread.start()
+        # self.startSendingRequests()
         pass
 
 
 if __name__ == "__main__":
     from controls import Controls
     import queue
-    controls = Controls()
-    controls.comms.startThread()
+    # controls = None
+    controls = Controls(onshoreEnabled=False)
+    # controls.comms.startThread()
     
     pidC = PIDController(10, controls=controls, requestQueue=queue.Queue())
     pidC.start()
