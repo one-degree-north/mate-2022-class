@@ -76,9 +76,13 @@ class PIDController():
         self.roll = RotationAxis(interval)
         self.yaw = RotationAxis(interval)
 
+        self.x = TranslationAxis(interval)
+        self.y = TranslationAxis(interval)
+        self.z = TranslationAxis(interval)
+
 
         self.lastOrientationReading = [0, 0, 0]
-        # self.lastAccelReading       = [0, 0, 0]
+        self.lastAccelReading       = [0, 0, 0]
 
         self.sendNewRequest = False
         self.isActive = True
@@ -89,26 +93,29 @@ class PIDController():
             orientationData = self.controls.orientationData
         else:
             orientationData = [0, 0, 0]
-
+        # orientationData = self.controls.orientationData
         if orientationData != self.lastOrientationReading:
+            # print("updateding")
             self.yaw.update(orientationData[0])
             self.pitch.update(orientationData[1])
             self.roll.update(orientationData[2])
 
             self.lastOrientationReading = [orientationData[0], orientationData[1], orientationData[2]]
             self.sendNewRequest = True
+        # print(f"{self.lastOrientationReading = }")
 
     def updateDisplacements(self, accelData=None):
         if self.controlsConnected:
             accelData = self.controls.accelData
         else:
             accelData = [0, 0, 0]
-
+        # accelData = self.controls.accelData
         self.x.update(accelData[0])
         self.y.update(accelData[1])
         self.z.update(accelData[2])
 
         self.lastAccelReading = [accelData[0], accelData[1], accelData[2]]
+        # print(f"{self.lastAccelReading = }")
 
     def planarDisplacement(self):
         return sqrt(self.x.displacement * self.x.displacement + self.y.displacement * self.y.displacement)
@@ -122,9 +129,11 @@ class PIDController():
         def updateInternalvalues():
             while True:
                 self.updateOrientation()
+                # self.updateDisplacements()
+                # print()
                 time.sleep(self.interval * 0.001)
 
-        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=True)
+        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=False)
         self.internalUpdateThread.start()
 
     def startSendingRequests(self):
@@ -132,13 +141,14 @@ class PIDController():
             while True:
 
                 if self.sendNewRequest and self.isActive:
+                    # print("sending")
                     self.requestQueue.put(
-                        Message("automation", {"reqMotion": self.calcForces()})
+                        Message("automation", {"reqRotation": self.calcForces()})
                     )
                     self.sendNewRequest = False
                 time.sleep(self.interval * 0.001)
 
-        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=True)
+        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=False)
         self.sendRequestsThread.start()
 
     def calcForces(self):
@@ -163,8 +173,10 @@ class PIDController():
 
 
 if __name__ == "__main__":
-    # from controls import Controls
+    from controls import Controls
     import queue
+    controls = Controls()
+    controls.comms.startThread()
     
-    pidC = PIDController(10, controls=None, requestQueue=queue.Queue())
+    pidC = PIDController(10, controls=controls, requestQueue=queue.Queue())
     pidC.start()

@@ -13,47 +13,43 @@ import yaml
 from threading import Thread
 from time import sleep
 
-def unify_listener():
-    while True:
-        if q_out.qsize() != 0:
-            output = q_out.get()
-            main.update_thruster_values(output[0])
-            main.update_axis_values(output[1])
+# def unify_listener():
+#     while True:
+#         if guiQueue.qsize() != 0:
+#             output = guiQueue.get()
+#             main.update_thruster_values(output[0])
+#             main.update_axis_values(output[1])
 
-            sleep(0.01)
+#             sleep(0.01)
 
 if __name__ == '__main__':
+    from controls import Controls
     controls = None  
-    # controls = Controls()
-    # controls.comms.startThread()
+    controls = Controls()
+    controls.comms.startThread()
 
+    requestQueue = queue.Queue()
+    guiQueue = queue.Queue()
 
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
-    
-    q = queue.Queue()
-    q_out = queue.Queue()
-
     app = QApplication([])
     app.setStyle('Fusion')
 
-    main = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
-    main.show()
+    window = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
+    u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
 
-    unify_listener_thread = Thread(target=unify_listener, daemon=True)
-    unify_listener_thread.start()
+    window.show()
+    u.start()
 
-    unify = Unify(q, q_out, 10)
-    unify.start()
+    # try:
+    #     os.mkdir('captures')
+    #     logging.warning('No captures directory detected; one has been generated for you!')
+    # except FileExistsError:
+    #     pass
 
-    try:
-        os.mkdir('captures')
-        logging.warning('No captures directory detected; one has been generated for you!')
-    except FileExistsError:
-        pass
+    # print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
+    # logging.info('Successfully loaded Crimson UI')
 
-    print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
-    logging.info('Successfully loaded Crimson UI')
-
-    sys.exit(app.exec())
+    # sys.exit(app.exec())
 

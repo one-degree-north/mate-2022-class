@@ -22,14 +22,20 @@ class Unify():
         
         self.readLasts = False
 
-        self.lastPayloadFromKeyboard = {"reqMotion": [0, 0, 0], "reqRotation": [0, 0, 0]}
+        self.lastPayloadFromKeyboard = {
+            "reqMotion": (0, 0, 0),
+            "reqRotation": (0, 0, 0),
+            "thrustScale": 1,
+            "toggleRotater": False,
+            "toggleOpenner": False,
+        }
         self.lastPayloadFromAutomation = {"reqRotation": (0, 0, 0)}
 
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
         # either "balancing", "full", or "off"
         # balancing excludes yaw, full includes it
-        self.automationMode = "balancing"
+        self.automationMode = "off"
 
         self.combineType = self.getAverage
 
@@ -43,16 +49,18 @@ class Unify():
                 message = self.requestQueue.get()
                 source, payload = message.source, message.payload
                 if source == "keyboard" and self.lastPayloadFromKeyboard != payload:
+                    print("doing this")
+                    print(payload)
                     self.lastPayloadFromKeyboard = payload
                     self.readLasts = True
                 
-                elif source == "automation" and self.lastPayloadFromAutomation != payload:
+                elif source == "automation" and self.lastPayloadFromAutomation != payload and self.automationMode != "off":
                     self.lastPayloadFromAutomation = payload
                     self.readLasts = True
 
                 if self.readLasts:
-                    print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
-                    print(f"AUtomation: {self.lastPayloadFromAutomation}")
+                    # print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
+                    # print(f"AUtomation: {self.lastPayloadFromAutomation}")
 
                     reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
 
@@ -87,15 +95,12 @@ class Unify():
             time.sleep(self.interval * 0.001)  
 
 
-    def getKrishnaQ(self):
-        return self.KrishnaQ
-
     def start(self):
         self.KManager.start()
         self.pidC.start()
         # print("doing this")
 
-        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=True)
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=False)
         self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
@@ -115,8 +120,8 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    # controls = Controls()
-    # controls.comms.startThread()
+    controls = Controls()
+    controls.comms.startThread()
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()

@@ -108,21 +108,21 @@ void processCommand(Input inputValue){
       writeAccelOutput();
     break;
     case 0x12: //set accel auto report
-      autoData.accelDelay = inputValue.value*10;
+      autoData.accelDelay = inputValue.value;
       autoData.accelTime = 0;
     break;
     case 0x20: //send gyro data once
       writeGyroOutput();
     break;
     case 0x23: //set gyro auto report
-      autoData.gyroDelay = inputValue.value*10;
+      autoData.gyroDelay = inputValue.value;
       autoData.gyroTime = 0;
     break;
     case 0x30:  //get orientation data once
       writeOrientationOutput();
     break;
     case 0x35:  //set orientation auto report
-      autoData.orientationDelay = inputValue.value*10;
+      autoData.orientationDelay = inputValue.value;
       autoData.orientationTime = 0;
     break;
     case 0x40:  //reset adafruit qtpy along with bno055
@@ -190,7 +190,7 @@ void writeGyroOutput(){
 
 void writeAccelOutput(){
   sensors_event_t event;
-  bnoIMU.getEvent(&event, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  bnoIMU.getEvent(&event, Adafruit_BNO055::VECTOR_LINEARACCEL);
   byte* x = (byte*)&event.acceleration.x;
   byte* y = (byte*)&event.acceleration.y;
   byte* z = (byte*)&event.acceleration.z;

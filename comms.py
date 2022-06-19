@@ -21,15 +21,24 @@ class AccelData:
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def __init__(self, controls=None, outputQueue=None):
         ports = list_ports.comports()
-        # offshorePort = "/dev/cu.usbmodem14201"
-        onshorePort = "/dev/cu.usbserial-1120"
+        offshorePort = "/dev/cu.usbmodem142101"
+        onshorePort = "/dev/cu.usbserial-142101"
         for port in ports:
-           if port.description == "USB Serial":
-               onshorePort = port.device
-           #elif port.description == "FT232R USB UART - FT232R USB UART":
-           #    offshorePort = port.device
-
-        # self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
+            print(f"product: {port.product}")
+            print(f"device: {port.device}")
+            if port.product == "QT Py M0" or port.product == "FT232R USB UART":
+                print(f"QT Py found")
+                offshorePort = port.device
+            #elif port.description == "FT232R USB UART - FT232R USB UART":
+            #    print(f"serial connection found")
+            #    offshorePort = port.device
+            if port.product == "USB Serial":
+                print(f"arduino nano found")
+                onshorePort = port.device
+            #elif port.description == "USB Serial":
+            #    onshorePort = port.device
+        
+        self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
         self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
@@ -95,9 +104,6 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         else:
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
-            """for value in output[0][1]:
-                print(value)
-                self.onshoreArduino.write(value)"""
             for value in output[1][1]:
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
@@ -107,11 +113,10 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         while self.threadActive:
             # print("doing this too")
             # print(f"{self.offshoreArduino.in_waiting = }")
-            # if (self.offshoreArduino.in_waiting >= 15):
-                # print("doing this")
-                # self.controls.handleInput(self.readOffshore())
+            if (self.offshoreArduino.in_waiting >= 15):
+               self.controls.handleInput(self.readOffshore())
             if (not self.outputQueue.empty()):
-               self.writeOutput(self.outputQueue.get())
+                self.writeOutput(self.outputQueue.get())
 
             # time.sleep(1)
 

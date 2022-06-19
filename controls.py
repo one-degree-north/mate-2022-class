@@ -42,10 +42,13 @@ class Controls:
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            #print(f"accel data: {self.accelData}")
+            # print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
-                self.orientationData[i] = input[i+1]
+                if (i == 0):
+                    self.orientationData[i] = input[i+1] - 180
+                else:
+                    self.orientationData[i] = input[i+1]
             # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
@@ -122,7 +125,7 @@ if __name__ == "__main__":
     #controls.setOrientationAutoreport(1)
     # controls.resetOffshore()
     #controls.resetOffshore()
-    """inputNum = 0
+    inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -132,7 +135,7 @@ if __name__ == "__main__":
         inputs[index] = value
         print(inputs)
         controls.writeAllThrusters(inputs)
-        inputs = [0, 0, 0, 0, 0,0]"""
+        inputs = [0, 0, 0, 0, 0,0]
     
     """while True:
         print(f"thrusterNum: {inputNum}")
@@ -143,7 +146,7 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     
-    while True:
+    """while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -151,7 +154,7 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)
+            controls.rotateClaw(deg)"""
         #controls.rotateClaw(deg)
     #controls.setAccelAutoreport(100)
     #controls.comms.readThread()
