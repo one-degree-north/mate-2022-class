@@ -27,6 +27,9 @@ class Unify():
 
         # allows/disallows automation to affect thruster speed calculations
         self.allowAutoInfluence = True
+        # either "balancing", "full", or "off"
+        # balancing excludes yaw, full includes it
+        self.automationMode = "balancing"
 
         self.combineType = self.getAverage
 
@@ -52,7 +55,20 @@ class Unify():
                     # print(f"{self.lastPayloadFromAutomation = }")
 
                     reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
-                    reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
+
+
+                    if self.automationMode == "off":
+                        reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
+                    elif self.automationMode == "balancing":
+                        reqRotation = (self.lastPayloadFromAutomation["reqRotation"][0], 
+                                       self.lastPayloadFromAutomation["reqRotation"][1], 
+                                       self.lastPayloadFromKeyboard["reqRotation"][2])
+                    elif self.automationMode == "full":
+                        reqRotation = self.lastPayloadFromAutomation["reqRotation"]
+
+
+
+
                     thrustScale = self.lastPayloadFromKeyboard["thrustScale"]
 
                     if self.lastPayloadFromKeyboard["toggleOpenner"]:
@@ -99,9 +115,8 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None  
-    controls = Controls()
-    #controls.setOrientationAutoreport(1)
-    controls.comms.startThread()
+    # controls = Controls()
+    # controls.comms.startThread()
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()

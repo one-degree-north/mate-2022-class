@@ -68,7 +68,7 @@ class PIDController():
         self.controls = controls
         self.controlsConnected = controls != None
         if controls == None:
-            print("\nMessage from PID Controller:\n\tControls is None\n\tControls not connected\n")
+            print("\nMessage from PID Controller:\n\tControls not connected\n")
 
         self.requestQueue = requestQueue
 

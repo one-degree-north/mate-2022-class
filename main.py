@@ -23,6 +23,11 @@ def unify_listener():
             sleep(0.01)
 
 if __name__ == '__main__':
+    controls = None  
+    # controls = Controls()
+    # controls.comms.startThread()
+
+
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
     
