@@ -89,12 +89,13 @@ class PIDController():
         self.fullAuto = False
 
     def updateOrientation(self, orientationData=None):
-        # if self.controlsConnected:
-        #     orientationData = self.controls.orientationData
-        # else:
-        #     orientationData = [0, 0, 0]
-        orientationData = self.controls.orientationData
+        if self.controlsConnected:
+            orientationData = self.controls.orientationData
+        else:
+            orientationData = [0, 0, 0]
+        # orientationData = self.controls.orientationData
         if orientationData != self.lastOrientationReading:
+            # print("updateding")
             self.yaw.update(orientationData[0])
             self.pitch.update(orientationData[1])
             self.roll.update(orientationData[2])
@@ -104,11 +105,11 @@ class PIDController():
         # print(f"{self.lastOrientationReading = }")
 
     def updateDisplacements(self, accelData=None):
-        # if self.controlsConnected:
-        #     accelData = self.controls.accelData
-        # else:
-        #     accelData = [0, 0, 0]
-        accelData = self.controls.accelData
+        if self.controlsConnected:
+            accelData = self.controls.accelData
+        else:
+            accelData = [0, 0, 0]
+        # accelData = self.controls.accelData
         self.x.update(accelData[0])
         self.y.update(accelData[1])
         self.z.update(accelData[2])
@@ -128,7 +129,7 @@ class PIDController():
         def updateInternalvalues():
             while True:
                 self.updateOrientation()
-                self.updateDisplacements()
+                # self.updateDisplacements()
                 # print()
                 time.sleep(self.interval * 0.001)
 
@@ -140,6 +141,7 @@ class PIDController():
             while True:
 
                 if self.sendNewRequest and self.isActive:
+                    # print("sending")
                     self.requestQueue.put(
                         Message("automation", {"reqRotation": self.calcForces()})
                     )
