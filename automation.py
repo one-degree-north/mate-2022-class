@@ -133,7 +133,7 @@ class PIDController():
                 # print()
                 time.sleep(self.interval * 0.001)
 
-        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=True)
+        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=False)
         self.internalUpdateThread.start()
 
     def startSendingRequests(self):
@@ -148,7 +148,7 @@ class PIDController():
                     self.sendNewRequest = False
                 time.sleep(self.interval * 0.001)
 
-        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=True)
+        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=False)
         self.sendRequestsThread.start()
 
     def calcForces(self):
