@@ -190,7 +190,7 @@ void writeGyroOutput(){
 
 void writeAccelOutput(){
   sensors_event_t event;
-  bnoIMU.getEvent(&event, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  bnoIMU.getEvent(&event, Adafruit_BNO055::VECTOR_LINEARACCEL);
   byte* x = (byte*)&event.acceleration.x;
   byte* y = (byte*)&event.acceleration.y;
   byte* z = (byte*)&event.acceleration.z;

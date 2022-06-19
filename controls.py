@@ -42,7 +42,7 @@ class Controls:
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            #print(f"accel data: {self.accelData}")
+            # print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
                 self.orientationData[i] = input[i+1]
@@ -143,7 +143,7 @@ if __name__ == "__main__":
             inputNum = 0
         inputNum += 1"""
     
-    while True:
+    """while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -151,7 +151,7 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)
+            controls.rotateClaw(deg)"""
         #controls.rotateClaw(deg)
     #controls.setAccelAutoreport(100)
     #controls.comms.readThread()
