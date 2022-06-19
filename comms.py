@@ -39,7 +39,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             #    onshorePort = port.device
         
         self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
-        #self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
+        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -101,15 +101,12 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             for value in output[1]:
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
-        else:
+        """else:
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
-            """for value in output[0][1]:
-                print(value)
-                self.onshoreArduino.write(value)"""
             for value in output[1][1]:
                 self.onshoreArduino.write(value)
-            self.onshoreArduino.write(self.FOOTER)
+            self.onshoreArduino.write(self.FOOTER)"""
 
     def readThread(self):
         self.threadActive = True
