@@ -35,7 +35,7 @@ class Unify():
         self.allowAutoInfluence = True
         # either "balancing", "full", or "off"
         # balancing excludes yaw, full includes it
-        self.automationMode = "balancing"
+        self.automationMode = "off"
 
         self.combineType = self.getAverage
 
@@ -54,7 +54,7 @@ class Unify():
                     self.lastPayloadFromKeyboard = payload
                     self.readLasts = True
                 
-                elif source == "automation" and self.lastPayloadFromAutomation != payload:
+                elif source == "automation" and self.lastPayloadFromAutomation != payload and self.automationMode != "off":
                     self.lastPayloadFromAutomation = payload
                     self.readLasts = True
 
@@ -100,7 +100,7 @@ class Unify():
         self.pidC.start()
         # print("doing this")
 
-        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=True)
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=False)
         self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
