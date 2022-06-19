@@ -45,7 +45,7 @@ class Controls:
             # print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
-                if (i == 1):
+                if (i == 0):
                     self.orientationData[i] = input[i+1] - 180
                 else:
                     self.orientationData[i] = input[i+1]
