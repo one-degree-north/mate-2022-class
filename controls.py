@@ -1,21 +1,8 @@
-
 from comms import Comms
 import queue
 
-# @dataclass
-# class GyroData:
-#     xOrientation:float = 0
-#     yOrientation:float = 0
-#     zOrientation:float = 0
-
-# @dataclass
-# class AccelData:
-#     xAccel:float = 0
-#     yAccel:float = 0
-#     zAccel:float = 0
-
 class Controls:
-    def __init__(self):
+    def __init__(self, gyroAutoreport=10, accelAutoreport=10, orientationAutoreport=10, onshoreEnabled=True, offshoreEnabled=True):
         #self.movements = Movements()
         #self.gyroData = GyroData()
         #self.accelData = AccelData()
@@ -24,11 +11,12 @@ class Controls:
         self.orientationData = [0, 0, 0] #EULER: yaw (0-360), pitch (values are a bit weird, -90 to 90), roll (-180 to 180), may try using gyro instead of euler later
         self.accelData = [0, 0, 0] #m/s^2
         self.outputQueue = queue.Queue()
-        self.comms = Comms(controls=self, outputQueue=self.outputQueue)
-        #self.thrusterValues = [0, 0, 0, 0, 0, 0]
-
-    #def applyMovements(self):
-    #    thrusterValues = [0, 0, 0, 0, 0, 0]
+        self.comms = Comms(controls=self, outputQueue=self.outputQueue, onshoreEnabled=onshoreEnabled, offshoreEnabled=offshoreEnabled)
+        self.comms.startThread()
+        self.setAccelAutoreport(accelAutoreport)
+        self.setGyroAutoreport(gyroAutoreport)
+        self.setOrientationAutoreport(orientationAutoreport)
+        
 
     def handleInput(self, input):
         # print("This is being run")

@@ -19,7 +19,9 @@ class AccelData:
     zAccel: float = 0
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
-    def __init__(self, controls=None, outputQueue=None):
+    def __init__(self, controls=None, outputQueue=None, onshoreEnabled=True, offshoreEnabled=True):
+        self.onshoreEnabled = onshoreEnabled
+        self.offshoreEnabled= offshoreEnabled
         ports = list_ports.comports()
         offshorePort = "/dev/cu.usbmodem142101"
         onshorePort = "/dev/cu.usbserial-142101"
@@ -37,9 +39,12 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
                 onshorePort = port.device
             #elif port.description == "USB Serial":
             #    onshorePort = port.device
-        
-        self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
-        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
+        self.offshoreArduino = None
+        self.onshoreArduino = None
+        if self.offshoreEnabled:
+            self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
+        if self.onshoreEnabled:
+            self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -73,7 +78,6 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         headerFound = False
         while (not headerFound):
             #print(currByte)
-            #print(currByte == b'\xAB')
             if (currByte == self.HEADER):
                 #print("header found")
                 headerFound = True
@@ -96,12 +100,12 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
 
     def writeOutput(self, output):
         #print(output)
-        if (output[0] == 0):
+        if output[0] == 0 and self.offshoreEnabled:
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
-        else:
+        elif self.onshoreEnabled:
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
             for value in output[1][1]:
@@ -113,9 +117,9 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         while self.threadActive:
             # print("doing this too")
             # print(f"{self.offshoreArduino.in_waiting = }")
-            if (self.offshoreArduino.in_waiting >= 15):
+            if self.offshoreArduino.in_waiting >= 15 and self.offshoreEnabled:
                self.controls.handleInput(self.readOffshore())
-            if (not self.outputQueue.empty()):
+            if not self.outputQueue.empty():
                 self.writeOutput(self.outputQueue.get())
 
             # time.sleep(1)
