@@ -13,7 +13,9 @@ class VerificationPacket:
         self.startTime = time.perf_counter_ns()
 
     def checkConfirmation(self, recvPacket):    #not going to use checksum, instead just compare all values
-        pass
+        if recvPacket != self.packetData:
+            #is not good, resend
+            self.resendPacket()
 
     def checkTime(self):
         if self.startTime - time.perf_counter_ns() > self.timeout:

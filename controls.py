@@ -1,4 +1,3 @@
-from pyparsing import rest_of_line
 from comms import Comms
 import queue, time
 
@@ -111,7 +110,6 @@ class Controls:
 
 def testThrusters():
     controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
-    controls.comms.startThread()
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -125,14 +123,12 @@ def testThrusters():
 
 def testOrientationData():
     controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
-    controls.comms.startThread()
     while True:
         print(f"orientation: {controls.orientationData}")
         time.sleep(0.01)
 
 def testClaw():
     controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
-    controls.comms.startThread()
     while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
@@ -145,8 +141,7 @@ def testClaw():
 
 def reset():
     controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
-    controls.comms.startThread()
     controls.resetOffshore()
 
 if __name__ == "__main__":
-    testThrusters()
+    reset()
