@@ -125,7 +125,7 @@ if __name__ == "__main__":
     #controls.setOrientationAutoreport(1)
     # controls.resetOffshore()
     #controls.resetOffshore()
-    """inputNum = 0
+    inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         inputs[index] = value
         print(inputs)
         controls.writeAllThrusters(inputs)
-        inputs = [0, 0, 0, 0, 0,0]"""
+        inputs = [0, 0, 0, 0, 0,0]
     
     """while True:
         print(f"thrusterNum: {inputNum}")
