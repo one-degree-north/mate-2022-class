@@ -26,7 +26,7 @@ if __name__ == '__main__':
     from controls import Controls
     controls = None  
     controls = Controls()
-    controls.comms.startThread()
+    #controls.comms.startThread()
 
     requestQueue = queue.Queue()
     guiQueue = queue.Queue()

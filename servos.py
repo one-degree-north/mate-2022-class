@@ -36,7 +36,7 @@ class ServoManager():
 if __name__ == "__main__":
     from controls import Controls
     controls = Controls()
-    controls.comms.startThread()
+    #controls.comms.startThread()
 
     s = ServoManager(controls=controls)
     while True:
