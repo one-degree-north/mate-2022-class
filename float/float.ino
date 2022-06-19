@@ -201,7 +201,7 @@ void readWaterPressure(){
   currClient.write(FOOTER);
 }
 
-void writeCommandFailure(WiFiClient currClient){
+/*void writeCommandFailure(WiFiClient currClient){
   currClient.write(HEADER);
   currClient.write(0x18);
   currClient.write(0);
@@ -223,7 +223,7 @@ void writeCommandSuccess(input_t *input){
 
 void writeCommandExecute(input_t *input){  //does TCP already kind of give reliability, is echoing the whole command to certify reliability needed? Would a simple writeCommandSuccess sufice?
 
-}
+}*/
 
 void sendPressureData(){
   //get pressure data
