@@ -1,5 +1,6 @@
+from pyparsing import rest_of_line
 from comms import Comms
-import queue
+import queue, time
 
 class Controls:
     def __init__(self, gyroAutoreport=10, accelAutoreport=10, orientationAutoreport=10, onshoreEnabled=True, offshoreEnabled=True):
@@ -34,7 +35,7 @@ class Controls:
         else:
             for i in range(3):
                 if (i == 0):
-                    self.orientationData[i] = input[i+1] - 180
+                   self.orientationData[i] = input[i+1] - 180
                 else:
                     self.orientationData[i] = input[i+1]
             # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
@@ -107,13 +108,10 @@ class Controls:
     def resetOffshore(self):
         self.outputQueue.put((0, (int.to_bytes(0x40, 1, "big"), int.to_bytes(0, 1, "big"))))
 
-if __name__ == "__main__":
-    controls = Controls()
+
+def testThrusters():
+    controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
     controls.comms.startThread()
-    #controls.setOrientationAutoreport(1)
-    # controls.resetOffshore()
-    #controls.resetOffshore()
-    inputNum = 0
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -124,17 +122,18 @@ if __name__ == "__main__":
         print(inputs)
         controls.writeAllThrusters(inputs)
         inputs = [0, 0, 0, 0, 0,0]
-    
-    """while True:
-        print(f"thrusterNum: {inputNum}")
-        inputs[inputNum] = float(input())
-        if inputNum >= 5:
-            print(inputs)
-            controls.writeAllThrusters(inputs)
-            inputNum = 0
-        inputNum += 1"""
-    
-    """while True:
+
+def testOrientationData():
+    controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
+    controls.comms.startThread()
+    while True:
+        print(f"orientation: {controls.orientationData}")
+        time.sleep(0.01)
+
+def testClaw():
+    controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
+    controls.comms.startThread()
+    while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -142,9 +141,12 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)"""
-        #controls.rotateClaw(deg)
-    #controls.setAccelAutoreport(100)
-    #controls.comms.readThread()
-    while True:
-        pass
+            controls.rotateClaw(deg)
+
+def reset():
+    controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
+    controls.comms.startThread()
+    controls.resetOffshore()
+
+if __name__ == "__main__":
+    testThrusters()

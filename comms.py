@@ -117,7 +117,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         while self.threadActive:
             # print("doing this too")
             # print(f"{self.offshoreArduino.in_waiting = }")
-            if self.offshoreArduino.in_waiting >= 15 and self.offshoreEnabled:
+            if self.offshoreEnabled and self.offshoreArduino.in_waiting >= 15:
                self.controls.handleInput(self.readOffshore())
             if not self.outputQueue.empty():
                 self.writeOutput(self.outputQueue.get())
