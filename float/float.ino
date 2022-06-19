@@ -80,7 +80,7 @@ void setDC(uint8_t newDC){
   onLength = cycleLength * dc;
 }
 
-void writePWM( unsigned long deltaTime){
+void writePWM( unsigned long deltaTime){  //dc ranges from 20-100
   currCycle += deltaTime;
   if (currCycle > cycleLength){
     currCycle -= cycleLength;
@@ -98,7 +98,7 @@ void turnPumpOn(){
 }
 
 void turnPumpOff(){
-  setDC(0);
+  setDC(20);
 }
 
 bool getInput(WiFiClient currClient, int clientIndex){
@@ -191,7 +191,7 @@ void pressureAutoreport(unsigned long deltaTime){
 void readWaterPressure(){
   //get water pressure data here
   float waterPressure;
-  byte* byteCastWaterPressure
+  byte* byteCastWaterPressure = (byte*)&waterPressure;
   currClient.write(HEADER);
   currCLient.write(0x18);
   currClient.write(byteCastWaterPressure[0]);
@@ -229,7 +229,7 @@ void sendPressureData(){
   //get pressure data
   float V = analogRead(A0) * 5.00 / 1024;     //Sensor output voltage
   float P = (V - OFFSET) * 250;             //Calculate water pressure
-  byte* byteCastPressure;
+  byte* byteCastPressure = (byte*)&P;
   for (int i = 0; i < 4; i++){
     if(openClients[i]){
       WiFiClient currClient = connectedClients[i];
