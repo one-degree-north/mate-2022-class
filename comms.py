@@ -2,24 +2,28 @@
 from dataclasses import dataclass
 from serial import *
 from serial.tools import list_ports
-import threading, struct
-import time
-#assuming only RPi, onboard electronics communicating via serial
+import threading, struct, queue, time
 
-@dataclass
-class GyroData:
-    xOrientation: float = 0
-    yOrientation: float = 0
-    zOrientation: float = 0
+class VerificationPacket:
+    def __init__(self, packetData, verificationQueue):
+        self.packetData = packetData
+        self.verificationQueue = verificationQueue
+        self.timeout = 150 #in ms
+        self.timeout *= 1000000 #in ns
+        self.startTime = time.perf_counter_ns()
 
-@dataclass
-class AccelData:
-    xAccel: float = 0
-    yAccel: float = 0
-    zAccel: float = 0
+    def checkConfirmation(self, recvPacket):    #not going to use checksum, instead just compare all values
+        pass
+
+    def checkTime(self):
+        if self.startTime - time.perf_counter_ns() > self.timeout:
+            self.resendPacket()
+
+    def resendPacket(self):
+        pass
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
-    def __init__(self, controls=None, outputQueue=None, onshoreEnabled=True, offshoreEnabled=True):
+    def __init__(self, controls=None, outputQueue=None, onshoreEnabled=True, offshoreEnabled=True, verificationPacket=False):
         self.onshoreEnabled = onshoreEnabled
         self.offshoreEnabled= offshoreEnabled
         ports = list_ports.comports()
@@ -45,51 +49,27 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
         if self.onshoreEnabled:
             self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
-        self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
-        self.thrusterPWMs = []
-        self.gyroData = GyroData()
-        self.accelData = AccelData()
         self.controls = controls
-        #self.HEADER = 0xAB
         self.HEADER = b'\xab'
-        #self.FOOTER = 0xB3
         self.FOOTER = b'\xb3'
         self.threadActive = False
-        
-        #configure GPIO
-        """
-        #GPIO.setmode(GPIO.board)
-        
-        for thrusterPin in self.thrusterPins:
-            #GPIO.setup(thrusterPin, GPIO.out)
-            #pwm = GPIO.PWM(12, 250) #frequency of 250 per second, length of 4000 microseconds
-            pwm.start(0.375)
-            self.thrusterPWMs.append(pwm)
-        """
         self.outputQueue = outputQueue;
-
-    def writePWM(self, thrusterNum, value):
-        dc = (value*0.0025+0.375)
-        #self.thrusterPWMs[thrusterNum].ChangeDutyCycle(dc)
+        self.onshoreVerificationQueue = queue.Queue()
+        self.offshoreVerificationQueue = queue.Queue()
 
     def readOffshore(self):
         currByte = self.offshoreArduino.read()
         footerFound = False
         headerFound = False
         while (not headerFound):
-            #print(currByte)
             if (currByte == self.HEADER):
-                #print("header found")
                 headerFound = True
                 returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
-                #print(returnValue)
                 if (returnValue[-1] == int.from_bytes(self.FOOTER, "big")):
-                    #print("footer found")
                     footerFound=True
                     break
             currByte = self.offshoreArduino.read()
         if (len(returnValue) != 14):
-            #print(len(returnValue))
             return -1
         structValue = struct.unpack("=cfffc", returnValue)
         if (headerFound):
@@ -122,12 +102,9 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
             if not self.outputQueue.empty():
                 self.writeOutput(self.outputQueue.get())
 
-            # time.sleep(1)
-
     def startThread(self):
         currThread = threading.Thread(target=self.readThread)
         currThread.start()
     
     def endThread(self):
         self.threadActive = False
-
