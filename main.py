@@ -15,24 +15,25 @@ from time import sleep
 
 def unify_listener():
     while True:
-        if q_out.qsize() != 0:
-            output = q_out.get()
+        if guiQueue.qsize() != 0:
+            output = guiQueue.get()
             main.update_thruster_values(output[0])
             main.update_axis_values(output[1])
 
             sleep(0.01)
 
 if __name__ == '__main__':
+    from controls import Controls
     controls = None  
-    # controls = Controls()
-    # controls.comms.startThread()
+    controls = Controls()
+    controls.comms.startThread()
 
 
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
     
-    q = queue.Queue()
-    q_out = queue.Queue()
+    requestQueue = queue.Queue()
+    guiQueue = queue.Queue()
 
     app = QApplication([])
     app.setStyle('Fusion')
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     unify_listener_thread = Thread(target=unify_listener, daemon=True)
     unify_listener_thread.start()
 
-    unify = Unify(q, q_out, 10)
+    unify = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
     unify.start()
 
     try:

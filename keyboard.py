@@ -70,7 +70,7 @@ class KeyboardManager():
         payload = {
             "reqMotion": (),
             "reqRotation": (),
-            "thrustScale": (),
+            "thrustScale": 1,
             "toggleRotater": False,
             "toggleOpenner": False,
         }
@@ -93,7 +93,7 @@ class KeyboardManager():
         payload["toggleOpenner"] = toggleOpenner
         payload["toggleRotater"] = toggleRotater
 
-        # print(payload)
+        print(f"{payload = }")
         self.requestQueue.put(Message("keyboard", payload))
         # print("putting")
 
