@@ -93,7 +93,7 @@ class KeyboardManager():
         payload["toggleOpenner"] = toggleOpenner
         payload["toggleRotater"] = toggleRotater
 
-        print(payload)
+        # print(payload)
         self.requestQueue.put(Message("keyboard", payload))
         # print("putting")
 

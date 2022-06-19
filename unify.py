@@ -51,8 +51,8 @@ class Unify():
                     self.readLasts = True
 
                 if self.readLasts:
-                    # print(f"\n{self.lastPayloadFromKeyboard = }")
-                    # print(f"{self.lastPayloadFromAutomation = }")
+                    print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
+                    print(f"AUtomation: {self.lastPayloadFromAutomation}")
 
                     reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
 

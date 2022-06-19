@@ -30,7 +30,7 @@ class ServoManager():
         self.openner = Servo(minmax=(0, 1), controls=controls, servoType="claw")
         
         if self.controls == None:
-            print("\nFrom Servo Manager:\n\tControls not connected\n")
+            print("\nMessage from Servos:\n\tControls not connected\n")
 
 
 if __name__ == "__main__":
