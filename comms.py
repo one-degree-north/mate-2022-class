@@ -26,7 +26,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         for port in ports:
             print(f"product: {port.product}")
             print(f"device: {port.device}")
-            if port.product == "QT Py M0":
+            if port.product == "QT Py M0" or port.product == "FT232R USB UART":
                 print(f"QT Py found")
                 offshorePort = port.device
             #elif port.description == "FT232R USB UART - FT232R USB UART":
