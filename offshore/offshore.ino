@@ -1,4 +1,4 @@
-//#define Serial Serial1
+#define Serial Serial1
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 

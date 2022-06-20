@@ -38,7 +38,7 @@ class Controls:
                    self.orientationData[i] = input[i+1] - 180
                 else:
                     self.orientationData[i] = input[i+1]
-            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -125,7 +125,7 @@ def testThrusters():
 def testOrientationData():
     controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
     while True:
-        print(f"orientation: {controls.orientationData}")
+        #print(f"orientation: {controls.orientationData}")
         time.sleep(0.01)
 
 def testClaw():
@@ -145,4 +145,4 @@ def reset():
     controls.resetOffshore()
 
 if __name__ == "__main__":
-    testThrusters()
+    reset()
