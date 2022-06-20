@@ -99,16 +99,16 @@ class PIDController():
         # print(f"{self.lastOrientationReading = }")
 
     def updateDisplacement(self, accelData=None):
-        # if self.controlsConnected:
-        #     accelData = self.controls.accelData
-        # else:
-        #     accelData = [0, 0, 0]
-        accelData = self.controls.accelData
+        if self.controlsConnected:
+            accelData = self.controls.accelData
+        else:
+            accelData = [0, 1, 0]
+        # accelData = self.controls.accelData
 
         self.y.update(accelData[1])
 
         # self.lastAccelReading = [accelData[0], accelData[1], accelData[2]]
-        print(f"{accelData = }")
+        # print(f"{accelData = }")
         print(f"{self.y.displacement = }")
 
     def planarDisplacement(self):
@@ -156,7 +156,7 @@ class PIDController():
         self.initialDisplacement = self.y.displacement
         while (self.y.displacement - self.initialDisplacement) < reqDistance:
             # print("doing this")
-            power = (reqDistance - 50 * abs(self.y.displacement - self.initialDisplacement)) / reqDistance
+            power = (reqDistance - abs(self.y.displacement - self.initialDisplacement)) / reqDistance
             # print(f"Difference: {power}")
             
             self.requestQueue.put(
@@ -166,6 +166,7 @@ class PIDController():
         self.requestQueue.put(
                         Message("automation", {"reqRotation": (0, 0, 0)})
                     )
+        print("done!")
 
     def shiftTargetRight(self):
         self.yaw.shiftTarget(90)
@@ -177,18 +178,18 @@ class PIDController():
 
     def start(self):
         self.startReadingBNO()
-        time.sleep(1)
-        moveThread = threading.Thread(target=self.moveForward, args=(1, ))
-        moveThread.start()
-        # self.startSendingRequests()
+        # time.sleep(1)
+        # moveThread = threading.Thread(target=self.moveForward, args=(1, ))
+        # moveThread.start()
+        self.startSendingRequests()
         pass
 
 
 if __name__ == "__main__":
     from controls import Controls
     import queue
-    # controls = None
-    controls = Controls(onshoreEnabled=False)
+    controls = None
+    # controls = Controls(onshoreEnabled=False)
     # controls.comms.startThread()
     
     pidC = PIDController(10, controls=controls, requestQueue=queue.Queue())

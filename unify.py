@@ -35,7 +35,7 @@ class Unify():
         self.allowAutoInfluence = True
         # either "balancing", "full", or "off"
         # balancing excludes yaw, full includes it
-        self.automationMode = "full"
+        self.automationMode = "off"
 
         self.combineType = self.getAverage
 
@@ -119,8 +119,8 @@ class Unify():
         return output
 
 if __name__ == "__main__":  
-    controls = None  
-    controls = Controls(offshoreEnabled=True)
+    controls = None
+    # controls = Controls(offshoreEnabled=True)
 
 
     requestQueue = queue.Queue()
