@@ -1,13 +1,13 @@
 import socket, time, struct, asyncio, curses, queue, threading
 
-ESP_LOCAL_IP = "192.168.1.22"
-PORT = 1122
+ESP_LOCAL_IP = "192.168.0.133"
+PORT = 2020
 BUFSIZE = 4096
 HEADER = b'\xAB'
 FOOTER = b'\xB3'
 
 class Client:
-    def __init__(self, ui, strInputQueue):
+    def __init__(self, ui=None):
         self.bufferData = bytearray()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ESP_LOCAL_IP, PORT))
@@ -15,11 +15,11 @@ class Client:
 
     def writeData(self, values):
         self.sock.sendall(HEADER)
-        print(HEADER)
-        print(int.from_bytes(HEADER, "big"))
+        #print(HEADER)
+        #print(int.from_bytes(HEADER, "big"))
         sentParams = 0
         for value in values:
-            print(value)
+            #print(value)
             if type(value) == bytes or type(value) == bytearray:
                 sentParams += len(value)
                 self.sock.sendall(value)
@@ -39,29 +39,40 @@ class Client:
         self.sock.sendall(FOOTER)
 
     def recvData(self):
+        #self.ui.dataWin.addStr("RECEIVING")
         dataRcv = self.sock.recv(BUFSIZE)
         self.bufferData.extend(dataRcv)
+        #self.ui.dataWin.addStr(str(self.bufferData))
+        #self.ui.dataWin.addStr(str(len(self.bufferData)))
         headerIndexes = []
         i = 0
-        while i < len(self.bufferData):
+        while i+7 <= len(self.bufferData):
+            #self.ui.dataWin.addStr(f"i: {i}")
             byte = self.bufferData[i]
-            if byte == HEADER and self.bufferData[i+7] == FOOTER:    #this may be error prone? What if header is dropped for some reason (TCP RELIABILITY LELELLELELELELE NVM RESIGN),
-                self.processInput(dataRcv[i:i+7])
+            #self.ui.dataWin.addStr(f"{byte}")
+            if byte == int.from_bytes(HEADER, byteorder="big") and self.bufferData[i+6] == int.from_bytes(FOOTER, byteorder="big"):    #this may be error prone? What if header is dropped for some reason (TCP RELIABILITY LELELLELELELELE NVM RESIGN),
+                self.processInput(self.bufferData[i:i+7])
                 headerIndexes.append(i)
                 i += 6
             i += 1
         for i in headerIndexes: #delete read packets
-            del dataRcv[i:i+7]
+            del self.bufferData[i:i+7]
         #print(bufferData)   #for debugging
         #if the buffer doesn't start with a header for some reason, remove it until the last header. Actually tcp may be reliable enough, not going to bother with this as more errors could be introduced
 
     def processInput(self, inputBytes):
-        if inputBytes[1] == b'\x18': #water pressure data
+        #self.ui.reportWin.addStr(f"processing Input")
+        #print("processing input")
+        #print(inputBytes[1])
+        if inputBytes[1] == int.from_bytes(b'\x18', "big"): #water pressure data
+            #self.ui.dataWin.addStr(f"AAAA")
             inputStruct = struct.unpack("=ccfc", inputBytes)
-            self.ui.dataWin.addStr(f"water pressure: {inputStruct[2]}")
-        elif inputBytes[1] == b'\x41':
+            #print(f"water pressure: {round(inputStruct[2], 3)}")
+            self.ui.dataWin.addStr(f"water pressure: {round(inputStruct[2], 3)}")
+            #self.ui.dataWin.addStr(f"water pressure:")
+        elif inputBytes[1] == int.from_bytes(b'\x41', "big"):
             inputStruct = struct.unpack("=ccccccc", inputBytes) #I probably don't need this but who cares, nobody reads these comments so you don't exist.
-            echoValues = inputStruct[2:6].decode("ascii")
+            echoValues = inputStruct[2:5].decode("ascii")
             self.ui.reportWin.addStr(f"echo values: {echoValues}")
 
     def plotWaterPressure():
@@ -142,7 +153,7 @@ class InputWin:
     def __init__(self, stdscr, height, width, y, x):
         self.stdscr = stdscr
         self.win = curses.newwin(height, width, y, x)
-        self.win.box()
+        #self.win.box()
         curses.echo()
         stdscr.refresh()
     def getInput(self):
@@ -154,7 +165,7 @@ class InputWin:
 class ScrollingScreen:
     def __init__(self, stdscr, height, width, y, x):
         self.win = curses.newwin(height, width, y, x)
-        self.win.box()
+        #self.win.box()
         self.height = height
         self.width = width
         stdscr.refresh()
@@ -177,7 +188,7 @@ class UI:
         stdscr.keypad(True)
         self.inputWin = InputWin(stdscr, 1, 15, 0, 0)
         self.infoWin = curses.newwin(6, 57, 2, curses.COLS-59)
-        self.infoWin.box()
+        #self.infoWin.box()
         stdscr.refresh()
         self.infoWin.addstr(0, 0, "halt: no param: stops thrusters from spinning")
         self.infoWin.addstr(1, 0, "spd: duration in ms, duty cycle: start pump with duration")
@@ -194,9 +205,9 @@ def strInputThread(ui, client):
     while True:
         try:
             client.recvData()
-        except:
+        except Exception as e:
+            ui.reportWin.addStr(str(e))
             ui.reportWin.addStr("ERROR WHILE READING")
-            break
 
 def main(stdscr):
     ui = UI(stdscr)
@@ -206,7 +217,11 @@ def main(stdscr):
     while True:
         if client.handleStrInput(ui.inputWin.getInput()) == "disconnect":
             stdscr.endwin()
-            break
+
+def testRecv():
+    client = Client()
+    while True:
+        client.recvData()
 
 def cursesTest(stdscr):
     ui = UI(stdscr)
@@ -219,5 +234,5 @@ def cursesTest(stdscr):
         ui.reportWin.addStr(ui.inputWin.getInput())
 
 if __name__ == "__main__":
-   #asyncio.run(testAsync())
-   curses.wrapper(cursesTest)
+   #testRecv()
+   curses.wrapper(main)

@@ -72,7 +72,7 @@ void loop() {
       }
     }
     if (!openSlot){ //maybe kick a client instead?
-      Serial.println("too many clients, kicking 1st slot"); //cant be bothered to find longest / least connected client
+      Serial.println("too many clients, kicking 1st index slot"); //cant be bothered to find longest / least connected client
       openClients[1].stop();
       connectedClients[1] = connectedClient;
     }
@@ -170,6 +170,7 @@ bool getInput(WiFiClient currClient, int clientIndex){
     input.command = inputs[1];
     input.values[0] = inputs[2];
     input.values[1] = inputs[3];
+    input.values[2] = inputs[4]
     executeCommand(&input);
     return true;
   }
@@ -195,7 +196,7 @@ void executeCommand(input_t *input){
     case 0x23:  //set pressure autoreport in milliseconds
     {
       commandFound = true;
-      uint16_t reportDelay = (((uint16_t)input->values[0])<<8)+input[1]->values[1];
+      uint16_t reportDelay = (((uint16_t)input->values[0])<<8)+input->values[1];
       autoreportData.pressureDelay = reportDelay;
       
       /*input->currClient.write(input->values[0]);
