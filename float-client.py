@@ -1,4 +1,4 @@
-import socket, time, struct
+import socket, time, struct, asyncio, curses
 
 from numpy import byte
 ESP_LOCAL_IP = "192.168.1.22"
@@ -13,21 +13,29 @@ class Client:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ESP_LOCAL_IP, PORT))
 
-    def writeData(self, values):    
+    def writeData(self, values):
         self.sock.sendall(HEADER)
         print(HEADER)
         print(int.from_bytes(HEADER, "big"))
+        sentParams = 0
         for value in values:
             print(value)
             if type(value) == bytes or type(value) == bytearray:
+                sentParams += len(value)
                 self.sock.sendall(value)
             elif type(value) == int:
+                sentParams += 1
                 self.sock.sendall(int.to_bytes(value, 1, "big"))
             elif type(value) == str:
                 for i in len(value):
+                    sentParams += 1
                     self.sock.sendall(int.to_bytes(ord(value[i]), 1, "big"))
             else:
                 print("AAAA")
+        if sentParams < 3:
+            print(f"sendParams: {sentParams}, sending {3-sentParams}")
+            for i in (3 - sentParams):
+                self.sock.sendall(b'\x00')
         self.sock.sendall(FOOTER)
 
     def recvData(self):
@@ -65,26 +73,78 @@ class Client:
     def stopPump(self):
         self.writeData([0x10, 0, 0])
 
-    def startPump(self, seconds, speed):
-        self.writeData([0x15, seconds, speed])
+    def startPump(self, milliseconds, speed):
+        self.writeData([0x15, int.to_bytes(milliseconds, 2, "big"), speed])
 
     def startPumpNoStop(self, speed):
-        self.writeData([0x36, speed])
+        self.writeData([0x36, speed, 0, 0])
 
     def setPressureAutoreport(self, milliseconds):
-        self.writeData([0x23, int.to_bytes(milliseconds, 2, "big")])
+        self.writeData([0x23, int.to_bytes(milliseconds, 2, "big"), 0])
 
     def disconnect(self):
         self.sock.shutdown()
         self.sock.close()
             #terminate gui
 
+class InputWin:
+    def __init__(self, stdscr, height, width, y, x):
+        self.stdscr = stdscr
+        self.win = curses.newwin(height, width, y, x)
+        stdscr.echo(True)
+        stdscr.refresh()
+    def getInput(self):
+        inputVal = (self.win.getstr(0, 0, 15)).decode("ascii")
+        return inputVal
+
+class ScrollingScreen:
+    def __init__(self, stdscr, height, width, y, x):
+        self.win = curses.newwin(height, width, y, x)
+        self.height = height
+        self.width = width
+        stdscr.refresh()
+        self.strings = []
+    
+    def addStr(self, string):
+        self.strings.append(string)
+        self.win.clear()
+        if len(self.strings > self.height):
+            for i in range(len(self.strings)):
+                self.win.addstr(i, 0, self.strings[i])
+        else:
+            for i in range(self.height):
+                self.win.addstr(i, 0, self.strings[self.strings-self.height + i])
+        self.win.refresh()
+
+class UI:
+    def __init__(self, stdscr):
+        self.stdscr = stdscr
+        stdscr.keypad(True)
+        self.inputWin = InputWin(curses.LINES-1, curses.COLS-1, 0, 0)
+        self.infoWin = curses.newwin(5, 57, 2, curses.COLS-59)
+        stdscr.refresh()
+        self.infoWin.addstr(0, 0, "halt: no param: stops thrusters from spinning")
+        self.infoWin.addstr(1, 0, "spd: duration in ms, duty cycle: start pump with duration")
+        self.infoWin.addstr(2, 0, "spi: duty cycle: starts pump indefinetly")
+        self.infoWin.addstr(3, 0, "auto: milliseconds: set autoreport")
+        self.infoWin.addstr(4, 0, "dc no param: disconnect")
+        self.infoWin.addstr(5, 0, "echo: 4 chars: echos characters back")
+        self.infoWin.refresh()
+        self.dataWin = ScrollingScreen(curses.LINES-3, 57, 2, curses.COLS-59)
+        self.reportWin = ScrollingScreen(curses.LINES-9, curses.COLS)
+        stdscr.refresh()
+
 class InputHandler:
-    def __init__(self, client):
+    def __init__(self, client=None):
         self.client = client
     
     def getInput(self):
-        pass
+        print("AAAA")
+        #yield from input("eee")
+        inputStr = yield from input("input here> ")
+        print(inputStr)
+        #self.handleInput(inputStr)
+        print("BBB")
 
     def handleInput(self, inputStr):
         delinIndexs = []
@@ -109,13 +169,22 @@ class InputHandler:
             self.client.stopPump()
         elif command == "spd":  #start pump with delay
             if len(params) == 2:
-                self.client.startPump(params[0], int(params[1]))
+                try:
+                    self.client.startPump(int(params[0]), int(params[1]))
+                except:
+                    print("param does not match int")
         elif command == "spi'": #start pump indefinetly
             if len(params) >= 1:
-                self.client.startPumpNoStop(int(params[0]))
+                try:
+                    self.client.startPumpNoStop(int(params[0]))
+                except:
+                    print("param does not match int")
         elif command == "auto":  #set autoreport
             if len(params) == 1:
-                self.client.setPressureAutoreport(int(params[0]))
+                try:
+                    self.client.setPressureAutoreport(int(params[0]))
+                except:
+                    print("param does not match int")
         elif command == "dc":   #disconnect
             self.client.disconnect()
         elif command == "echo":
@@ -128,5 +197,23 @@ def main():
     while True:
         print(sock.recv(BUFSIZE))
 
+def cursesTest(stdscr):
+    stdscr.keypad(True)
+
+    infoWin = curses.newwin(15, 50, 0, 25)
+    stdscr.refresh()
+    infoWin.addstr(0, 0, "halt: no param: stops thrusters from spinning")
+    infoWin.addstr(1, 0, "spd: duration in ms, duty cycle: start pump with duration")
+    infoWin.addstr(2, 0, "spi: duty cycle: starts pump indefinetly")
+    infoWin.addstr(3, 0, "auto: milliseconds: set autoreport")
+    infoWin.addstr(4, 0, "dc no param: disconnect")
+    infoWin.addstr(5, 0, "echo: 4 chars: echos characters back")
+    infoWin.refresh()
+    #statusWin = curses.newwin(curses.COLS, curses.LINES, 0, 0)
+    #inputWin = curses.newwin()
+    while True:
+        continue
+
 if __name__ == "__main__":
-    main()
+   #asyncio.run(testAsync())
+   curses.wrapper(cursesTest)

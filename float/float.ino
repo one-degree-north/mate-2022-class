@@ -215,7 +215,11 @@ void executeCommand(input_t *input){
     break;
     case 0x41:  //echo
       commandFound = true;
+      echo(&input)
     break;
+  }
+  if (!commandFound){
+    Serial.println("no valid command");
   }
 }
 
