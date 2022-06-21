@@ -91,7 +91,7 @@ class InputWin:
     def __init__(self, stdscr, height, width, y, x):
         self.stdscr = stdscr
         self.win = curses.newwin(height, width, y, x)
-        stdscr.echo(True)
+        #curses.echo()
         stdscr.refresh()
     def getInput(self):
         inputVal = (self.win.getstr(0, 0, 15)).decode("ascii")
@@ -107,21 +107,21 @@ class ScrollingScreen:
     
     def addStr(self, string):
         self.strings.append(string)
-        self.win.clear()
-        if len(self.strings > self.height):
+        self.win.erase()
+        if len(self.strings) < self.height:
             for i in range(len(self.strings)):
                 self.win.addstr(i, 0, self.strings[i])
         else:
             for i in range(self.height):
-                self.win.addstr(i, 0, self.strings[self.strings-self.height + i])
+                self.win.addstr(i, 0, self.strings[len(self.strings)-self.height + i])
         self.win.refresh()
 
 class UI:
     def __init__(self, stdscr):
         self.stdscr = stdscr
         stdscr.keypad(True)
-        self.inputWin = InputWin(curses.LINES-1, curses.COLS-1, 0, 0)
-        self.infoWin = curses.newwin(5, 57, 2, curses.COLS-59)
+        self.inputWin = InputWin(stdscr, curses.LINES-1, curses.COLS-1, 0, 0)
+        self.infoWin = curses.newwin(6, 57, 2, curses.COLS-59)
         stdscr.refresh()
         self.infoWin.addstr(0, 0, "halt: no param: stops thrusters from spinning")
         self.infoWin.addstr(1, 0, "spd: duration in ms, duty cycle: start pump with duration")
@@ -130,8 +130,8 @@ class UI:
         self.infoWin.addstr(4, 0, "dc no param: disconnect")
         self.infoWin.addstr(5, 0, "echo: 4 chars: echos characters back")
         self.infoWin.refresh()
-        self.dataWin = ScrollingScreen(curses.LINES-3, 57, 2, curses.COLS-59)
-        self.reportWin = ScrollingScreen(curses.LINES-9, curses.COLS)
+        self.dataWin = ScrollingScreen(stdscr, curses.LINES-3, curses.COLS-59, 2, 0)
+        self.reportWin = ScrollingScreen(stdscr, curses.LINES-12, 57, 11, curses.COLS-59)
         stdscr.refresh()
 
 class InputHandler:
@@ -198,7 +198,7 @@ def main():
         print(sock.recv(BUFSIZE))
 
 def cursesTest(stdscr):
-    stdscr.keypad(True)
+    """stdscr.keypad(True)
 
     infoWin = curses.newwin(15, 50, 0, 25)
     stdscr.refresh()
@@ -212,7 +212,14 @@ def cursesTest(stdscr):
     #statusWin = curses.newwin(curses.COLS, curses.LINES, 0, 0)
     #inputWin = curses.newwin()
     while True:
-        continue
+        continue"""
+    ui = UI(stdscr)
+    i = 0
+    while True:
+        i += 1
+        time.sleep(0.01)
+        ui.dataWin.addStr(f"{i}")
+        ui.reportWin.addStr(f"ddd{i}")
 
 if __name__ == "__main__":
    #asyncio.run(testAsync())
