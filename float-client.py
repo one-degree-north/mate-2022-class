@@ -85,6 +85,7 @@ class Client:
     def disconnect(self):
         self.sock.shutdown()
         self.sock.close()
+        return "disconnect"
             #terminate gui as well
 
     def handleStrInput(self, inputStr):
@@ -141,6 +142,7 @@ class InputWin:
     def __init__(self, stdscr, height, width, y, x):
         self.stdscr = stdscr
         self.win = curses.newwin(height, width, y, x)
+        self.win.box()
         curses.echo()
         stdscr.refresh()
     def getInput(self):
@@ -152,6 +154,7 @@ class InputWin:
 class ScrollingScreen:
     def __init__(self, stdscr, height, width, y, x):
         self.win = curses.newwin(height, width, y, x)
+        self.win.box()
         self.height = height
         self.width = width
         stdscr.refresh()
@@ -174,6 +177,7 @@ class UI:
         stdscr.keypad(True)
         self.inputWin = InputWin(stdscr, 1, 15, 0, 0)
         self.infoWin = curses.newwin(6, 57, 2, curses.COLS-59)
+        self.infoWin.box()
         stdscr.refresh()
         self.infoWin.addstr(0, 0, "halt: no param: stops thrusters from spinning")
         self.infoWin.addstr(1, 0, "spd: duration in ms, duty cycle: start pump with duration")
@@ -188,14 +192,21 @@ class UI:
 
 def strInputThread(ui, client):
     while True:
-        client.handleStrInput(ui.inputWin.getInput())
+        try:
+            client.recvData()
+        except:
+            ui.reportWin.addStr("ERROR WHILE READING")
+            break
 
 def main(stdscr):
     ui = UI(stdscr)
     client = Client(ui)
     inputThread = threading.Thread(target=strInputThread,args=(ui, client), daemon=True)
+    inputThread.start()
     while True:
-        client.recvData()
+        if client.handleStrInput(ui.inputWin.getInput()) == "disconnect":
+            stdscr.endwin()
+            break
 
 def cursesTest(stdscr):
     ui = UI(stdscr)
@@ -203,8 +214,8 @@ def cursesTest(stdscr):
     while True:
         i += 1
         time.sleep(0.01)
-        ui.dataWin.addStr(f"{i}")
-        ui.reportWin.addStr(f"ddd{i}")
+        ui.reportWin.addStr(f"r:{i}")
+        ui.dataWin.addStr(f"d:{i}")
         ui.reportWin.addStr(ui.inputWin.getInput())
 
 if __name__ == "__main__":
