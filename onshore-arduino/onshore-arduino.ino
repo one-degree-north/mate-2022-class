@@ -35,7 +35,7 @@ void loop(){
 }
 
 int packetIndex = 0;
-int exepctedPacketLen = 0;
+int expectedPacketLen = 0;
 Input inputValue;
 void readInput(){
   if (Serial.available()){
@@ -52,7 +52,7 @@ void readInput(){
         packetIndex = -1;
       }
     }
-    else if (packetIndex < exepctedPacketLen+2){
+    else if (packetIndex < expectedPacketLen+2){
       inputValue.values[packetIndex-2] = input;
     }
     else{
