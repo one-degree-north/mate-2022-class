@@ -35,6 +35,7 @@ void loop(){
 }
 
 int packetIndex = 0;
+int exepctedPacketLen = 0;
 Input inputValue;
 void readInput(){
   if (Serial.available()){
@@ -46,54 +47,61 @@ void readInput(){
     }
     else if (packetIndex == 1){
       inputValue.command = input;
+      expectedPacketLen = getPacketLength(inputValue.command);
+      if (expectedPacketLen == -1){
+        packetIndex = -1;
+      }
     }
-    else if (packetIndex >= 2){
+    else if (packetIndex < exepctedPacketLen+2){
+      inputValue.values[packetIndex-2] = input;
+    }
+    else{
       if (input == FOOTER){
         inputValue.paramNum = packetIndex-2;
         processCommand(inputValue);
-        packetIndex = -1;
       }
-      else if (packetIndex > 8){
-        packetIndex = -1;
-      }
-      else{
-        inputValue.values[packetIndex-2] = input;
-      }
+      packetIndex = -1;
     }
     packetIndex++;
   }
 }
 
-void processCommand(Input inputValue){
+int getPacketLength(uint8_t command){
+  switch (command){
+    case 0x14:  //move all thrustesr
+      return 6;
+    case 0x1C:  //move claw servo
+      return 1;
+    case 0x5A:  //rotate claw servo
+      return 1;
+    case 0x32:  //halt
+      return 0;
+  }
+  return -1;
+}
+
+bool processCommand(Input inputValue){
+  if (inputValue.paramNum != getPacketLength(inputValue.command)){  //don't need this anymore, packet checking is integrated
+    return false;
+  }
   switch(inputValue.command){
     case 0x14: //provides all thruster values
-      if(inputValue.paramNum != 6){
-        break;
-      }
       moveMultipleThrusters(inputValue);
     break;
     case 0x1C: //move claw servo
-      if (inputValue.paramNum != 1){
-        break;
-      }
       moveClawServo(inputValue);
     break;
     case 0x5A:
-      if (inputValue.paramNum != 1){
-        break;
-      }
       rotateClaw(inputValue);
     break;
     case 0x32: //halt
-      if (inputValue.paramNum != 0){
-        break;
-      }
       halt(inputValue);
     break;
     case 0x45: //return offshore or onshore
       writeOnshore();
     break;
   }
+  return true;
 }
 void writeOnshore(){  //Indicates that this board is the onshore board
   uint8_t onshore = 0x10;
