@@ -100,7 +100,7 @@ class PIDController():
 
             self.yaw.update(orientationData[0])
             self.pitch.update(orientationData[2])
-            self.roll.update(-orientationData[1])
+            self.roll.update(-orientationData[1])   
 
             self.lastOrientationReading = [orientationData[0], orientationData[1], orientationData[2]]
             self.sendNewRequest = True
