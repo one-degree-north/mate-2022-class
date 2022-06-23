@@ -77,14 +77,14 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         footerFound = False
         headerFound = False
         while (not headerFound):
-            print(currByte)
+            # print(currByte)
             if (currByte == self.HEADER):
-                print("header found")
+                # print("header found")
                 headerFound = True
                 #returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
                 returnValue = self.offshoreArduino.read(size=14)
-                print(returnValue)
-                print(len(returnValue))
+                # print(returnValue)
+                # print(len(returnValue))
                 if (returnValue[-1] == int.from_bytes(self.FOOTER, "big")):
                     #print("footer found")
                     footerFound=True
@@ -103,6 +103,7 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
     def writeOutput(self, output):
         #print(output)
         if output[0] == 0 and self.offshoreEnabled:
+            print(output)
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
                 self.offshoreArduino.write(value)

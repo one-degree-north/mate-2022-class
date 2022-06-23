@@ -27,7 +27,7 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            #print(f"gyro data: {self.gyroData}")
+            print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
@@ -38,7 +38,7 @@ class Controls:
                    self.orientationData[i] = input[i+1] - 180
                 else:
                     self.orientationData[i] = input[i+1]
-            print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -72,7 +72,8 @@ class Controls:
             deg = 0
         if deg > 90:
             deg = 90
-        outputVal = int((deg*7/9)+90)
+        #outputVal = int((deg*7/9)+90)
+        outputVal = int(deg*2)
         print("BBB")
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
@@ -83,7 +84,8 @@ class Controls:
             deg = 0
         if deg > 1:
             deg = 1
-        outputVal = int((deg*63)+117)
+        outputVal = int(deg*180)
+        #outputVal = int((deg*63)+117)
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
@@ -123,8 +125,10 @@ def testThrusters():
         inputs = [0, 0, 0, 0, 0,0]
 
 def testOrientationData():
-    controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
+    controls = Controls(orientationAutoreport=0, accelAutoreport=0, gyroAutoreport=0, onshoreEnabled=False, offshoreEnabled=True)
     controls.setOrientationAutoreport(100)
+    controls.setAccelAutoreport(0)
+    controls.setGyroAutoreport(0)
     while True:
         #print(f"orientation: {controls.orientationData}")
         time.sleep(0.01)
@@ -142,9 +146,9 @@ def testClaw():
             controls.rotateClaw(deg)
 
 def reset():
-    controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
-    controls.resetOffshore()
+    controls = Controls(orientationAutoreport=0, accelAutoreport=0, gyroAutoreport=0, onshoreEnabled=False, offshoreEnabled=True)
+    controls.resetOffshore()        
 
 if __name__ == "__main__":
-    # reset()
     testOrientationData()
+    # testOrientationData()
