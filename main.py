@@ -25,7 +25,7 @@ from time import sleep
 if __name__ == '__main__':
     from controls import Controls
     controls = None  
-    controls = Controls()
+    controls = Controls(offshoreEnabled=False)
     #controls.comms.startThread()
 
     requestQueue = queue.Queue()
