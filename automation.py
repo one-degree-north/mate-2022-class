@@ -109,7 +109,7 @@ class PIDController():
 
         # self.lastAccelReading = [accelData[0], accelData[1], accelData[2]]
         # print(f"{accelData = }")
-        print(f"{self.y.displacement = }")
+        # print(f"{self.y.displacement = }")
 
     def planarDisplacement(self):
         return sqrt(self.x.displacement * self.x.displacement + self.y.displacement * self.y.displacement)
@@ -123,11 +123,11 @@ class PIDController():
         def updateInternalvalues():
             while True:
                 self.updateOrientation()
-                self.updateDisplacement()
+                # self.updateDisplacement()
 
                 time.sleep(self.interval * 0.001)
 
-        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=False)
+        self.internalUpdateThread = threading.Thread(target=updateInternalvalues, daemon=True)
         self.internalUpdateThread.start()
 
     def startSendingRequests(self):
@@ -142,7 +142,7 @@ class PIDController():
                     self.sendNewRequest = False
                 time.sleep(self.interval * 0.001)
 
-        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=False)
+        self.sendRequestsThread = threading.Thread(target=sendRequests, daemon=True)
         self.sendRequestsThread.start()
 
     def calcForces(self):
