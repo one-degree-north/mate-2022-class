@@ -4,8 +4,8 @@ import numpy as np
 import time
 
 class TransectLine:
-    def __init__(self, cam_dex, delay): # Delay in seconds
-        self.vid = cv2.VideoCapture(cam_dex)
+    def __init__(self, down_camera, delay): # Delay in seconds
+        self.vid = down_camera
         self.delay = delay
         
     def detect_rope(self, img):
@@ -49,18 +49,21 @@ class TransectLine:
 
         if direction == left:
             # Turn left 
+            pass
         elif direction == right:
             # Turn right
+            pass
 
     def move_forward(self, move: bool):
         # Kevin: finish this part
+        pass
 
     def wait_for_turns(self, delay):
         defect_pt = (-1, -1)
 
         while defect_pt is (-1, -1):
             _, frame_hsv = self.vid.read()
-            rope_hsv = self.detect_rope(frame_hsv[0 : round(frame_hsv.shape[0]/2]))
+            rope_hsv = self.detect_rope(frame_hsv[0 : round(frame_hsv.shape[0]/2)])
             defect_pt = self.find_defect(rope_hsv)
             time.sleep(delay)
 

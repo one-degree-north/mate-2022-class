@@ -98,10 +98,10 @@ class VideoThread(QThread):
         self.port = port
 
     def run(self):
-        cap = cv2.VideoCapture(self.port)
+        self.cap = cv2.VideoCapture(self.port)
 
         while self.running:
-            ret, self.image = cap.read()
+            ret, self.image = self.cap.read()
 
             if ret:
                 self.parent.connected = True
@@ -114,7 +114,7 @@ class VideoThread(QThread):
             else:
                 self.parent.connected = False
                 
-        cap.release()
+        self.cap.release()
         
 
     def stop(self):

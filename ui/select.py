@@ -12,7 +12,9 @@ class SelectionWidget(QWidget):
         self.setStyleSheet("""
             background: rgb(26, 26, 26);
             border-radius: 10px;
-            margin: 10px
+            margin: 10px;
+
+            color: white
         """)
 
         self.scrolling_label = ScrollingLabel()

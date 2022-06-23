@@ -7,6 +7,8 @@ import sys
 sys.path.append('..')
 
 from wreck_size import WreckSize
+from transect_line import TransectLine
+from photomosaic import Photomosaic
 
 class AutomationControlBar(QWidget):
     def __init__(self, parent):
@@ -25,23 +27,24 @@ class AutomationControlBar(QWidget):
 
         self.docking_button = Button('ui/icons/docking_icon.png', 'Autonomous docking')
         self.docking_button.clicked.connect(self.docking)
+        self.docking_button.setDisabled(True)
 
         self.transect_button = Button('ui/icons/transect_icon.png', 'Transect line')
         self.transect_button.clicked.connect(self.transect)
-        self.transect_button.setDisabled(True)
 
         self.morts_button = Button('ui/icons/morts_icon.png', 'Differentiate morts')
         self.morts_button.clicked.connect(self.morts)
+        self.morts_button.setDisabled(True)
 
         self.measure_button = Button('ui/icons/measure_icon.png', 'Measure fish size')
         self.measure_button.clicked.connect(self.measure)
 
         self.endurance_button = Button('ui/icons/Endurance_icon.png', 'Transect over Endurance area')
         self.endurance_button.clicked.connect(self.endurance)
+        self.endurance_button.setDisabled(True)
 
         self.measure_endurance_button = Button('ui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
         self.measure_endurance_button.clicked.connect(self.measure_endurance)
-        # self.measure_endurance_button.setDisabled(True)
 
         self.photomosaic_button = Button('ui/icons/photomosaic_icon.png', 'Photomosaic')
         self.photomosaic_button.clicked.connect(self.photomosaic)
@@ -69,8 +72,8 @@ class AutomationControlBar(QWidget):
         pass
 
     def transect(self):
-        print('transect')
-        pass
+        TransectLine(self.parent.parent.grid.down_cam.thread.cap, 0.1)
+        self.parent.selection.scrolling_label.setText('TRANSECT LINE')
 
     def morts(self):
         print('dead fish')
@@ -95,5 +98,12 @@ class AutomationControlBar(QWidget):
         # print(selection)
 
     def photomosaic(self):
-        print('photomosaic')
-        pass
+        # print('photomosaic')
+        # pass
+        selections, _ = QFileDialog.getOpenFileNames(self, 'Select 8 images', 'captures/IMAGES', 'Images (*.png *.jpg)')
+        if len(selections) == 8:
+            split_selections = "\n".join(selections)
+            self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\n{split_selections}')
+
+            Photomosaic(selections)
+
