@@ -10,7 +10,7 @@ from ui.console import ConsoleModule
 from ui.info import ThrusterDisplayModule, AxisDisplayModule
 
 from ui.automation_control import AutomationControlBar
-from ui.selector import SelectorWidget
+from ui.select import SelectionWidget
 
 import logging
 
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
 
         self.axis_display = AxisDisplayModule()
         self.axis_display.hide()
+        
 
         self.automation_window = AutomationWindow(self)
 
@@ -179,9 +180,8 @@ class AutomationWindow(QWidget):
 
         self.parent = parent
 
-        self.selector = SelectorWidget()
-
-        self.automation_control = AutomationControlBar()
+        self.automation_control = AutomationControlBar(self)
+        self.selection = SelectionWidget()
 
         self.automation_control_frame = QWidget()
         self.automation_control_frame.layout = QVBoxLayout()
@@ -196,7 +196,7 @@ class AutomationWindow(QWidget):
         self.layout = QHBoxLayout()
         
         self.layout.addWidget(self.automation_control_frame)
-        self.layout.addWidget(self.selector, 100)
+        self.layout.addWidget(self.selection, 100)
         # self.automation_control_frame.setLayout(self.automation_control_frame.layout)
 
         # self.preview_frame = QWidget()

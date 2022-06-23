@@ -73,24 +73,23 @@ class CaptureControlBar(QWidget):
         self.record_stopwatch_label.setText(f'{self.minutes:02d}:{self.seconds:02d}')
 
     def capture_image(self):
-        folder = f'IMAGES_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
-        os.mkdir(f'captures/{folder}')
+        time = datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]
 
         try:
-            filename = f'captures/{folder}/front_camera.png'
+            filename = f'captures/IMAGES/{time}-front_camera.png'
             cv2.imwrite(filename, self.parent.grid.front_cam.thread.image)
 
-            logging.info(f'Image captured under: captures/{folder}/front_camera.png')
+            logging.info(f'Image captured under: captures/IMAGES/{time}-front_camera.png')
         except cv2.error:
             logging.error('An error occurred while attempting to capture an image from the FRONT camera')
             # pass
 
         try:
-            filename = f'captures/{folder}/down_camera.png'
+            filename = f'captures/IMAGES/{time}-down_camera.png'
             cv2.imwrite(filename, self.parent.grid.down_cam.thread.image)
 
 
-            logging.info(f'Image captured under: captures/{folder}/down_camera.png')
+            logging.info(f'Image captured under: captures/IMAGES/{time}-down_camera.png')
         except cv2.error:
             logging.error('An error occurred while attempting to capture an image from the DOWN camera')
             # pass
@@ -105,11 +104,10 @@ class CaptureControlBar(QWidget):
 
             
 
-            self.folder = f'VIDEOS_{datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]}'
-            os.mkdir(f'captures/{self.folder}')
+            self.time = datetime.now().strftime(f"%d-%m-%y_%H:%M:%S.%f")[:-4]
 
             try:
-                filename = f'captures/{self.folder}/front_video.avi'
+                filename = f'captures/VIDEOS/{self.time}-front_video.avi'
                 self.parent.grid.front_cam.thread.video_output = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.parent.grid.front_cam.thread.image.shape[1], self.parent.grid.front_cam.thread.image.shape[0]))
                 # logging.info(f'Video captured under: captures/{folder}/front_video.mp4')
                 logging.info('Started video capture from the FRONT camera')
@@ -117,7 +115,7 @@ class CaptureControlBar(QWidget):
                 logging.error('An error occurred while attempting to start video capture from the FRONT camera')
 
             try:
-                filename = f'captures/{self.folder}/down_video.avi'
+                filename = f'captures/VIDEOS/{self.time}-down_video.avi'
                 self.parent.grid.down_cam.thread.video_output = cv2.VideoWriter(filename, cv2.VideoWriter_fourcc('M','J','P','G'), 30, (self.parent.grid.down_cam.thread.image.shape[1], self.parent.grid.down_cam.thread.image.shape[0]))
                 
                 logging.info('Started video capture from the DOWN camera')
@@ -152,13 +150,13 @@ class CaptureControlBar(QWidget):
         #     print('open1')
         try:
             self.parent.grid.front_cam.thread.video_output.release()
-            logging.info(f'Video saved under: captures/{self.folder}/front_video.mp4')
+            logging.info(f'Video saved under: captures/VIDEOS/{self.time}-front_video.avi')
         except AttributeError:
             logging.error('An error occurred while attempting to save a video from the FRONT camera')
         
         try:
             self.parent.grid.down_cam.thread.video_output.release()
-            logging.info(f'Video saved under: captures/{self.folder}/front_video.mp4')
+            logging.info(f'Video saved under: captures/VIDEOS/{self.time}-down_video.avi')
         except AttributeError:
             logging.error('An error occurred while attempting to save a video from the DOWN camera')
 
