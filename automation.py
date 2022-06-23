@@ -90,7 +90,7 @@ class PIDController():
         else:
             orientationData = [0, 0, 0]
         # print("heloooooooooooooooooo\n\n\n\n")
-        print(f"Orientation Data from controls: {self.controls.orientationData}")
+        # print(f"Orientation Data from controls: {self.controls.orientationData}")
         # orientationData = self.controls.orientationData
         if orientationData != self.lastOrientationReading:
             # print("updateding")
