@@ -1,10 +1,15 @@
-from PyQt5.QtWidgets import QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QFileDialog
 from PyQt5.QtCore import Qt
 
 from .button import Button
 
+import sys
+sys.path.append('..')
+
+from wreck_size import WreckSize
+
 class AutomationControlBar(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
@@ -16,11 +21,14 @@ class AutomationControlBar(QWidget):
             }
         """)
 
+        self.parent = parent
+
         self.docking_button = Button('ui/icons/docking_icon.png', 'Autonomous docking')
         self.docking_button.clicked.connect(self.docking)
 
         self.transect_button = Button('ui/icons/transect_icon.png', 'Transect line')
         self.transect_button.clicked.connect(self.transect)
+        self.transect_button.setDisabled(True)
 
         self.morts_button = Button('ui/icons/morts_icon.png', 'Differentiate morts')
         self.morts_button.clicked.connect(self.morts)
@@ -33,6 +41,7 @@ class AutomationControlBar(QWidget):
 
         self.measure_endurance_button = Button('ui/icons/measure_Endurance_icon.png', 'Measure Endurance area')
         self.measure_endurance_button.clicked.connect(self.measure_endurance)
+        # self.measure_endurance_button.setDisabled(True)
 
         self.photomosaic_button = Button('ui/icons/photomosaic_icon.png', 'Photomosaic')
         self.photomosaic_button.clicked.connect(self.photomosaic)
@@ -76,8 +85,14 @@ class AutomationControlBar(QWidget):
         pass
 
     def measure_endurance(self):
-        print('not ok')
-        pass
+        selection, _ = QFileDialog.getOpenFileName(self, 'Select image', 'captures/IMAGES', 'Images (*.png *.jpg)')
+
+        if selection:
+            self.parent.selection.scrolling_label.setText(f'MEASURE ENDURANCE\n{selection}')
+
+            WreckSize(selection)
+
+        # print(selection)
 
     def photomosaic(self):
         print('photomosaic')
