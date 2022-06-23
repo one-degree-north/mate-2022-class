@@ -28,16 +28,15 @@ if __name__ == '__main__':
     # controls = Controls(offshoreEnabled=False)
     # controls.comms.startThread()
 
-    requestQueue = queue.Queue()
-    guiQueue = queue.Queue()
-
-
     with open('settings.yml', 'r') as f:
         settings = yaml.safe_load(f)
 
 
     app = QApplication([])
     app.setStyle('Fusion')
+
+    requestQueue = queue.Queue()
+    guiQueue = queue.Queue()
 
     window = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
@@ -68,15 +67,6 @@ if __name__ == '__main__':
 
     window.show()
     u.start()
-
-    try:
-        os.mkdir('captures')
-        logging.warning('No captures directory detected; one has been generated for you!')
-    except FileExistsError:
-        pass
-
-    print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
-    logging.info('Successfully loaded Crimson UI')
 
     sys.exit(app.exec())
 
