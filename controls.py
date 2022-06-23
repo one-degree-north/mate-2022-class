@@ -73,7 +73,7 @@ class Controls:
         if deg > 90:
             deg = 90
         #outputVal = int((deg*7/9)+90)
-        outputVal = int(deg*2)
+        outputVal = int(deg*135/90)
         print("BBB")
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
@@ -84,7 +84,7 @@ class Controls:
             deg = 0
         if deg > 1:
             deg = 1
-        outputVal = int(deg*180)
+        outputVal = int(deg*110)
         #outputVal = int((deg*63)+117)
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
@@ -150,6 +150,7 @@ def reset():
     controls.resetOffshore()        
 
 if __name__ == "__main__":
-    testOrientationData()
+    # testOrientationData()
+    testClaw()
     # testThrusters()
     # testOrientationData()
