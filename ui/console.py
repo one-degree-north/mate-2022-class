@@ -159,19 +159,26 @@ class CommandLine(QLineEdit):
             exit()
 
         elif split_text[0] == 'list':
-            captures_dir = sorted([f for f in os.listdir('captures/')])
+            images_dir = sorted([f for f in os.listdir('captures/IMAGES')])
+            videos_dir = sorted([f for f in os.listdir('captures/VIDEOS')])
 
-            
-
-            if captures_dir:
-                stringed_captures = "\n".join(captures_dir)
-                logging.info(f'captures/\n{stringed_captures}')
+            if images_dir:
+                stringed_images = "\n".join(images_dir)
+                logging.info(f'captures/IMAGES/\n{stringed_images}\n')
             else:
-                logging.info('The captures directory is empty!')
+                logging.info('The IMAGES directory is empty!\n')
+
+            if videos_dir:
+                stringed_videos = "\n".join(videos_dir)
+                logging.info(f'captures/VIDEOS/\n{stringed_videos}\n')
+            else:
+                logging.info('The VIDEOS directory is empty!\n')
 
         elif split_text[0] == 'empty':
             shutil.rmtree('captures')
             os.mkdir('captures')
+            os.mkdir('captures/IMAGES')
+            os.mkdir('captures/VIDEOS')
 
             logging.info('Successfully emptied the captures directory')
 
