@@ -77,12 +77,12 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         footerFound = False
         headerFound = False
         while (not headerFound):
-            #print(currByte)
+            print(currByte)
             if (currByte == self.HEADER):
-                #print("header found")
+                print("header found")
                 headerFound = True
                 returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
-                #print(returnValue)
+                print(returnValue)
                 if (returnValue[-1] == int.from_bytes(self.FOOTER, "big")):
                     #print("footer found")
                     footerFound=True

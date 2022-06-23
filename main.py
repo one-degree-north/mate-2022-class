@@ -42,14 +42,14 @@ if __name__ == '__main__':
     window.show()
     u.start()
 
-    # try:
-    #     os.mkdir('captures')
-    #     logging.warning('No captures directory detected; one has been generated for you!')
-    # except FileExistsError:
-    #     pass
+    try:
+        os.mkdir('captures')
+        logging.warning('No captures directory detected; one has been generated for you!')
+    except FileExistsError:
+        pass
 
-    # print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
-    # logging.info('Successfully loaded Crimson UI')
+    print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
+    logging.info('Successfully loaded Crimson UI')
 
-    # sys.exit(app.exec())
+    sys.exit(app.exec())
 
