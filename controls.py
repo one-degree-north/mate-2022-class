@@ -124,6 +124,7 @@ def testThrusters():
 
 def testOrientationData():
     controls = Controls(onshoreEnabled=False, offshoreEnabled=True)
+    controls.setOrientationAutoreport(100)
     while True:
         #print(f"orientation: {controls.orientationData}")
         time.sleep(0.01)
@@ -145,4 +146,5 @@ def reset():
     controls.resetOffshore()
 
 if __name__ == "__main__":
-    reset()
+    # reset()
+    testOrientationData()
