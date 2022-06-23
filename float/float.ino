@@ -16,7 +16,10 @@ IPAddress espLocalIP;
 WiFiClient connectedClients[4]; //maximum of 4 connections
 bool openClients[4];
 int clientIndex = 0;
-int dc = 40;  //percentage, duty cycle is between 20% and 100% (I assume 20% is off)
+int dc = 20;  //percentage, duty cycle is between 20% and 100% (I assume 20% is off)
+double cycleLength;
+double onLength;
+double currCycle = 0;
 unsigned long timerStart = 0;
 unsigned long duration = 0;
 bool timerEnabled = false;
@@ -43,7 +46,8 @@ void setup() {
   autoreportData.pressureDelay = 10;  //default report time of 10 millis
   autoreportData.pressureTime = 0;
   Serial.begin(115200);
-
+  cycleLength = 1/FREQUENCY;
+  setDC(20);
   for (int i = 0; i < 4; i++){
     openClients[i] = true;
   }
@@ -73,7 +77,7 @@ void loop() {
     }
     if (!openSlot){ //maybe kick a client instead?
       Serial.println("too many clients, kicking 1st index slot"); //cant be bothered to find longest / least connected client
-      openClients[1].stop();
+      connectedClients[1].stop();
       connectedClients[1] = connectedClient;
     }
   }
@@ -91,16 +95,16 @@ void loop() {
 void moveDownSpecifiedTime(input_t *input){
   timerEnabled = true;
   timerStart = millis();
-  duration = (((uint16_t)input[0])<<8) + input[1];
-  setDC(input[2]);
+  duration = (((uint16_t)input->values[0])<<8) + input->values[1];
+  setDC(input->values[2]);
 }
 
 void moveDown(input_t *input){
   timerEnabled = false;
-  setDC(input[0]);
+  setDC(input->values[0]);
 }
 
-void haltPump(input_t *input){
+void haltPump(){
   timerEnabled = false;
   timerStart = 0;
   turnPumpOff();
@@ -170,7 +174,7 @@ bool getInput(WiFiClient currClient, int clientIndex){
     input.command = inputs[1];
     input.values[0] = inputs[2];
     input.values[1] = inputs[3];
-    input.values[2] = inputs[4]
+    input.values[2] = inputs[4];
     executeCommand(&input);
     return true;
   }
@@ -186,17 +190,24 @@ void executeCommand(input_t *input){
   switch (input->command){
     case 0x10:  //stop pump
       commandFound = true;
+      Serial.println("halting");
       haltPump();
       //input->currClient.write()
     break;
     case 0x15:  //move down for x seconds and y speed then move up
       commandFound = true;
-      moveDownSpecifiedTime(&input);
+      Serial.println("moving down 0x15");
+      Serial.println(input->values[0]);
+      Serial.println(input->values[1]);
+
+      moveDownSpecifiedTime(input);
     break;
     case 0x23:  //set pressure autoreport in milliseconds
     {
       commandFound = true;
       uint16_t reportDelay = (((uint16_t)input->values[0])<<8)+input->values[1];
+      Serial.println("pressure autoreport");
+      Serial.println(reportDelay);
       autoreportData.pressureDelay = reportDelay;
       
       /*input->currClient.write(input->values[0]);
@@ -207,16 +218,19 @@ void executeCommand(input_t *input){
     break;
     case 0x30:  //disconnect
       commandFound = true;
+      Serial.println("disconnect");
       input->currClient.stop();
       openClients[input->clientIndex] = true;
     break;
     case 0x36:  //move down no duration limit
+      Serial.println("moving down");
       commandFound = true;
-      moveDown(&input)
+      moveDown(input);
     break;
     case 0x41:  //echo
+      Serial.println("echoing");
       commandFound = true;
-      echo(&input)
+      echo(input);
     break;
   }
   if (!commandFound){
@@ -241,7 +255,7 @@ void sendWaterPressure(WiFiClient currClient){
   float waterPressure;
   byte* byteCastWaterPressure = (byte*)&waterPressure;
   currClient.write(HEADER);
-  currCLient.write(0x18);
+  currClient.write(0x18);
   currClient.write(byteCastWaterPressure[0]);
   currClient.write(byteCastWaterPressure[1]);
   currClient.write(byteCastWaterPressure[2]);
