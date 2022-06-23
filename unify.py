@@ -15,7 +15,6 @@ class Unify():
         self.KManager = KeyboardManager(requestQueue=requestQueue)
         self.SManager = ServoManager(controls=controls)
         self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
-        self.pidC.override = True
         
         self.requestQueue = requestQueue
         self.guiQueue = guiQueue
