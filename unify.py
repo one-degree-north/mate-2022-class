@@ -15,6 +15,7 @@ class Unify():
         self.KManager = KeyboardManager(requestQueue=requestQueue)
         self.SManager = ServoManager(controls=controls)
         self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
+        self.pidC.override = True
         
         self.requestQueue = requestQueue
         self.guiQueue = guiQueue
@@ -23,15 +24,19 @@ class Unify():
         self.readLasts = False
 
         self.lastPayloadFromKeyboard = {
-            "reqMotion": (0, 0, 0),
-            "reqRotation": (0, 0, 0),
+            "reqMotion": (),
+            "reqRotation": (),
             "thrustScale": 1,
             "toggleRotater": False,
             "toggleOpenner": False,
+            "toggleAutomationMode": False,
+            "targetShiftAmount": 0,
+            "temp": False
         }
-        self.lastPayloadFromAutomation = {"reqRotation": (0, 0, 0)}
+        self.lastPayloadFromAutomation = {"reqRotation": (0, 0, 0), "reqMotion": None,}
 
         # allows/disallows automation to affect thruster speed calculations
+        # no longer in use...
         self.allowAutoInfluence = True
         # either "balancing", "full", or "off"
         # balancing excludes yaw, full includes it
@@ -62,8 +67,45 @@ class Unify():
                     print(f"\nKeyboard: {self.lastPayloadFromKeyboard}")
                     print(f"Automation: {self.lastPayloadFromAutomation}")
 
-                    reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
+                    # move servos 
+                    # set automation mode
+                    # set thrust scale
+                    # set shift amount
+                    if self.lastPayloadFromKeyboard["toggleOpenner"]:
+                        self.SManager.openner.toggle()
 
+                    if self.lastPayloadFromKeyboard["toggleRotater"]:
+                        self.SManager.rotater.toggle()
+
+                    if self.lastPayloadFromKeyboard["toggleAutomationMode"]:
+                        # print("changing automation mode")
+                        if self.automationMode == "balancing":
+                            self.automationMode = "full"
+                        elif self.automationMode == "full":
+                            self.automationMode = "off"
+                        else:
+                            self.automationMode = "balancing"
+
+                    if self.lastPayloadFromKeyboard["targetShiftAmount"] != 0:
+                        print("Something.............................")
+                        self.pidC.shiftTargetBy(self.lastPayloadFromKeyboard["targetShiftAmount"])
+
+                    if self.lastPayloadFromKeyboard["temp"]:
+                        self.pidC.override = False
+                    
+                    if self.lastPayloadFromKeyboard["temp2"]:
+                        self.pidC.override = True
+
+                    thrustScale = self.lastPayloadFromKeyboard["thrustScale"]
+
+
+                    # calculate reqMotion and reqRotation based on automation mode
+
+                    print(f"Automation mode: {self.automationMode}")
+                    if self.lastPayloadFromAutomation["reqMotion"] == None:
+                        reqMotion = self.lastPayloadFromKeyboard["reqMotion"]
+                    else:
+                        reqMotion = self.lastPayloadFromAutomation["reqMotion"]
 
                     if self.automationMode == "off":
                         reqRotation = self.lastPayloadFromKeyboard["reqRotation"]
@@ -74,15 +116,9 @@ class Unify():
                     elif self.automationMode == "full":
                         reqRotation = self.lastPayloadFromAutomation["reqRotation"]
 
+                    # print(f"{reqRotation = }")
 
 
-
-                    thrustScale = self.lastPayloadFromKeyboard["thrustScale"]
-
-                    if self.lastPayloadFromKeyboard["toggleOpenner"]:
-                        self.SManager.openner.toggle()
-                    if self.lastPayloadFromKeyboard["toggleRotater"]:
-                        self.SManager.rotater.toggle()
 
                     thrusterSpeeds = self.TManager.getTSpeeds(reqMotion, reqRotation, thrustScale)
 
@@ -120,7 +156,7 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None
-    controls = Controls(offshoreEnabled=False)
+    # controls = Controls(offshoreEnabled=False)
 
 
     requestQueue = queue.Queue()

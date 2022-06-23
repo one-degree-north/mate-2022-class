@@ -35,6 +35,7 @@ class RotationAxis():
         print(f"targetValue changed from {self.targetValue} to", end=" ")
         self.targetValue = (self.targetValue + extent) % 360
         print(f"{self.targetValue}")
+        time.sleep(0.25) # not ideal, can't find a fix right now...
         
     def tare(self):
         self.targetValue = self.errorHistory[-1]
@@ -68,7 +69,7 @@ class PIDController():
 
         self.pitch = RotationAxis(interval)
         self.roll = RotationAxis(interval)
-        self.yaw = RotationAxis(interval)
+        self.yaw = RotationAxis(interval, kp=-0.001)
 
         self.y = TranslationAxis(interval)
 
@@ -81,6 +82,7 @@ class PIDController():
         self.sendNewRequest = False
         self.isActive = True
         self.fullAuto = False
+        self.override = False
 
     def updateOrientation(self, orientationData=None):
         if self.controlsConnected:
@@ -133,11 +135,13 @@ class PIDController():
     def startSendingRequests(self):
         def sendRequests():
             while True:
+                if self.override:
+                    self.moveForward()
 
                 if self.sendNewRequest and self.isActive:
                     # print("sending")
                     self.requestQueue.put(
-                        Message("automation", {"reqRotation": self.calcForces()})
+                        Message("automation", {"reqRotation": self.calcForces(), "reqMotion": None})
                     )
                     self.sendNewRequest = False
                 time.sleep(self.interval * 0.001)
@@ -146,27 +150,15 @@ class PIDController():
         self.sendRequestsThread.start()
 
     def calcForces(self):
-        return (
-            round(self.roll.force(), 5),
-            round(self.pitch.force(), 5),
-            round(self.yaw.force(), 5),
-        )
+        return (self.roll.force(),
+                self.pitch.force(),
+                self.yaw.force(),)
 
-    def moveForward(self, reqDistance):
-        self.initialDisplacement = self.y.displacement
-        while (self.y.displacement - self.initialDisplacement) < reqDistance:
-            # print("doing this")
-            power = (reqDistance - abs(self.y.displacement - self.initialDisplacement)) / reqDistance
-            # print(f"Difference: {power}")
-            
-            self.requestQueue.put(
-                        Message("automation", {"reqRotation": (0, round(power, 2), 0)})
-                    )
-            time.sleep(self.interval * 0.001)
-        self.requestQueue.put(
-                        Message("automation", {"reqRotation": (0, 0, 0)})
-                    )
-        print("done!")
+    def moveForward(self):
+        while self.override:
+            self.requestQueue.put(Message("automation", {"reqMotion": (0, 1, 0), "reqRotation": self.calcForces()}))
+            print("Moving forward")
+        print("Finished!\n\n")
 
     def shiftTargetRight(self):
         self.yaw.shiftTarget(90)
@@ -174,6 +166,10 @@ class PIDController():
 
     def shiftTargetLeft(self):
         self.yaw.shiftTarget(-90)
+        self.sendNewRequest = True
+
+    def shiftTargetBy(self, degrees):
+        self.yaw.shiftTarget(degrees)
         self.sendNewRequest = True
 
     def start(self):
