@@ -27,7 +27,7 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            print(f"gyro data: {self.gyroData}")
+            # print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
