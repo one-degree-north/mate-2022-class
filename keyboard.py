@@ -1,5 +1,4 @@
 
-from re import A
 from pynput import keyboard
 
 from dataclasses import dataclass
