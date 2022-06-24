@@ -11,8 +11,16 @@ struct Input{
   uint8_t paramNum;
   uint8_t values[6];
 };
-
-int thrusterPins[] = {4, 3, 6, 7, 8, 5};
+//int thrusterPins[] = {4, 7, 6, 3, 8, 5};
+//0: FL
+//1: MR
+//2: BR
+//3: BL
+//4: ML
+//5: FR
+//int thrusterPins[] = {4, 5, 8, 3, 7, 6}
+int thrusterPins[] = {4, 5, 7, 6  8, 3};
+//int thrusterPins[] = {4, 3, 6, 7, 8, 5};
 Servo thrusters[6];
 int servoPins[] = {11, 10};
 Servo clawServos[2];
