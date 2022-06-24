@@ -100,10 +100,17 @@ class AutomationControlBar(QWidget):
     def photomosaic(self):
         # print('photomosaic')
         # pass
-        selections, _ = QFileDialog.getOpenFileNames(self, 'Select 8 images', 'captures/IMAGES', 'Images (*.png *.jpg)')
-        if len(selections) == 8:
-            split_selections = "\n".join(selections)
-            self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\n{split_selections}')
-
-            Photomosaic(selections)
+        selections = []
+        while len(selections) != 8:
+            selection, _ = QFileDialog.getOpenFileName(self, f'Select image ({len(selections)}/8)', 'captures/IMAGES', 'Images (*.png *.jpg)')
+            
+            if selection:
+                selections.append(selection)
+                self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\nAppended ({len(selections)}): {selection}')
+            else:
+                self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\nexit')
+                return
+            
+        self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\n{selections}')
+        Photomosaic(selections)
 
