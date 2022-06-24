@@ -41,6 +41,13 @@ if __name__ == '__main__':
     window = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
     # u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
 
+
+    try:
+        os.mkdir('automation-images')
+        logging.warning('No automation images directory detected; one has been generated for you!')
+    except FileExistsError:
+        pass
+
     try:
         os.mkdir('captures')
         logging.warning('No captures directory detected; one has been generated for you!')

@@ -1,4 +1,5 @@
 captures
+automation-images
 testing
 __pycache__/
 *.pyc

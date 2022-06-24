@@ -3,6 +3,8 @@ from PyQt5.QtCore import Qt
 
 from .button import Button
 
+import cv2
+import numpy as np
 import sys
 sys.path.append('..')
 
@@ -112,5 +114,6 @@ class AutomationControlBar(QWidget):
                 return
             
         self.parent.selection.scrolling_label.setText(f'PHOTOMOSAIC\n{selections}')
-        Photomosaic(selections)
+        photomosaic = Photomosaic(selections)
+        cv2.imwrite('automation-images/', np.asarray(photomosaic))
 
