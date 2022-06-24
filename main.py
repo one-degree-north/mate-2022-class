@@ -24,8 +24,8 @@ def unify_listener():
             sleep(0.01)
 
 if __name__ == '__main__':
-    controls = None  
-    # controls = Controls(offshoreEnabled=False)
+    # controls = None  
+    controls = Controls(offshoreEnabled=False)
     # controls.comms.startThread()
 
     with open('settings.yml', 'r') as f:
