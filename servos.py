@@ -35,13 +35,13 @@ class ServoManager():
 
 if __name__ == "__main__":
     from controls import Controls
-    controls = Controls()
+    controls = Controls(offshoreEnabled=False)
     #controls.comms.startThread()
 
     s = ServoManager(controls=controls)
     while True:
         test = input(">\n")
-        s.rotater.toggle()
+        s.openner.toggle()
     s.openner.toggle()
 
 

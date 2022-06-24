@@ -1,5 +1,4 @@
 
-from re import A
 from pynput import keyboard
 
 from dataclasses import dataclass
@@ -58,13 +57,13 @@ class KeyboardManager():
 
             "t": Key(Action.toggleAuto),
 
-            "c": Key(Action.shiftPIDTarget, 15),
-            "v": Key(Action.shiftPIDTarget, 90),
-            "x": Key(Action.shiftPIDTarget, -15),
-            "z": Key(Action.shiftPIDTarget, -90),
+            # "c": Key(Action.shiftPIDTarget, 15),
+            # "v": Key(Action.shiftPIDTarget, 90),
+            # "x": Key(Action.shiftPIDTarget, -15),
+            # "z": Key(Action.shiftPIDTarget, -90),
 
-            "b": Key(Action.temp),
-            "n": Key(Action.temp2),
+            # "b": Key(Action.temp),
+            # "n": Key(Action.temp2),
         }
         
 

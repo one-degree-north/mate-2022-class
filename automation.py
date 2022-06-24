@@ -89,12 +89,20 @@ class PIDController():
             orientationData = self.controls.orientationData
         else:
             orientationData = [0, 0, 0]
+        # print("heloooooooooooooooooo\n\n\n\n")
+        # print(f"Orientation Data from controls: {self.controls.orientationData}")
         # orientationData = self.controls.orientationData
         if orientationData != self.lastOrientationReading:
             # print("updateding")
+
+            # old values
+            # self.yaw.update(orientationData[0])
+            # self.pitch.update(orientationData[1])
+            # self.roll.update(orientationData[2])
+
             self.yaw.update(orientationData[0])
-            self.pitch.update(orientationData[1])
-            self.roll.update(orientationData[2])
+            self.pitch.update(orientationData[2])
+            self.roll.update(-orientationData[1])   
 
             self.lastOrientationReading = [orientationData[0], orientationData[1], orientationData[2]]
             self.sendNewRequest = True
@@ -185,7 +193,7 @@ if __name__ == "__main__":
     from controls import Controls
     import queue
     controls = None
-    # controls = Controls(onshoreEnabled=False)
+    controls = Controls(onshoreEnabled=False)
     # controls.comms.startThread()
     
     pidC = PIDController(10, controls=controls, requestQueue=queue.Queue())

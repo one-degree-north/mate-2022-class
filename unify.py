@@ -15,7 +15,6 @@ class Unify():
         self.KManager = KeyboardManager(requestQueue=requestQueue)
         self.SManager = ServoManager(controls=controls)
         self.pidC = PIDController(interval, controls=controls, requestQueue=requestQueue)
-        self.pidC.override = True
         
         self.requestQueue = requestQueue
         self.guiQueue = guiQueue
@@ -136,7 +135,7 @@ class Unify():
         self.pidC.start()
         # print("doing this")
 
-        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=True)
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=False)
         self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
@@ -156,7 +155,7 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None
-    # controls = Controls(offshoreEnabled=False)
+    controls = Controls()
 
 
     requestQueue = queue.Queue()
