@@ -55,7 +55,7 @@ class KeyboardManager():
             "e": Key(Action.toggleOpen),
             "r": Key(Action.toggleRotate),
 
-            "t": Key(Action.toggleAuto),
+            # "t": Key(Action.toggleAuto),
 
             # "c": Key(Action.shiftPIDTarget, 15),
             # "v": Key(Action.shiftPIDTarget, 90),
