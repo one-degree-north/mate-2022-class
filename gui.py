@@ -26,12 +26,13 @@ class MainWindow(QMainWindow):
             }
         """)
 
-        self.grid = CameraGrid(self, front_port, down_port)
         self.control = ControlBar(self)
         self.status = StatusBar()
         self.stopwatch = Stopwatch()
         self.stopwatch_control = StopwatchControlBar(self)
         self.capture_control = CaptureControlBar(self)
+
+        self.grid = CameraGrid(self, front_port, down_port)
 
         self.console = ConsoleModule(self)
         self.console.hide()
