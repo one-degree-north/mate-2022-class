@@ -130,7 +130,7 @@ def testOrientationData():
     controls.setAccelAutoreport(0)
     controls.setGyroAutoreport(0)
     while True:
-        # print(f"orientation: {controls.orientationData}")
+        print(f"orientation: {controls.orientationData}")
         time.sleep(0.01)
 
 def testClaw():
