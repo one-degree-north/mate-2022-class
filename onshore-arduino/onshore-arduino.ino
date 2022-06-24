@@ -19,7 +19,7 @@ struct Input{
 //4: ML
 //5: FR
 //int thrusterPins[] = {4, 5, 8, 3, 7, 6}
-int thrusterPins[] = {4, 5, 7, 6  8, 3};
+int thrusterPins[] = {4, 5, 7, 6, 8, 3};
 //int thrusterPins[] = {4, 3, 6, 7, 8, 5};
 Servo thrusters[6];
 int servoPins[] = {11, 10};
