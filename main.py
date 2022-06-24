@@ -25,7 +25,7 @@ from controls import Controls
 
 if __name__ == '__main__':
     controls = None  
-    # controls = Controls()
+    controls = Controls(offshoreEnabled=False)
     # controls.comms.startThread()
 
     with open('settings.yml', 'r') as f:
