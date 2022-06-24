@@ -7,7 +7,7 @@ class Controls:
         #self.movements = Movements()
         #self.gyroData = GyroData()
         #self.accelData = AccelData()
-        self.reversed = [0, 2, 3, 4, 5]
+        self.reversed = [0, 2, 3, 4, 5] #remove one
         self.gyroData = [0, 0, 0] #rad/s
         self.orientationData = [0, 0, 0] #EULER: yaw (0-360), pitch (values are a bit weird, -90 to 90), roll (-180 to 180), may try using gyro instead of euler later
         self.accelData = [0, 0, 0] #m/s^2
