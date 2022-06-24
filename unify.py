@@ -135,7 +135,7 @@ class Unify():
         self.pidC.start()
         # print("doing this")
 
-        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=True)
+        self.readRequestThread = threading.Thread(target=self.readRequestQueue, daemon=False)
         self.readRequestThread.start()
 
     def getAverage(self, kData, aData):
@@ -155,7 +155,7 @@ class Unify():
 
 if __name__ == "__main__":  
     controls = None
-    controls = Controls(offshoreEnabled=True)
+    # controls = Controls(offshoreEnabled=True)
 
 
     requestQueue = queue.Queue()

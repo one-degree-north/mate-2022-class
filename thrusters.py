@@ -2,9 +2,9 @@
 class ThrustManager():
     def __init__(self, controls=None, multiplier=1):
         self.thrusters = [
-            # Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
-            Thruster(pin=1, power=(0, 0, 1), position=( 0, 1)),
-            Thruster(pin=2, power=(0, 0, 1), position=(-1,-1)),
+            Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
+            # Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
+            # Thruster(pin=2, power=(0, 0, 1), position=(-1,-1)),
             Thruster(pin=3, power=(0, 0, 1), position=( 1,-1)),
             Thruster(pin=4, power=(1, 1, 0), position=(-1, 0)),
             Thruster(pin=5, power=(1, 1, 0), position=( 1, 0)),
