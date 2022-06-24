@@ -7,7 +7,7 @@ from message import Message
 
 
 class RotationAxis():
-    def __init__(self, interval, kp=-0.01, ki=-0.005, kd=-0.005):
+    def __init__(self, interval, kp=-0.005, ki=-0.005, kd=-0.005):
         self.interval = interval
         self.kp = kp
         self.ki = ki
@@ -90,7 +90,7 @@ class PIDController():
         else:
             orientationData = [0, 0, 0]
         # print("heloooooooooooooooooo\n\n\n\n")
-        # print(f"Orientation Data from controls: {self.controls.orientationData}")
+        print(f"Orientation Data from controls: {self.controls.orientationData}")
         # orientationData = self.controls.orientationData
         if orientationData != self.lastOrientationReading:
             # print("updateding")

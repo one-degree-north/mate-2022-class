@@ -16,7 +16,6 @@ class Action:
     shiftPIDTarget = 6
     temp = 7
     temp2 = 8
-    tare = 9
 
 class Key():
     def __init__(self, actionType, action=None):
@@ -64,10 +63,8 @@ class KeyboardManager():
             "x": Key(Action.shiftPIDTarget, -15),
             "z": Key(Action.shiftPIDTarget, -90),
 
-            # "b": Key(Action.temp),
-            # "n": Key(Action.temp2),
-
-            "p": Key(Action.tare),
+            "b": Key(Action.temp),
+            "n": Key(Action.temp2),
         }
         
 
@@ -87,7 +84,6 @@ class KeyboardManager():
         targetShiftAmount = 0
         temp = False
         temp2 = False
-        tare = False
 
 
         payload = {
@@ -100,7 +96,6 @@ class KeyboardManager():
             "targetShiftAmount": 0,
             "temp": False,
             "temp2": False,
-            "tare": False,
         }
         for keyString, key in self.keys.items():
             if key.isDown:
@@ -122,8 +117,6 @@ class KeyboardManager():
                     temp = True
                 elif key.actionType == Action.temp2:
                     temp2 = True
-                elif key.actionType == Action.tare:
-                    tare = True
 
 
         payload["reqMotion"] = reqMotion
@@ -135,7 +128,6 @@ class KeyboardManager():
         payload["targetShiftAmount"] = targetShiftAmount
         payload["temp"] = temp
         payload["temp2"] = temp2
-        payload["tare"] = tare
 
         # print(f"{payload = }")
         self.requestQueue.put(Message("keyboard", payload))
