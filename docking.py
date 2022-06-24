@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
+import time
 
 class Docking:
-    def __init__(self, img_path):
+    def __init__(self, img_path, tm):
         self.img = cv2.imread(img_path)
         self.height, self.width, self.channels = self.img.shape
-        self.centre = (int(width/2), int(height/2))
+        self.centre = (int(self.width/2), int(self.height/2))
+        self.tm = tm
         
     def detect_diff(self):
         hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
@@ -31,9 +33,38 @@ class Docking:
             # turn left/right for 0.05 seconds
             # move forward for 0.15 seconds
             
+            # turning
+            if self.centre[0] > (x + 0.5 * w):  #check
+                self.tm.getTSpeeds((0, 0, 0), (0, 0,1), 1)    #turn right
+            else:
+                self.tm.getTSpeeds((0, 0, 0), (0, 0,-1), 1) #turn left
+            time.sleep(0.05)
+
+            # move forward
+            self.tm.getTSpeeds((0,1,0), (0,0,0), 1)
+            time.sleep(0.15)
+
+            # stop everything
+            self.tm.getTSpeeds((0, 0, 0), (0, 0, 0), 1)
+            
+
+            
         if abs(y + h/2 - self.centre[1]) > 0.1*self.height:
             # up/down for 0.05 seconds
-            # move forward for 0.15 secoinds
+
+            # move up
+            if self.centre[1] > (y + 0.5 * h):
+                self.tm.getTSpeeds((0, 0, -1), (0, 0, 0), 1)#down
+                time.sleep(0.05)
+            else:
+                self.tm.getTSpeeds((0, 0, 1), (0, 0, 0), 1) #up
+                time.sleep(0.05)
+
+            # move forward
+            self.tm.getTSpeeds((0, 1, 0), (0, 0, 0), 1)
+            time.sleep(0.15)
+
+            # move forward for 0.15 seconds
             
         if w >= self.width/2:
             return False
