@@ -154,8 +154,8 @@ class Unify():
         return output
 
 if __name__ == "__main__":  
-    controls = None
-    # controls = Controls(offshoreEnabled=False)
+    # controls = None
+    controls = Controls(offshoreEnabled=False)
 
 
     requestQueue = queue.Queue()
