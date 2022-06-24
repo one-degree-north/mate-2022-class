@@ -11,6 +11,7 @@ sys.path.append('..')
 from wreck_size import WreckSize
 from transect_line import TransectLine
 from photomosaic import Photomosaic
+from docking import Docking
 
 class AutomationControlBar(QWidget):
     def __init__(self, parent):
@@ -29,7 +30,6 @@ class AutomationControlBar(QWidget):
 
         self.docking_button = Button('ui/icons/docking_icon.png', 'Autonomous docking')
         self.docking_button.clicked.connect(self.docking)
-        self.docking_button.setDisabled(True)
 
         self.transect_button = Button('ui/icons/transect_icon.png', 'Transect line')
         self.transect_button.clicked.connect(self.transect)
@@ -40,6 +40,7 @@ class AutomationControlBar(QWidget):
 
         self.measure_button = Button('ui/icons/measure_icon.png', 'Measure fish size')
         self.measure_button.clicked.connect(self.measure)
+        self.measure_button.setDisabled(True)
 
         self.endurance_button = Button('ui/icons/Endurance_icon.png', 'Transect over Endurance area')
         self.endurance_button.clicked.connect(self.endurance)
@@ -70,8 +71,12 @@ class AutomationControlBar(QWidget):
 
 
     def docking(self):
-        print('dock')
-        pass
+        selection, _ = QFileDialog.getOpenFileName(self, 'Select image', 'captures/IMAGES', 'Images (*.png *.jpg)')
+
+        if selection:
+            self.parent.selection.scrolling_label.setText(f'DOCKING\n{selection}')
+
+            Docking(selection, None)
 
     def transect(self):
         TransectLine(self.parent.parent.grid.down_cam.thread.cap, 0.1)
