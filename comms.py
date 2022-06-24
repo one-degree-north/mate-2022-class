@@ -20,14 +20,16 @@ class AccelData:
     zAccel: float = 0
 
 class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
-    def __init__(self, controls=None, outputQueue=None):
+    def __init__(self, controls=None, outputQueue=None, onshoreEnabled=True, offshoreEnabled=True):
+        self.onshoreEnabled = onshoreEnabled
+        self.offshoreEnabled= offshoreEnabled
         ports = list_ports.comports()
         offshorePort = "/dev/cu.usbmodem142101"
         onshorePort = "/dev/cu.usbserial-142101"
         for port in ports:
             print(f"product: {port.product}")
             print(f"device: {port.device}")
-            if port.product == "QT Py M0":
+            if port.product == "QT Py M0" or port.product == "FT232R USB UART":
                 print(f"QT Py found")
                 offshorePort = port.device
             #elif port.description == "FT232R USB UART - FT232R USB UART":
@@ -38,9 +40,12 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
                 onshorePort = port.device
             #elif port.description == "USB Serial":
             #    onshorePort = port.device
-
-        self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
-        self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
+        self.offshoreArduino = None
+        self.onshoreArduino = None
+        if self.offshoreEnabled:
+            self.offshoreArduino = Serial(port=f"{offshorePort}", baudrate=115200)
+        if self.onshoreEnabled:
+            self.onshoreArduino = Serial(port=f"{onshorePort}", baudrate=115200)
         self.thrusterPins = [0, 1, 2, 3, 4, 5]  #maps thruster position via index to pins. [midL, midR, frontL, frontR, backL, backR]
         self.thrusterPWMs = []
         self.gyroData = GyroData()
@@ -73,13 +78,14 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         footerFound = False
         headerFound = False
         while (not headerFound):
-            #print(currByte)
-            #print(currByte == b'\xAB')
+            # print(currByte)
             if (currByte == self.HEADER):
-                #print("header found")
+                # print("header found")
                 headerFound = True
-                returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
-                #print(returnValue)
+                #returnValue = self.offshoreArduino.read_until(expected=self.FOOTER, size=14) #probably set timeout as well
+                returnValue = self.offshoreArduino.read(size=14)
+                # print(returnValue)
+                # print(len(returnValue))
                 if (returnValue[-1] == int.from_bytes(self.FOOTER, "big")):
                     #print("footer found")
                     footerFound=True
@@ -97,20 +103,16 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
 
     def writeOutput(self, output):
         #print(output)
-        if (output[0] == 0):
+        if output[0] == 0 and self.offshoreEnabled:
+            print(output)
             self.offshoreArduino.write(self.HEADER)
             for value in output[1]:
-                print(value)
                 self.offshoreArduino.write(value)
             self.offshoreArduino.write(self.FOOTER)
-        else:
+        elif self.onshoreEnabled:
             self.onshoreArduino.write(self.HEADER)
             self.onshoreArduino.write(output[1][0])
-            """for value in output[0][1]:
-                print(value)
-                self.onshoreArduino.write(value)"""
             for value in output[1][1]:
-                print(value)
                 self.onshoreArduino.write(value)
             self.onshoreArduino.write(self.FOOTER)
 
@@ -119,9 +121,9 @@ class Comms:    #COMMENTING THINGS OUT FOR TEST ON LAPTOP
         while self.threadActive:
             # print("doing this too")
             # print(f"{self.offshoreArduino.in_waiting = }")
-            if (self.offshoreArduino.in_waiting >= 15):
-                self.controls.handleInput(self.readOffshore())
-            if (not self.outputQueue.empty()):
+            if self.offshoreEnabled and self.offshoreArduino.in_waiting >= 15:
+               self.controls.handleInput(self.readOffshore())
+            if not self.outputQueue.empty():
                 self.writeOutput(self.outputQueue.get())
 
             # time.sleep(1)

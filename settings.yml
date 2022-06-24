@@ -1,0 +1,6 @@
+camera-ports:
+  front: 1
+  down: 2
+
+serial-port: "/dev/"
+baud-rate: 115200

@@ -66,8 +66,10 @@ def turn(direction):
     
     if direction == left:
         #packet = 
+        pass
     elif direction == right:
         #packet = 
+        pass
         
     send_packet()
     time.sleep((len(packet)+2)/baud_rate)

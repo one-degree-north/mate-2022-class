@@ -1,21 +1,9 @@
-from dataclasses import dataclass
+
 from comms import Comms
-import queue
-
-@dataclass
-class GyroData:
-    xOrientation:float = 0
-    yOrientation:float = 0
-    zOrientation:float = 0
-
-@dataclass
-class AccelData:
-    xAccel:float = 0
-    yAccel:float = 0
-    zAccel:float = 0
+import queue, time
 
 class Controls:
-    def __init__(self):
+    def __init__(self, gyroAutoreport=10, accelAutoreport=10, orientationAutoreport=10, onshoreEnabled=True, offshoreEnabled=True):
         #self.movements = Movements()
         #self.gyroData = GyroData()
         #self.accelData = AccelData()
@@ -24,11 +12,12 @@ class Controls:
         self.orientationData = [0, 0, 0] #EULER: yaw (0-360), pitch (values are a bit weird, -90 to 90), roll (-180 to 180), may try using gyro instead of euler later
         self.accelData = [0, 0, 0] #m/s^2
         self.outputQueue = queue.Queue()
-        self.comms = Comms(controls=self, outputQueue=self.outputQueue)
-        #self.thrusterValues = [0, 0, 0, 0, 0, 0]
-
-    #def applyMovements(self):
-    #    thrusterValues = [0, 0, 0, 0, 0, 0]
+        self.comms = Comms(controls=self, outputQueue=self.outputQueue, onshoreEnabled=onshoreEnabled, offshoreEnabled=offshoreEnabled)
+        self.comms.startThread()
+        self.setAccelAutoreport(accelAutoreport)
+        self.setGyroAutoreport(gyroAutoreport)
+        self.setOrientationAutoreport(orientationAutoreport)
+        
 
     def handleInput(self, input):
         # print("This is being run")
@@ -38,15 +27,18 @@ class Controls:
         if (input[0] == b'\x20'):   #GYRO output (degrees)
             for i in range(3):
                 self.gyroData[i] = input[i+1]
-            print(f"gyro data: {self.gyroData}")
+            # print(f"gyro data: {self.gyroData}")
         elif (input[0] == b'\x10'):   #ACCEL output (m/s^2)
             for i in range(3):
                 self.accelData[i] = input[i+1]
-            #print(f"accel data: {self.accelData}")
+            # print(f"accel data: {self.accelData}")
         else:
             for i in range(3):
-                self.orientationData[i] = input[i+1]
-            #print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
+                if (i == 0):
+                   self.orientationData[i] = input[i+1] - 180
+                else:
+                    self.orientationData[i] = input[i+1]
+            # print(f"orientation data: {self.orientationData[0]}\n{self.orientationData[1]}\n{self.orientationData[2]}\n")
         return 1
 
     def applyJoystickOutput(self, joyData):
@@ -76,12 +68,24 @@ class Controls:
 
     def rotateClaw(self, deg):  #input values between 0 and 90 (0 is horizontal, 90 is vertical)
         #values between 90-160
-        outputVal = int((deg*7/9)+90)
+        if deg < 0:
+            deg = 0
+        if deg > 90:
+            deg = 90
+        #outputVal = int((deg*7/9)+90)
+        outputVal = int(deg*2)
+        print("BBB")
+        print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x5A, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
     def moveClaw(self, deg):    #input values between 0 and 1 (0 is fully closed, 1 is fully open)
         #match to values between 180-117
-        outputVal = int((deg*63)+117)
+        if deg < 0:
+            deg = 0
+        if deg > 1:
+            deg = 1
+        outputVal = int(deg*180)
+        #outputVal = int((deg*63)+117)
         print(outputVal)
         self.outputQueue.put((1, (int.to_bytes(0x1C, 1, "big"), [int.to_bytes(outputVal, 1, "big")])))
 
@@ -106,11 +110,9 @@ class Controls:
     def resetOffshore(self):
         self.outputQueue.put((0, (int.to_bytes(0x40, 1, "big"), int.to_bytes(0, 1, "big"))))
 
-if __name__ == "__main__":
-    controls = Controls()
-    controls.comms.startThread()
-    controls.resetOffshore()
-    """inputNum = 0
+
+def testThrusters():
+    controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
     inputs = [0, 0, 0, 0, 0, 0]
     while True:
         print("index")
@@ -120,18 +122,20 @@ if __name__ == "__main__":
         inputs[index] = value
         print(inputs)
         controls.writeAllThrusters(inputs)
-        inputs = [0, 0, 0, 0, 0,0]"""
-    
-    """while True:
-        print(f"thrusterNum: {inputNum}")
-        inputs[inputNum] = float(input())
-        if inputNum >= 5:
-            print(inputs)
-            controls.writeAllThrusters(inputs)
-            inputNum = 0
-        inputNum += 1"""
-    
-    """while True:
+        inputs = [0, 0, 0, 0, 0,0]
+
+def testOrientationData():
+    controls = Controls(orientationAutoreport=0, accelAutoreport=0, gyroAutoreport=0, onshoreEnabled=False, offshoreEnabled=True)
+    controls.setOrientationAutoreport(100)
+    controls.setAccelAutoreport(0)
+    controls.setGyroAutoreport(0)
+    while True:
+        #print(f"orientation: {controls.orientationData}")
+        time.sleep(0.01)
+
+def testClaw():
+    controls = Controls(onshoreEnabled=True, offshoreEnabled=False)
+    while True:
         servo = int(input("servoNum"))
         deg = float(input("deg\n"))
         if (servo == 0):
@@ -139,7 +143,13 @@ if __name__ == "__main__":
             controls.moveClaw(deg)
         else:
             print("rotateClaw")
-            controls.rotateClaw(deg)"""
-        #controls.rotateClaw(deg)
-    #controls.setAccelAutoreport(100)
-    controls.comms.readThread()
+            controls.rotateClaw(deg)
+
+def reset():
+    controls = Controls(orientationAutoreport=0, accelAutoreport=0, gyroAutoreport=0, onshoreEnabled=False, offshoreEnabled=True)
+    controls.resetOffshore()        
+
+if __name__ == "__main__":
+    testOrientationData()
+    # testThrusters()
+    # testOrientationData()

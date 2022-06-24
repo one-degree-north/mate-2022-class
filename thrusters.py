@@ -1,22 +1,23 @@
-from math import floor
-
 
 class ThrustManager():
-    def __init__(self, multiplier=1, controls=None):
+    def __init__(self, controls=None, multiplier=1):
         self.thrusters = [
-            Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
-            Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
+            # Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
+            Thruster(pin=1, power=(0, 0, 1), position=( 0, 1)),
             Thruster(pin=2, power=(0, 0, 1), position=(-1,-1)),
             Thruster(pin=3, power=(0, 0, 1), position=( 1,-1)),
             Thruster(pin=4, power=(1, 1, 0), position=(-1, 0)),
             Thruster(pin=5, power=(1, 1, 0), position=( 1, 0)),
         ]
 
-        self.multiplier = multiplier
         self.controls = controls
+        if controls == None:
+            print("\nMessage from Thrusters:\n\tControls not connected")
+
+        self.multiplier = multiplier
         self.x, self.y, self.z = 0, 1, 2
 
-    def getTSpeeds(self, reqMotion, reqRotation, scale=1, normalizeZ=True, normalizeY=True):
+    def getTSpeeds(self, reqMotion, reqRotation, thrustScale, normalizeZ=True, normalizeY=True):
         if reqMotion[2] == 0:
             normalizeZ = False
         if reqMotion[1] == 0:
@@ -38,7 +39,7 @@ class ThrustManager():
                     if speed != 0:
                         divisor += 1
                 try:
-                    output[thruster.pin] = scale * self.multiplier * sum(speeds) / divisor
+                    output[thruster.pin] = thrustScale * self.multiplier * sum(speeds) / divisor
                 except ZeroDivisionError:
                     output[thruster.pin] = divisor
 
@@ -57,7 +58,7 @@ class ThrustManager():
                 bump = 0
             
             for pin, value in axisDict.items():
-                output[pin] = scale * self.multiplier * (value + bump)
+                output[pin] = thrustScale * self.multiplier * (value + bump)
 
 
         thrusterSpeeds = []
@@ -67,12 +68,13 @@ class ThrustManager():
         if self.controls != None:
             self.controls.writeAllThrusters(thrusterSpeeds)
         else:
-            print("WARNING: Controls not connected...")
+            pass
 
         return output
 
-
-
+    def displayTSpeeds(speeds):
+        for pin in sorted(list(speeds.keys()), reverse=False):
+            print(f"{pin=} -> {round(speeds[pin], 5)}")
 
 class Thruster():
     def __init__(self, pin, power, position):
@@ -119,13 +121,15 @@ class Thruster():
         return forRotation
 
 def displayTSpeeds(speeds):
+    
     for pin in sorted(list(speeds.keys()), reverse=False):
         print(f"{pin=} -> {round(speeds[pin], 5)}")
+    print()
 
 def sendStopSignal(q):
     q.put(["s", ()])
 
 if __name__ == "__main__":
     TManager = ThrustManager()
-    displayTSpeeds(TManager.getTSpeeds((0,1,1), (0,0,0)))
+    displayTSpeeds(TManager.getTSpeeds((0,0,0), (0,1,0), 1))
     
