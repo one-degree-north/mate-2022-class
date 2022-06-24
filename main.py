@@ -24,7 +24,7 @@ from controls import Controls
 #             sleep(0.01)
 
 if __name__ == '__main__':
-    # controls = None  
+    controls = None  
     # controls = Controls()
     # controls.comms.startThread()
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     guiQueue = queue.Queue()
 
     window = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
-    # u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
+    u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
 
     try:
         os.mkdir('captures')
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     logging.info('Successfully loaded Crimson UI')
 
     window.show()
-    # u.start()
+    u.start()
 
     sys.exit(app.exec())
 
