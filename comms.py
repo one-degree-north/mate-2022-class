@@ -1,5 +1,6 @@
 #import RPi.GPIO as GPIO
 from dataclasses import dataclass
+from this import d
 from serial import *
 from serial.tools import list_ports
 import threading, struct

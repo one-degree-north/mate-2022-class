@@ -16,13 +16,19 @@ IPAddress espLocalIP;
 WiFiClient connectedClients[4]; //maximum of 4 connections
 bool openClients[4];
 int clientIndex = 0;
-int dc = 40;  //percentage, duty cycle is between 20% and 100% (I assume 20% is off)
+int dc = 20;  //percentage, duty cycle is between 20% and 100% (I assume 20% is off)
+double cycleLength;
+double onLength;
+double currCycle = 0;
+unsigned long timerStart = 0;
+unsigned long duration = 0;
+bool timerEnabled = false;
 
 typedef struct{  //0:Header 1:Command 2:Data 3:Footer
     WiFiClient currClient;
     int clientIndex;
     uint8_t command;
-    uint8_t values[2];
+    uint8_t values[3];
 }input_t;
 
 typedef struct{
@@ -37,17 +43,25 @@ void setup() {
   WiFi.softAP("RESIGNMATE!!!", "crimsoncrimson");
   server.begin();
   espLocalIP = WiFi.localIP();
-  autoreportData.pressureDelay = 10;
+  autoreportData.pressureDelay = 10;  //default report time of 10 millis
   autoreportData.pressureTime = 0;
   Serial.begin(115200);
-
+  cycleLength = 1/FREQUENCY;
+  setDC(20);
   for (int i = 0; i < 4; i++){
     openClients[i] = true;
   }
 }
 
 void loop() {
-  
+  for (int i = 0; i < 4; i++){
+    if (!openClients[i]){
+      WiFiClient currClient = connectedClients[i];
+      if (!currClient.connected()){
+        openClients[i] = true;
+      }
+    }
+  }
   if (WiFiClient connectedClient = server.available()){ //new client connection
     Serial.print("connection with");
     Serial.println(connectedClient.localIP());
@@ -61,22 +75,39 @@ void loop() {
         break;
       }
     }
-    if (!openSlot){
-      Serial.println("too many clients");
-      connectedClient.stop();
+    if (!openSlot){ //maybe kick a client instead?
+      Serial.println("too many clients, kicking 1st index slot"); //cant be bothered to find longest / least connected client
+      connectedClients[1].stop();
+      connectedClients[1] = connectedClient;
     }
-  }
-  for (int i = 0; i < 4; i++){
-    WiFiClient currClient = connectedClients[i];
-    
   }
   for (int i = 0; i < 4; i++){  //iterate through connections, read input
-    WiFiClient currClient = connectedClients[i];
-    if (currClient.available() >= 5){
-      Serial.println("reading input");
-      getInput(currClient, i);
+    if (!openClients[i]){
+      WiFiClient currClient = connectedClients[i];
+      if (currClient.available() >= 6){ //1: header, 2: command, 3-6
+        Serial.println("reading input");
+        getInput(currClient, i);
+      }
     }
   }
+}
+
+void moveDownSpecifiedTime(input_t *input){
+  timerEnabled = true;
+  timerStart = millis();
+  duration = (((uint16_t)input->values[0])<<8) + input->values[1];
+  setDC(input->values[2]);
+}
+
+void moveDown(input_t *input){
+  timerEnabled = false;
+  setDC(input->values[0]);
+}
+
+void haltPump(){
+  timerEnabled = false;
+  timerStart = 0;
+  turnPumpOff();
 }
 
 void setDC(uint8_t newDC){
@@ -85,6 +116,11 @@ void setDC(uint8_t newDC){
 }
 
 void writePWM( unsigned long deltaTime){  //dc ranges from 20-100
+  if (timerEnabled){
+    if(millis() - timerStart > duration){
+      haltPump();
+    }
+  }
   currCycle += deltaTime;
   if (currCycle > cycleLength){
     currCycle -= cycleLength;
@@ -95,6 +131,17 @@ void writePWM( unsigned long deltaTime){  //dc ranges from 20-100
   else{
     digitalWrite(PUMP_PIN, LOW);
   }
+}
+
+void echo(input_t *input){
+  WiFiClient currClient = input->currClient;
+  currClient.write(HEADER);
+  currClient.write(0x41);
+  currClient.write(input->values[0]);
+  currClient.write(input->values[1]);
+  currClient.write(input->values[2]);
+  currClient.write(0);
+  currClient.write(FOOTER);
 }
 
 void turnPumpOn(){
@@ -114,7 +161,7 @@ bool getInput(WiFiClient currClient, int clientIndex){
     Serial.println(input);
     if ((i == 0 && input != HEADER) || (i == 4 && input != FOOTER)){
       Serial.println("no header found");
-      writeCommandFailure(currClient);
+      //writeCommandFailure(currClient);
       failed = true;
       return false;
     }
@@ -127,11 +174,11 @@ bool getInput(WiFiClient currClient, int clientIndex){
     input.command = inputs[1];
     input.values[0] = inputs[2];
     input.values[1] = inputs[3];
+    input.values[2] = inputs[4];
     executeCommand(&input);
     return true;
   }
   else{
-    writeCommandFailure(currClient);
     return false;
   }
   //can I cast inputs into input_t? Will padding and other stuff be an issue?
@@ -143,40 +190,51 @@ void executeCommand(input_t *input){
   switch (input->command){
     case 0x10:  //stop pump
       commandFound = true;
+      Serial.println("halting");
+      haltPump();
       //input->currClient.write()
     break;
-    case 0x15:  //move down for x seconds and y speed
+    case 0x15:  //move down for x seconds and y speed then move up
       commandFound = true;
+      Serial.println("moving down 0x15");
+      Serial.println(input->values[0]);
+      Serial.println(input->values[1]);
+
+      moveDownSpecifiedTime(input);
     break;
     case 0x23:  //set pressure autoreport in milliseconds
     {
       commandFound = true;
       uint16_t reportDelay = (((uint16_t)input->values[0])<<8)+input->values[1];
+      Serial.println("pressure autoreport");
+      Serial.println(reportDelay);
       autoreportData.pressureDelay = reportDelay;
       
-      input->currClient.write(input->values[0]);
+      /*input->currClient.write(input->values[0]);
       input->currClient.write(input->values[1]);
       Serial.println("RECVpressure autoreport");
-      Serial.println(reportDelay);
+      Serial.println(reportDelay);*/
     }
     break;
     case 0x30:  //disconnect
       commandFound = true;
+      Serial.println("disconnect");
       input->currClient.stop();
       openClients[input->clientIndex] = true;
     break;
-    case 0x36:  //renew timeout
+    case 0x36:  //move down no duration limit
+      Serial.println("moving down");
       commandFound = true;
+      moveDown(input);
     break;
-    case 0x41:
+    case 0x41:  //echo
+      Serial.println("echoing");
       commandFound = true;
+      echo(input);
     break;
   }
-  if (commandFound){
-    writeCommandSuccess(input);
-  }
-  else{
-    writeCommandFailure(input->currClient);
+  if (!commandFound){
+    Serial.println("no valid command");
   }
 }
 
@@ -192,41 +250,17 @@ void pressureAutoreport(unsigned long deltaTime){
   }
 }
 
-void readWaterPressure(){
+void sendWaterPressure(WiFiClient currClient){
   //get water pressure data here
   float waterPressure;
   byte* byteCastWaterPressure = (byte*)&waterPressure;
   currClient.write(HEADER);
-  currCLient.write(0x18);
+  currClient.write(0x18);
   currClient.write(byteCastWaterPressure[0]);
   currClient.write(byteCastWaterPressure[1]);
   currClient.write(byteCastWaterPressure[2]);
   currClient.write(byteCastWaterPressure[3]);
   currClient.write(FOOTER);
-}
-
-void writeCommandFailure(WiFiClient currClient){
-  currClient.write(HEADER);
-  currClient.write(0x18);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(FOOTER);
-}
-
-void writeCommandSuccess(input_t *input){
-  currClient.write(HEADER);
-  currClient.write(0x34);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(0);
-  currClient.write(FOOTER);
-}
-
-void writeCommandExecute(input_t *input){  //does TCP already kind of give reliability, is echoing the whole command to certify reliability needed? Would a simple writeCommandSuccess sufice?
-
 }
 
 void sendPressureData(){
