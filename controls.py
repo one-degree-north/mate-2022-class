@@ -150,8 +150,8 @@ def reset():
     controls.resetOffshore()        
 
 if __name__ == "__main__":
-    testOrientationData()
+    # testOrientationData()
     # testClaw()
-    # testThrusters()
+    testThrusters()
     # testOrientationData()
     # reset()
