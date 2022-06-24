@@ -2,8 +2,8 @@
 class ThrustManager():
     def __init__(self, controls=None, multiplier=1):
         self.thrusters = [
-            Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
-            Thruster(pin=1, power=(0, 0, 1), position=( 1, 1)),
+            # Thruster(pin=0, power=(0, 0, 1), position=(-1, 1)),
+            Thruster(pin=1, power=(0, 0, 1), position=( 0, 1)),
             Thruster(pin=2, power=(0, 0, 1), position=(-1,-1)),
             Thruster(pin=3, power=(0, 0, 1), position=( 1,-1)),
             Thruster(pin=4, power=(1, 1, 0), position=(-1, 0)),
@@ -131,5 +131,4 @@ def sendStopSignal(q):
 
 if __name__ == "__main__":
     TManager = ThrustManager()
-    displayTSpeeds(TManager.getTSpeeds((0,1,1), (0,0,0)))
-    
+    displayTSpeeds(TManager.getTSpeeds((0,0,0), (0,1,0), 1))
