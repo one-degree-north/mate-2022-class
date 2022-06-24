@@ -12,8 +12,8 @@ struct Input{
   uint8_t values[6];
 };
 
-int thrusterPins[] = {4, 3, 6, 7, 8, 5};
-Servo thrusters[6];
+int thrusterPins[] = {4, 3, 6, 7, 8, 5};  //remove one of the thrusterPins
+Servo thrusters[5];
 int servoPins[] = {11, 10};
 Servo clawServos[2];
 
@@ -21,7 +21,7 @@ Adafruit_BNO055 bnoIMU = Adafruit_BNO055(55, 0x28);
 unsigned long pastMillis;
 
 void setup(){
-  for (int i = 0; i < 6; i++){
+  for (int i = 0; i < 5; i++){
     thrusters[i].attach(thrusterPins[i]);
   }
   for (int i = 0; i < 2; i++){
@@ -69,7 +69,7 @@ void readInput(){
 int getPacketLength(uint8_t command){
   switch (command){
     case 0x14:  //move all thrustesr
-      return 6;
+      return 5;
     case 0x1C:  //move claw servo
       return 1;
     case 0x5A:  //rotate claw servo
@@ -112,7 +112,7 @@ void writeOnshore(){  //Indicates that this board is the onshore board
 }
 
 void moveMultipleThrusters(Input inputValue){
-  for (int i = 0; i < 6; i++){
+  for (int i = 0; i < 5; i++){
     thrusters[i].writeMicroseconds(inputValue.values[i]*10);
   }
 }
