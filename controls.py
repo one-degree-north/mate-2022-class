@@ -53,6 +53,8 @@ class Controls:
     def writeAllThrusters(self, thrusterValues): #assuming thrusterValues is between -1 and 1
         modifiedThrusters = []
         for i in range(6):
+            if i == 1:
+                thrusterValues[i] = 0
             #print(thrusterValues[i])
             if i in self.reversed:
                 thrusterValues[i] *= -1
