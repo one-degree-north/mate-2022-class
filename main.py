@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication
 
 from gui import MainWindow
-from unify import Unify
+# from unify import Unify
 
 import sys
 import os
@@ -25,7 +25,7 @@ def unify_listener():
 
 if __name__ == '__main__':
     # controls = None  
-    controls = Controls(offshoreEnabled=False)
+    # controls = Controls(offshoreEnabled=False)
     # controls.comms.startThread()
 
     with open('settings.yml', 'r') as f:
@@ -35,11 +35,11 @@ if __name__ == '__main__':
     app = QApplication([])
     app.setStyle('Fusion')
 
-    requestQueue = queue.Queue()
+    # requestQueue = queue.Queue()
     guiQueue = queue.Queue()
 
     window = MainWindow(int(settings['camera-ports']['front']), int(settings['camera-ports']['down']))
-    u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
+    # u = Unify(requestQueue=requestQueue, guiQueue=guiQueue, interval=10, controls=controls)
 
 
     try:
@@ -66,13 +66,13 @@ if __name__ == '__main__':
     except FileExistsError:
         pass
 
-    unify_listener_thread = Thread(target=unify_listener, daemon=True)
-    unify_listener_thread.start()
+    # unify_listener_thread = Thread(target=unify_listener, daemon=True)
+    # unify_listener_thread.start()
 
     print('\033[92m\033[1mSuccessfully loaded Crimson UI\033[0m')
     logging.info('Successfully loaded Crimson UI')
 
     window.show()
-    u.start()
+    # u.start()
 
     sys.exit(app.exec())
